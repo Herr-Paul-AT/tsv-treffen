@@ -1,11 +1,13 @@
 import Link from 'next/link';
 import { TSVLockup, TSVMark } from '@/components/brand/Logo';
+import { AvatarGroup } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { StatusDot } from '@/components/ui/StatusDot';
 import { listNews } from '@/lib/db/queries/news';
-import { listEvents } from '@/lib/db/queries/events';
+import { listUpcomingEvents } from '@/lib/db/queries/events';
+import { listTeamsWithRoster } from '@/lib/db/queries/teams';
 import { listActiveSponsors } from '@/lib/db/queries/sponsors';
 import { getClubStats } from '@/lib/db/queries/stats';
 import { formatDayMonth, formatDayMonthCaps, MONTHS_DE } from '@/lib/format';
@@ -18,17 +20,6 @@ const NEWS_EYEBROW_TONES: Record<string, string> = {
   Vereinsmeisterschaft: 'text-sand-700',
   Bezirksliga: 'text-lake-700',
 };
-
-const TEAMS = [
-  { name: 'Herren I', league: 'Landesliga Kärnten', size: 9 },
-  { name: 'Herren II', league: 'Bezirksliga Ost', size: 8 },
-  { name: 'Damen 35+', league: 'Bezirksliga Damen', size: 6 },
-  { name: 'Damen 50+', league: 'Senioren-Cup', size: 6 },
-  { name: 'Jugend U10', league: 'Mini-Cup', size: 5 },
-  { name: 'Jugend U12', league: 'Nachwuchs-Cup', size: 7 },
-  { name: 'Jugend U14', league: 'Nachwuchs-Cup', size: 6 },
-  { name: 'Jugend U16', league: 'Bezirks-Cup U16', size: 5 },
-];
 
 const TRAININGS = [
   { day: 'Mo', time: '17:00 – 18:30', who: 'Damen 35+ / 50+', trainer: 'K. Wallner', court: 'Platz 3' },
@@ -120,12 +111,16 @@ const FAQS = [
 ];
 
 export default async function LandingPage() {
-  const [stats, news, events, sponsors] = await Promise.all([
+  const [stats, news, events, teams, sponsors] = await Promise.all([
     getClubStats(),
     listNews(3, { publicOnly: true }),
-    listEvents(12),
+    listUpcomingEvents(8),
+    listTeamsWithRoster(),
     listActiveSponsors(),
   ]);
+  const adultTeams = teams.filter((t) => !/^Jugend/.test(t.name));
+  const youthTeams = teams.filter((t) => /^Jugend/.test(t.name));
+  const seasons = new Date().getFullYear() - 1972;
   return (
     <main className="min-h-dvh bg-paper-100">
       {/* ─── HERO ─────────────────────────────────────────────── */}
@@ -244,9 +239,9 @@ export default async function LandingPage() {
               dem Berg, das Schloss Treffen im Tal, drei Seelinien davor.
             </p>
             <p>
-              Heute sind wir <strong className="text-stone-800">186 Mitglieder</strong> in acht
-              Mannschaften — von Jugend U10 bis Damen 50+. Wir spielen Bezirksliga und Landesliga,
-              ernst genug für die Tabelle und entspannt genug für ein Bier nach dem Match.
+              Heute sind wir <strong className="text-stone-800">{stats.members} Mitglieder</strong> in{' '}
+              {stats.teams} Mannschaften — von Jugend U10 bis Damen 50+. Wir spielen Bezirksliga und
+              Landesliga, ernst genug für die Tabelle und entspannt genug für ein Bier nach dem Match.
             </p>
             <p>
               Was uns trägt: <strong className="text-stone-800">vier perfekt gepflegte
@@ -269,7 +264,7 @@ export default async function LandingPage() {
               </li>
               <li className="flex items-start gap-2.5">
                 <Icon.Trophy size={18} className="text-stone-500 mt-0.5 flex-none" />
-                <span>52 Saisons · ungebrochen Bezirksliga</span>
+                <span>{seasons} Saisons · ungebrochen Bezirksliga</span>
               </li>
             </ul>
           </div>
@@ -292,7 +287,7 @@ export default async function LandingPage() {
             { name: 'Vereinsheim', sub: 'Umkleide, Dusche, kleine Küche', icon: <Icon.Home /> },
             { name: 'Schlägerverleih', sub: 'Für Schnupperer & Kinder', icon: <Icon.Ball /> },
           ].map((f) => (
-            <div key={f.name} className="bg-white rounded-lg border border-stone-200 p-5">
+            <div key={f.name} className="bg-white rounded-lg border border-stone-200 p-5 transition-all hover:border-stone-300 hover:shadow-card">
               <div className="w-10 h-10 rounded-full bg-paper-100 text-stone-700 inline-flex items-center justify-center">
                 {f.icon}
               </div>
@@ -325,34 +320,37 @@ export default async function LandingPage() {
 
       {/* ─── MANNSCHAFTEN ──────────────────────────────────── */}
       <section id="mannschaften" className="max-w-[1080px] mx-auto px-5 mt-20">
-        <div className="flex items-end justify-between gap-4 flex-wrap">
-          <div>
-            <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-stone-500 rule-eyebrow">
-              Mannschaften 2026
-            </div>
-            <h2 className="font-display text-[28px] sm:text-[36px] leading-[1.1] tracking-[-0.01em] text-stone-800 mt-4 max-w-2xl">
-              Acht Teams · vier Erwachsene, vier Jugend.
-            </h2>
-          </div>
-          <Link
-            href="/admin/mannschaften"
-            className="font-mono text-[11px] uppercase tracking-[0.14em] text-lake-700"
-          >
-            Alle Kader →
-          </Link>
+        <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-stone-500 rule-eyebrow">
+          Mannschaften 2026
         </div>
+        <h2 className="font-display text-[28px] sm:text-[36px] leading-[1.1] tracking-[-0.01em] text-stone-800 mt-4 max-w-2xl">
+          {teams.length} Teams · {adultTeams.length} Erwachsene, {youthTeams.length} Jugend.
+        </h2>
         <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {TEAMS.map((t) => (
+          {teams.map((t) => (
             <article
-              key={t.name}
-              className="bg-white rounded-lg border border-stone-200 p-4"
+              key={t.id}
+              className="bg-white rounded-lg border border-stone-200 p-4 transition-all hover:border-stone-300 hover:shadow-card hover:-translate-y-0.5"
             >
               <div className="font-display text-[19px] text-stone-800 leading-tight">{t.name}</div>
               <div className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-stone-500 mt-1.5">
                 {t.league}
               </div>
-              <div className="mt-3 text-[13px] text-stone-600">
-                {t.size} Spieler:innen
+              <div className="mt-3.5 flex items-center justify-between gap-2">
+                {t.roster.length > 0 ? (
+                  <>
+                    <AvatarGroup
+                      items={t.roster.map((r) => ({ initials: r.initials, tone: r.tone }))}
+                      max={4}
+                      size={26}
+                    />
+                    <span className="font-mono text-[11px] text-stone-500">
+                      {t.roster.length} {t.roster.length === 1 ? 'Spieler:in' : 'Spieler:innen'}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-[12.5px] text-stone-500">Kader in Aufstellung</span>
+                )}
               </div>
             </article>
           ))}
@@ -538,7 +536,14 @@ export default async function LandingPage() {
         </h2>
 
         <div className="mt-8 relative">
-          <div className="absolute left-[68px] sm:left-[88px] top-2 bottom-2 w-px bg-stone-200" aria-hidden="true" />
+          {events.length > 0 && (
+            <div className="absolute left-[68px] sm:left-[88px] top-2 bottom-2 w-px bg-stone-200" aria-hidden="true" />
+          )}
+          {events.length === 0 && (
+            <div className="bg-white rounded-lg border border-stone-200 px-5 py-8 text-center text-[14px] text-stone-500">
+              Aktuell sind keine weiteren Termine geplant — schau bald wieder vorbei.
+            </div>
+          )}
           <div className="space-y-2.5">
             {events.map((e) => {
               const dateLabel = formatEventDate(e.startsAt, e.endsAt);
@@ -602,7 +607,7 @@ export default async function LandingPage() {
               <Link
                 key={n.id}
                 href={`/app/news/${n.slug}`}
-                className="bg-white rounded-lg border border-stone-200 overflow-hidden group"
+                className="bg-white rounded-lg border border-stone-200 overflow-hidden group transition-all hover:border-stone-300 hover:shadow-card hover:-translate-y-0.5"
               >
                 <div className={`h-44 ${n.imageKind === 'sand' ? 'ph-sand' : n.imageKind === 'forest' ? 'ph-forest' : 'ph-lake'}`} />
                 <div className="p-5">
