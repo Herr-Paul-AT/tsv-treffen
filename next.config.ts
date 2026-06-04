@@ -1,7 +1,8 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
+import { withSerwist } from '@serwist/turbopack';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  serverExternalPackages: ['@electric-sql/pglite'],
 };
 
-export default nextConfig;
+export default withSerwist(nextConfig);

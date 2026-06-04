@@ -1,0 +1,42 @@
+{
+  "name": "TSV Schloss Treffen",
+  "short_name": "TSV Treffen",
+  "description": "Vereinsplattform des TSV Schloss Treffen — Tennis am Fuße der Gerlitzen.",
+  "id": "/",
+  "start_url": "/app/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "lang": "de-AT",
+  "theme_color": "#1F2224",
+  "background_color": "#F5F1E5",
+  "categories": ["sports", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Kalender",
+      "short_name": "Kalender",
+      "url": "/app/kalender",
+      "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Platz buchen",
+      "short_name": "Platz",
+      "url": "/app/platzbuchung",
+      "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
+  ]
+}

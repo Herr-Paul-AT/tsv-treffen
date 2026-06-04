@@ -36,6 +36,12 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local pglite data
+/data
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Claude local settings (per-user)
+.claude/settings.local.json

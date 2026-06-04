@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1779566943621,
+      "tag": "0000_quick_bruce_banner",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1779603868010,
+      "tag": "0001_square_the_spike",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780606694212,
+      "tag": "0002_wooden_metal_master",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1780608711338,
+      "tag": "0003_sloppy_fenris",
+      "breakpoints": true
+    }
+  ]
+}

@@ -1,0 +1,1083 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>TSV Schloss Treffen — Logo-Konzepte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="deck-stage.js"></script>
+<style>
+  :root{
+    --paper:#F4F1EB;
+    --paper-2:#FFFFFF;
+    --ink:#15171A;
+    --ink-2:#3B3F44;
+    --ink-3:#7A7E84;
+    --rule:#D9D4C8;
+
+    /* Direction 1 — Heraldisch modern */
+    --d1-burgundy:#6B2231;
+    --d1-forest:#1F3A2E;
+    --d1-cream:#F0E6D2;
+    --d1-gold:#B8923A;
+    --d1-stone:#1B1B1B;
+
+    /* Direction 2 — Geometrisch sportlich */
+    --d2-ink:#0F1012;
+    --d2-paper:#FFFFFF;
+    --d2-clay:#C8553D;     /* Sandplatz-Terrakotta */
+    --d2-mist:#EDE9E3;
+
+    /* Direction 3 — Landschaft & Verein */
+    --d3-stone:#3E4448;
+    --d3-lake:#3A6985;
+    --d3-sand:#C39265;
+    --d3-forest:#4F6B53;
+    --d3-paper:#EDE6D8;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#0c0c0d;color:var(--ink);font-family:'Inter',sans-serif}
+
+  deck-stage{ --bg:#0c0c0d; }
+  deck-stage section{
+    width:1920px;height:1080px;
+    background:var(--paper);
+    color:var(--ink);
+    position:relative;
+    overflow:hidden;
+    font-family:'Inter',sans-serif;
+  }
+
+  /* ——— Shared chrome ——— */
+  .chrome{
+    position:absolute;inset:0;
+    padding:72px 96px;
+    display:flex;flex-direction:column;
+  }
+  .meta-row{
+    display:flex;justify-content:space-between;align-items:baseline;
+    font-family:'DM Mono',monospace;font-size:14px;letter-spacing:.08em;
+    color:var(--ink-3);text-transform:uppercase;
+  }
+  .meta-row .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;vertical-align:middle;margin:0 12px}
+
+  .h-display{
+    font-family:'Cormorant Garamond',serif;
+    font-weight:500;
+    font-size:128px;
+    line-height:.95;
+    letter-spacing:-.01em;
+    color:var(--ink);
+  }
+  .h-1{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:88px;line-height:.95;letter-spacing:-.01em}
+  .h-2{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:56px;line-height:1.05;letter-spacing:-.005em}
+  .label{font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+  .lead{font-family:'Inter',sans-serif;font-size:26px;line-height:1.5;color:var(--ink-2);max-width:62ch}
+  .body{font-family:'Inter',sans-serif;font-size:18px;line-height:1.6;color:var(--ink-2)}
+  .mono{font-family:'DM Mono',monospace}
+
+  hr.rule{border:none;border-top:1px solid var(--rule);margin:0}
+
+  /* ——— Cover ——— */
+  .cover-bg{
+    position:absolute;inset:0;
+    background:
+      radial-gradient(1400px 700px at 80% 18%, rgba(107,34,49,.05), transparent 60%),
+      radial-gradient(1200px 700px at 12% 86%, rgba(31,58,46,.05), transparent 65%),
+      var(--paper);
+  }
+  .cover-mark{
+    position:absolute;
+    right:96px;top:50%;transform:translateY(-50%);
+    opacity:.06;
+    width:760px;height:760px;
+  }
+
+  /* ——— Application grid (system slide) ——— */
+  .sys-grid{
+    display:grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap:48px;
+    flex:1;
+    margin-top:36px;
+  }
+  .panel{
+    border:1px solid var(--rule);
+    background:#fff;
+    padding:36px;
+    position:relative;
+    display:flex;flex-direction:column;
+  }
+  .panel-dark{background:#15171A;color:#fff;border-color:#15171A}
+  .panel-tag{
+    position:absolute;top:14px;left:18px;
+    font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-3);
+  }
+  .panel-dark .panel-tag{color:rgba(255,255,255,.55)}
+
+  .swatch-row{display:flex;flex-direction:column;gap:0;border:1px solid var(--rule)}
+  .swatch{
+    display:grid;grid-template-columns: 90px 1fr auto;
+    align-items:center;gap:24px;
+    padding:18px 22px;border-bottom:1px solid var(--rule);
+    font-family:'DM Mono',monospace;font-size:13px;
+  }
+  .swatch:last-child{border-bottom:none}
+  .swatch .chip{width:54px;height:36px;border:1px solid rgba(0,0,0,.08)}
+  .swatch .name{letter-spacing:.04em;text-transform:uppercase;color:var(--ink)}
+  .swatch .hex{color:var(--ink-3);font-size:12px;letter-spacing:.08em}
+
+  .type-spec{display:flex;flex-direction:column;gap:6px;padding:14px 0;border-bottom:1px solid var(--rule)}
+  .type-spec:last-child{border-bottom:none}
+  .type-spec .role{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+  .type-spec .sample{color:var(--ink)}
+
+  .favicon-row{display:flex;gap:36px;align-items:flex-end}
+  .favicon-cell{display:flex;flex-direction:column;align-items:center;gap:10px}
+  .favicon-cell .fx-box{background:#fff;border:1px solid var(--rule);display:flex;align-items:center;justify-content:center}
+  .favicon-cell .fx-label{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink-3);letter-spacing:.1em}
+
+  /* footer numbering */
+  .footer{
+    position:absolute;left:96px;right:96px;bottom:48px;
+    display:flex;justify-content:space-between;align-items:center;
+    font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.14em;
+    color:var(--ink-3);text-transform:uppercase;
+  }
+
+  /* hero slide */
+  .hero-grid{
+    display:grid;
+    grid-template-columns: 1.05fr .95fr;
+    gap:80px;
+    flex:1;
+    align-items:center;
+    margin-top:24px;
+  }
+  .hero-stage{
+    background:#fff;
+    border:1px solid var(--rule);
+    aspect-ratio:1/1;
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+  }
+  .hero-stage.dark{background:#15171A;border-color:#15171A}
+  .hero-stage .stage-tag{
+    position:absolute;top:18px;left:22px;
+    font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-3);
+  }
+  .hero-stage.dark .stage-tag{color:rgba(255,255,255,.55)}
+
+  .rationale{display:flex;flex-direction:column;gap:28px}
+  .rationale .kicker{font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3)}
+  .rationale .pillars{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-top:12px}
+  .rationale .pillar{padding:18px;border:1px solid var(--rule);background:#fff}
+  .rationale .pillar .num{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink-3);letter-spacing:.14em}
+  .rationale .pillar .t{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;margin-top:6px}
+  .rationale .pillar .d{font-family:'Inter',sans-serif;font-size:14px;line-height:1.45;color:var(--ink-2);margin-top:8px}
+
+  /* Wordmark and combination layouts shared */
+  .wm-strip{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+
+  /* Comparison slide */
+  .compare-grid{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px;flex:1;margin-top:28px;
+  }
+  .compare-card{
+    background:#fff;border:1px solid var(--rule);
+    padding:28px 26px;display:flex;flex-direction:column;gap:14px;
+    position:relative;
+  }
+  .compare-card .index{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.16em;color:var(--ink-3)}
+  .compare-card .title{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:600;line-height:1}
+  .compare-card .stage{height:280px;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid var(--rule)}
+  .compare-card .swatch-mini{display:flex;gap:0;height:24px;border:1px solid var(--rule)}
+  .compare-card .swatch-mini i{flex:1;display:block}
+  .compare-card .tag{font-family:'Inter',sans-serif;font-size:14px;color:var(--ink-2);line-height:1.5}
+
+  /* Overview slide */
+  .overview-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px;flex:1;margin-top:36px;align-content:start}
+  .over-card{display:flex;flex-direction:column;gap:24px;padding:36px;background:#fff;border:1px solid var(--rule)}
+  .over-card .idx{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.18em;color:var(--ink-3)}
+  .over-card .nm{font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:600;line-height:1.02}
+  .over-card .desc{font-family:'Inter',sans-serif;font-size:15px;line-height:1.55;color:var(--ink-2)}
+  .over-card .pal{display:flex;height:22px;border:1px solid var(--rule)}
+  .over-card .pal i{flex:1}
+  .over-card .mini-mark{height:160px;background:#FAFAF7;border:1px solid var(--rule);display:flex;align-items:center;justify-content:center}
+  .over-card{padding:32px 30px;gap:18px}
+  .over-card .nm{font-size:40px}
+  .over-card .desc{font-size:14px}
+
+  /* Mini blocks for typography sample on cover */
+  .cover-foot{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    margin-top:auto;padding-top:48px;border-top:1px solid var(--rule);
+  }
+  .cover-foot .col{display:flex;flex-direction:column;gap:6px}
+  .cover-foot .col .l{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3)}
+  .cover-foot .col .v{font-family:'Inter',sans-serif;font-size:18px;color:var(--ink)}
+
+  /* utility */
+  .stack{display:flex;flex-direction:column}
+  .row{display:flex}
+  .gap-8{gap:8px}.gap-12{gap:12px}.gap-16{gap:16px}.gap-24{gap:24px}.gap-32{gap:32px}.gap-48{gap:48px}
+
+  /* TYPE sample chips for each direction */
+  .type-card{padding:28px;border:1px solid var(--rule);background:#fff;display:flex;flex-direction:column;gap:14px}
+  .type-card .ttl{font-size:64px;line-height:1;color:var(--ink)}
+  .type-card .sub{font-size:18px;color:var(--ink-2)}
+  .type-card .lbl{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+
+</style>
+</head>
+<body>
+
+<deck-stage>
+
+  <!-- =================== SLIDE 1 · COVER =================== -->
+  <section data-screen-label="01 Cover">
+    <div class="cover-bg"></div>
+
+    <!-- decorative big mark in background -->
+    <svg class="cover-mark" viewBox="0 0 100 120" aria-hidden="true">
+      <path d="M10 8 L90 8 L90 60 C90 90 72 108 50 114 C28 108 10 90 10 60 Z" fill="#15171A"/>
+    </svg>
+
+    <div class="chrome">
+      <div class="meta-row">
+        <span>Branding · Pitch Deck</span>
+        <span>Kärnten · Treffen am Ossiachersee</span>
+      </div>
+
+      <div style="margin-top:160px;max-width:1180px">
+        <div class="label" style="margin-bottom:28px">TSV Schloss Treffen — Logo-Konzepte</div>
+        <h1 class="h-display">Drei Richtungen<br>für eine Marke<br>mit Ort und Spiel.</h1>
+        <p class="lead" style="margin-top:48px;max-width:780px">
+          Tennisverein am Fuße der Gerlitzen, zwischen Schloss und See. Wir entwickeln eine Identität,
+          die regional verwurzelt ist, sportlich klar lesbar bleibt — und auch in zehn Jahren nicht trendy-müde wirkt.
+        </p>
+      </div>
+
+      <div class="cover-foot">
+        <div class="col"><span class="l">Auftraggeber</span><span class="v">TSV Schloss Treffen</span></div>
+        <div class="col"><span class="l">Sport</span><span class="v">Sandplatz-Tennis · Outdoor April – Oktober</span></div>
+        <div class="col"><span class="l">Umfang</span><span class="v">3 Richtungen · Bild- &amp; Wortmarke · System</span></div>
+        <div class="col"><span class="l">Datum</span><span class="v">Mai 2026</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== SLIDE 2 · ÜBERSICHT =================== -->
+  <section data-screen-label="02 Übersicht">
+    <div class="chrome">
+      <div class="meta-row">
+        <span>02 · Übersicht</span>
+        <span>Drei Richtungen im Vergleich</span>
+      </div>
+
+      <div style="margin-top:60px;display:flex;justify-content:space-between;align-items:flex-end;gap:60px">
+        <h2 class="h-1" style="max-width:1100px">Drei Wege zur Marke —<br>von wappentreu bis landschaftlich.</h2>
+        <p class="body" style="max-width:480px">Jede Richtung beantwortet die gleiche Frage anders: Wie verbindet man das Schloss als Namensgeber, den Tennissport und den Ort in einer Marke?</p>
+      </div>
+
+      <div class="overview-grid">
+        <div class="over-card">
+          <div class="idx">Richtung 01</div>
+          <div class="nm">Heraldisch<br>modern.</div>
+          <div class="mini-mark" id="ov-mark-1"></div>
+          <div class="desc">Schloss als Wappen, Tennisball als heraldische Marke. Tradition und Vereinscharakter, zeitgemäß reduziert.</div>
+          <div class="pal">
+            <i style="background:var(--d1-burgundy)"></i>
+            <i style="background:var(--d1-forest)"></i>
+            <i style="background:var(--d1-cream)"></i>
+            <i style="background:var(--d1-gold)"></i>
+            <i style="background:var(--d1-stone)"></i>
+          </div>
+        </div>
+
+        <div class="over-card">
+          <div class="idx">Richtung 02</div>
+          <div class="nm">Geometrisch<br>sportlich.</div>
+          <div class="mini-mark" id="ov-mark-2"></div>
+          <div class="desc">Schloss-Turm zur reinen Form abstrahiert, Sandplatz-Terrakotta als einziger Farbakzent. Klar, dynamisch, langlebig.</div>
+          <div class="pal">
+            <i style="background:var(--d2-ink)"></i>
+            <i style="background:var(--d2-clay)"></i>
+            <i style="background:var(--d2-mist)"></i>
+            <i style="background:#fff;border-right:1px solid var(--rule)"></i>
+          </div>
+        </div>
+
+        <div class="over-card">
+          <div class="idx">Richtung 03</div>
+          <div class="nm">Landschaft<br>&amp; Verein.</div>
+          <div class="mini-mark" id="ov-mark-3"></div>
+          <div class="desc">Tennisball als Sonne über Gerlitzen, Schloss und Ossiachersee. Sport-Bezug poetisch, Region klar lesbar.</div>
+          <div class="pal">
+            <i style="background:var(--d3-stone)"></i>
+            <i style="background:var(--d3-lake)"></i>
+            <i style="background:var(--d3-sand)"></i>
+            <i style="background:var(--d3-forest)"></i>
+            <i style="background:var(--d3-paper)"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>TSV Schloss Treffen — Logo-Pitch</span>
+        <span>02 / 09</span>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- =================== SLIDE 3 · RICHTUNG 1 HERO =================== -->
+  <section data-screen-label="03 R1 Heraldisch — Hero">
+    <div class="chrome">
+      <div class="meta-row">
+        <span>Richtung 01 <span class="dot"></span> Heraldisch modern</span>
+        <span>Bildmarke · Wortmarke · Kombination</span>
+      </div>
+
+      <div class="hero-grid">
+        <div class="hero-stage" style="background:var(--d1-cream)">
+          <span class="stage-tag">Kombinationslogo</span>
+          <div id="hero-combo-1"></div>
+        </div>
+
+        <div class="rationale">
+          <span class="kicker">Konzept</span>
+          <h2 class="h-1">Wappentreu.<br>Reduziert.</h2>
+          <p class="body" style="max-width:46ch">
+            Eine moderne Heraldik: Schloss-Silhouette mit drei Türmen, der Tennisball als
+            heraldische Charge darüber. Das Wappen erzählt unmittelbar, wer hier spielt —
+            ein Verein mit Geschichte, aber ohne Patina.
+          </p>
+
+          <div class="pillars">
+            <div class="pillar">
+              <div class="num">01</div>
+              <div class="t">Symbolik</div>
+              <div class="d">Schloss Treffen als zentrales Wahrzeichen, gestützt durch die Wappen-Form.</div>
+            </div>
+            <div class="pillar">
+              <div class="num">02</div>
+              <div class="t">Tonalität</div>
+              <div class="d">Bordeaux, Tannengrün, Creme — gedeckt, edel, "echter Verein".</div>
+            </div>
+            <div class="pillar">
+              <div class="num">03</div>
+              <div class="t">Anwendung</div>
+              <div class="d">Stickerei auf Trikot, Goldprägung auf Urkunde, Sticker auf der Tasche.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>Richtung 01 — Heraldisch modern</span>
+        <span>03 / 09</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== SLIDE 4 · RICHTUNG 1 SYSTEM =================== -->
+  <section data-screen-label="04 R1 Heraldisch — System">
+    <div class="chrome">
+      <div class="meta-row">
+        <span>Richtung 01 <span class="dot"></span> System</span>
+        <span>Anwendungen · Farbe · Typografie</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:auto auto;gap:24px;flex:1;margin-top:32px">
+        <div class="panel" style="background:var(--d1-cream)">
+          <span class="panel-tag">Bildmarke / Farbe</span>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center" id="r1-mark-color"></div>
+        </div>
+        <div class="panel">
+          <span class="panel-tag">Bildmarke / S-W</span>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center" id="r1-mark-bw"></div>
+        </div>
+        <div class="panel panel-dark">
+          <span class="panel-tag">Bildmarke / Negativ</span>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center" id="r1-mark-neg"></div>
+        </div>
+        <div class="panel">
+          <span class="panel-tag">Favicon-Test</span>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center">
+            <div class="favicon-row">
+              <div class="favicon-cell">
+                <div class="fx-box" style="width:128px;height:128px" id="r1-fav-128"></div>
+                <span class="fx-label">128 px</span>
+              </div>
+              <div class="favicon-cell">
+                <div class="fx-box" style="width:48px;height:48px" id="r1-fav-48"></div>
+                <span class="fx-label">48 px</span>
+              </div>
+              <div class="favicon-cell">
+                <div class="fx-box" style="width:16px;height:16px" id="r1-fav-16"></div>
+                <span class="fx-label">16 px</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="grid-column:span 2">
+          <span class="panel-tag">Wortmarke</span>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px">
+            <div class="stack" style="align-items:center;gap:6px">
+              <div style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:88px;line-height:1;letter-spacing:.01em;color:var(--d1-burgundy)">TSV Schloss Treffen</div>
+              <div style="font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.6em;color:var(--d1-gold);text-transform:uppercase;margin-top:14px;padding-top:10px;border-top:1px solid rgba(184,146,58,.4);align-self:stretch;text-align:center">Tennis · Gegr. MCMLXX</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <span class="panel-tag">Palette</span>
+          <div class="swatch-row" style="border:none;margin-top:14px">
+            <div class="swatch"><span class="chip" style="background:var(--d1-burgundy)"></span><span class="name">Schloss-Burgund</span><span class="hex">#6B2231</span></div>
+            <div class="swatch"><span class="chip" style="background:var(--d1-forest)"></span><span class="name">Wald-Tann</span><span class="hex">#1F3A2E</span></div>
+            <div class="swatch"><span class="chip" style="background:var(--d1-cream)"></span><span class="name">Pergament</span><span class="hex">#F0E6D2</span></div>
+            <div class="swatch"><span class="chip" style="background:var(--d1-gold)"></span><span class="name">Eichengold</span><span class="hex">#B8923A</span></div>
+            <div class="swatch"><span class="chip" style="background:var(--d1-stone)"></span><span class="name">Schiefer</span><span class="hex">#1B1B1B</span></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <span class="panel-tag">Typografie</span>
+          <div class="stack" style="margin-top:14px;gap:8px">
+            <div class="type-spec">
+              <span class="role">Display · Cormorant Garamond 600</span>
+              <span class="sample" style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:42px;line-height:1">Schloss Treffen</span>
+            </div>
+            <div class="type-spec">
+              <span class="role">Text · Inter 400 / 500</span>
+              <span class="sample" style="font-family:'Inter',sans-serif;font-size:18px;line-height:1.45">Sandplatz-Tennis am Ossiachersee, seit Generationen.</span>
+            </div>
+            <div class="type-spec">
+              <span class="role">Caps / Mono · DM Mono</span>
+              <span class="sample" style="font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.3em">SAISON · APRIL — OKTOBER</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>Richtung 01 — Heraldisch modern</span>
+        <span>04 / 09</span>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- =================== SLIDE 5 · RICHTUNG 2 HERO =================== -->
+  <section data-screen-label="05 R2 Geometrisch — Hero">
+    <div class="chrome">
+      <div class="meta-row">
+        <span>Richtung 02 <span class="dot"></span> Geometrisch sportlich</span>
+        <span>Bildmarke · Wortmarke · Kombination</span>
+      </div>
+
+      <div class="hero-grid">
+        <div class="hero-stage" style="background:var(--d2-mist)">
+          <span class="stage-tag">Kombinationslogo</span>
+          <div id="hero-combo-2"></div>
+        </div>
+
+        <div class="rationale">
+          <span class="kicker">Konzept</span>
+          <h2 class="h-1">Form folgt<br>Spielfeld.</h2>
+          <p class="body" style="max-width:46ch">
+            Der Schloss-Turm zur reinsten geometrischen Form reduziert: ein hohes Rechteck mit drei Zinnen.
+            Der Tennisbezug spielt sich in der Farbe ab — das Terrakotta des Sandplatzes als einziger Akzent
+            macht den Sport sofort lesbar, ohne ihn auszubuchstabieren.
+          </p>
+
+          <div class="pillars">
+            <div class="pillar">
+              <div class="num">01</div>
+              <div class="t">Reduktion</div>
+              <div class="d">Drei Zinnen, ein Korpus, ein Punkt. Mehr braucht eine starke Marke nicht.</div>
+            </div>
+            <div class="pillar">
+              <div class="num">02</div>
+              <div class="t">Akzent</div>
+              <div class="d">Sandplatz-Terrakotta ist der visuelle Code für Tennis — Heimspielplatz im Logo.</div>
+            </div>
+            <div class="pillar">
+              <div class="num">03</div>
+              <div class="t">Skalierung</div>
+              <div class="d">Funktioniert vom 16-px-Favicon bis zur Banner-Wand am Court.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>Richtung 02 — Geometrisch sportlich</span>
+        <span>05 / 09</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== SLIDE 6 · RICHTUNG 2 SYSTEM =================== -->
+  <section data-screen-label="06 R2 Geometrisch — System">
+    <div class="chrome">
+      <div class="meta-row">
+        <span>Richtung 02 <span class="dot"></span> System</span>
+        <span>Anwendungen · Farbe · Typografie</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:auto auto;gap:24px;flex:1;margin-top:32px">
+        <div class="panel">
+          <span class="panel-tag">Bildmarke / Farbe</span>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center" id="r2-mark-color"></div>
+        </div>
+        <div class="panel">
+          <span class="panel-tag">Bildmarke / S-W</span>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center" id="r2-mark-bw"></div>
+        </div>
+        <div class="panel panel-dark">
+          <span class="panel-tag">Bildmarke / Negativ</span>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center" id="r2-mark-neg"></div>
+        </div>
+        <div class="panel">
+          <span class="panel-tag">Favicon-Test</span>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center">
+            <div class="favicon-row">
+              <div class="favicon-cell">
+                <div class="fx-box" style="width:128px;height:128px" id="r2-fav-128"></div>
+                <span class="fx-label">128 px</span>
+              </div>
+              <div class="favicon-cell">
+                <div class="fx-box" style="width:48px;height:48px" id="r2-fav-48"></div>
+                <span class="fx-label">48 px</span>
+              </div>
+              <div class="favicon-cell">
+                <div class="fx-box" style="width:16px;height:16px" id="r2-fav-16"></div>
+                <span class="fx-label">16 px</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="grid-column:span 2">
+          <span class="panel-tag">Wortmarke</span>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px">
+            <div class="stack" style="align-items:flex-start;gap:4px">
+              <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:88px;line-height:.92;letter-spacing:-.02em;color:var(--d2-ink)">TSV<span style="color:var(--d2-clay)">.</span></div>
+              <div style="font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:42px;line-height:1;letter-spacing:-.01em;color:var(--d2-ink);margin-top:4px">Schloss Treffen</div>
+              <div style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.4em;color:var(--d2-ink);text-transform:uppercase;margin-top:14px">Tennis Club</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <span class="panel-tag">Palette</span>
+          <div class="swatch-row" style="border:none;margin-top:14px">
+            <div class="swatch"><span class="chip" style="background:var(--d2-ink)"></span><span class="name">Court-Schwarz</span><span class="hex">#0F1012</span></div>
+            <div class="swatch"><span class="chip" style="background:var(--d2-clay)"></span><span class="name">Sand-Terrakotta</span><span class="hex">#C8553D</span></div>
+            <div class="swatch"><span class="chip" style="background:var(--d2-mist)"></span><span class="name">Linien-Beige</span><span class="hex">#EDE9E3</span></div>
+            <div class="swatch"><span class="chip" style="background:#fff;border:1px solid var(--rule)"></span><span class="name">Papier-Weiß</span><span class="hex">#FFFFFF</span></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <span class="panel-tag">Typografie</span>
+          <div class="stack" style="margin-top:14px;gap:8px">
+            <div class="type-spec">
+              <span class="role">Display · Space Grotesk 600</span>
+              <span class="sample" style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:42px;line-height:1;letter-spacing:-.01em">Schloss Treffen.</span>
+            </div>
+            <div class="type-spec">
+              <span class="role">Text · Inter 400 / 500</span>
+              <span class="sample" style="font-family:'Inter',sans-serif;font-size:18px;line-height:1.45">Wir spielen auf vier Sandplätzen, von April bis Oktober.</span>
+            </div>
+            <div class="type-spec">
+              <span class="role">Caps / Mono · DM Mono</span>
+              <span class="sample" style="font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.3em">MEMBER · GAST · MATCH</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>Richtung 02 — Geometrisch sportlich</span>
+        <span>06 / 09</span>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- =================== SLIDE 7 · RICHTUNG 3 HERO =================== -->
+  <section data-screen-label="07 R3 Landschaft — Hero">
+    <div class="chrome">
+      <div class="meta-row">
+        <span>Richtung 03 <span class="dot"></span> Landschaft &amp; Verein</span>
+        <span>Bildmarke · Wortmarke · Kombination</span>
+      </div>
+
+      <div class="hero-grid">
+        <div class="hero-stage" style="background:var(--d3-paper)">
+          <span class="stage-tag">Kombinationslogo</span>
+          <div id="hero-combo-3"></div>
+        </div>
+
+        <div class="rationale">
+          <span class="kicker">Konzept</span>
+          <h2 class="h-1">Ball über<br>der Gerlitzen.</h2>
+          <p class="body" style="max-width:46ch">
+            Eine geschichtete Landschaftsmarke: Der Tennisball geht als Sonne hinter der Gerlitzen auf,
+            das Schloss steht im Tal, der Ossiachersee liegt ruhig im Vordergrund.
+            Die typische Ball-Naht macht den Sport unverwechselbar — bleibt aber Teil
+            der Naturpalette und kippt nie ins Klischee.
+          </p>
+
+          <div class="pillars">
+            <div class="pillar">
+              <div class="num">01</div>
+              <div class="t">Vier Zeichen</div>
+              <div class="d">Ball, Berg, Schloss und See — jedes erkennbar, zusammen unverwechselbar Treffen.</div>
+            </div>
+            <div class="pillar">
+              <div class="num">02</div>
+              <div class="t">Tennis ohne Klischee</div>
+              <div class="d">Der Ball als Sonne — Sport-Bezug sofort lesbar, aber poetisch statt plakativ.</div>
+            </div>
+            <div class="pillar">
+              <div class="num">03</div>
+              <div class="t">Verwurzelt</div>
+              <div class="d">Wirkt wie aus dem Ort gewachsen. Spricht Mitglieder, Gäste und Sponsoren an.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>Richtung 03 — Landschaft &amp; Verein</span>
+        <span>07 / 09</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== SLIDE 8 · RICHTUNG 3 SYSTEM =================== -->
+  <section data-screen-label="08 R3 Landschaft — System">
+    <div class="chrome">
+      <div class="meta-row">
+        <span>Richtung 03 <span class="dot"></span> System</span>
+        <span>Anwendungen · Farbe · Typografie</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:auto auto;gap:24px;flex:1;margin-top:32px">
+        <div class="panel" style="background:var(--d3-paper)">
+          <span class="panel-tag">Bildmarke / Farbe</span>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center" id="r3-mark-color"></div>
+        </div>
+        <div class="panel">
+          <span class="panel-tag">Bildmarke / S-W</span>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center" id="r3-mark-bw"></div>
+        </div>
+        <div class="panel panel-dark">
+          <span class="panel-tag">Bildmarke / Negativ</span>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center" id="r3-mark-neg"></div>
+        </div>
+        <div class="panel">
+          <span class="panel-tag">Favicon-Test</span>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center">
+            <div class="favicon-row">
+              <div class="favicon-cell">
+                <div class="fx-box" style="width:128px;height:128px" id="r3-fav-128"></div>
+                <span class="fx-label">128 px</span>
+              </div>
+              <div class="favicon-cell">
+                <div class="fx-box" style="width:48px;height:48px" id="r3-fav-48"></div>
+                <span class="fx-label">48 px</span>
+              </div>
+              <div class="favicon-cell">
+                <div class="fx-box" style="width:16px;height:16px" id="r3-fav-16"></div>
+                <span class="fx-label">16 px</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="grid-column:span 2">
+          <span class="panel-tag">Wortmarke</span>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px">
+            <div class="stack" style="align-items:center;gap:6px">
+              <div style="font-family:'Fraunces',serif;font-weight:500;font-size:82px;line-height:.95;letter-spacing:-.005em;color:var(--d3-stone)">Schloss Treffen</div>
+              <div style="display:flex;align-items:center;gap:14px;margin-top:10px">
+                <span style="width:60px;height:1px;background:var(--d3-sand)"></span>
+                <span style="font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.4em;color:var(--d3-stone);text-transform:uppercase">TSV · Tennis</span>
+                <span style="width:60px;height:1px;background:var(--d3-sand)"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <span class="panel-tag">Palette</span>
+          <div class="swatch-row" style="border:none;margin-top:14px">
+            <div class="swatch"><span class="chip" style="background:var(--d3-stone)"></span><span class="name">Schiefer-Stein</span><span class="hex">#3E4448</span></div>
+            <div class="swatch"><span class="chip" style="background:var(--d3-lake)"></span><span class="name">Ossiacher-See</span><span class="hex">#3A6985</span></div>
+            <div class="swatch"><span class="chip" style="background:var(--d3-sand)"></span><span class="name">Sand-Ocker</span><span class="hex">#C39265</span></div>
+            <div class="swatch"><span class="chip" style="background:var(--d3-forest)"></span><span class="name">Gerlitzen-Wald</span><span class="hex">#4F6B53</span></div>
+            <div class="swatch"><span class="chip" style="background:var(--d3-paper)"></span><span class="name">Kalkstein</span><span class="hex">#EDE6D8</span></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <span class="panel-tag">Typografie</span>
+          <div class="stack" style="margin-top:14px;gap:8px">
+            <div class="type-spec">
+              <span class="role">Display · Fraunces 500</span>
+              <span class="sample" style="font-family:'Fraunces',serif;font-weight:500;font-size:42px;line-height:1">Schloss Treffen</span>
+            </div>
+            <div class="type-spec">
+              <span class="role">Text · Manrope 400 / 600</span>
+              <span class="sample" style="font-family:'Manrope',sans-serif;font-size:18px;line-height:1.45">Vom See, vom Berg, vom Schloss — und vom Sandplatz.</span>
+            </div>
+            <div class="type-spec">
+              <span class="role">Caps / Mono · DM Mono</span>
+              <span class="sample" style="font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.3em">KÄRNTEN · TREFFEN A. SEE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>Richtung 03 — Landschaft &amp; Verein</span>
+        <span>08 / 09</span>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- =================== SLIDE 9 · VERGLEICH =================== -->
+  <section data-screen-label="09 Vergleich">
+    <div class="chrome">
+      <div class="meta-row">
+        <span>09 · Direkter Vergleich</span>
+        <span>Empfehlung &amp; nächste Schritte</span>
+      </div>
+
+      <div style="margin-top:48px;display:flex;justify-content:space-between;align-items:flex-end;gap:60px">
+        <h2 class="h-1">Drei Richtungen,<br>nebeneinander.</h2>
+        <p class="body" style="max-width:520px">
+          Unsere Empfehlung: <strong style="color:var(--ink)">Richtung 02</strong> als Kernmarke wegen ihrer Skalierbarkeit
+          und Langlebigkeit — mit der Heraldik-Variante (R01) als optionale Premium-/Event-Marke
+          für Urkunden, Jubiläen und Stickereien.
+        </p>
+      </div>
+
+      <div class="compare-grid" style="margin-top:36px">
+        <div class="compare-card">
+          <span class="index">Richtung 01 · Heraldisch modern</span>
+          <span class="title" style="color:var(--d1-burgundy)">Wappen.</span>
+          <div class="stage" style="background:var(--d1-cream)" id="cmp-1"></div>
+          <div class="swatch-mini">
+            <i style="background:var(--d1-burgundy)"></i>
+            <i style="background:var(--d1-forest)"></i>
+            <i style="background:var(--d1-cream)"></i>
+            <i style="background:var(--d1-gold)"></i>
+            <i style="background:var(--d1-stone)"></i>
+          </div>
+          <p class="tag">Trägt Tradition. Stark in Stickerei und Print, fordernd in 16 px.</p>
+        </div>
+
+        <div class="compare-card">
+          <span class="index">Richtung 02 · Geometrisch sportlich</span>
+          <span class="title" style="color:var(--d2-ink)">Turm<span style="color:var(--d2-clay)">.</span></span>
+          <div class="stage" id="cmp-2"></div>
+          <div class="swatch-mini">
+            <i style="background:var(--d2-ink)"></i>
+            <i style="background:var(--d2-clay)"></i>
+            <i style="background:var(--d2-mist)"></i>
+            <i style="background:#fff;border-right:1px solid var(--rule)"></i>
+          </div>
+          <p class="tag">Skaliert vom Favicon bis zur Bande. Wirkt frisch, ohne trendy zu sein.</p>
+        </div>
+
+        <div class="compare-card">
+          <span class="index">Richtung 03 · Landschaft &amp; Verein</span>
+          <span class="title" style="color:var(--d3-stone)">Region.</span>
+          <div class="stage" style="background:var(--d3-paper)" id="cmp-3"></div>
+          <div class="swatch-mini">
+            <i style="background:var(--d3-stone)"></i>
+            <i style="background:var(--d3-lake)"></i>
+            <i style="background:var(--d3-sand)"></i>
+            <i style="background:var(--d3-forest)"></i>
+            <i style="background:var(--d3-paper)"></i>
+          </div>
+          <p class="tag">Erzählt den Ort, mit dem Ball als Sonne über der Gerlitzen. Stark im Web und auf Vereinsschildern.</p>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>TSV Schloss Treffen — Logo-Pitch</span>
+        <span>09 / 09</span>
+      </div>
+    </div>
+  </section>
+
+</deck-stage>
+
+
+<!-- ============================================================
+     SVG LOGO LIBRARY — vorgerendert mit document.body.insertAdjacentHTML
+     ============================================================ -->
+<script>
+/* =================================================================
+   RICHTUNG 1 — HERALDISCH MODERN
+   Bildmarke: Wappen + Schloss + Tennisball
+   ================================================================= */
+function r1Mark({size=240, fg='#6B2231', cream='#F0E6D2', gold='#B8923A', mono=false}={}){
+  const shieldFill = mono ? '#15171A' : fg;
+  const inside     = mono ? '#fff' : cream;
+  const ball       = mono ? '#15171A' : gold;
+  return `
+  <svg viewBox="0 0 100 120" width="${size}" height="${size*1.2}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="TSV Schloss Treffen — Wappen">
+    <path d="M10 10 L90 10 L90 60 C90 89 73 107 50 113 C27 107 10 89 10 60 Z" fill="${shieldFill}"/>
+    <!-- inner frame -->
+    <path d="M14.5 14.5 L85.5 14.5 L85.5 60 C85.5 86 71 103 50 108.5 C29 103 14.5 86 14.5 60 Z"
+          fill="none" stroke="${inside}" stroke-width="0.8" opacity=".55"/>
+
+    <!-- Tennisball (charge) -->
+    <circle cx="50" cy="29" r="6.4" fill="${ball}" stroke="${inside}" stroke-width="0.6"/>
+    <path d="M44 28 Q50 24 56 28" stroke="${shieldFill}" stroke-width="0.9" fill="none" stroke-linecap="round"/>
+    <path d="M44 30 Q50 34 56 30" stroke="${shieldFill}" stroke-width="0.9" fill="none" stroke-linecap="round"/>
+
+    <!-- Castle silhouette -->
+    <g fill="${inside}">
+      <!-- left tower -->
+      <rect x="22" y="58" width="11" height="36"/>
+      <rect x="22" y="54" width="2.6" height="4"/>
+      <rect x="26.2" y="54" width="2.6" height="4"/>
+      <rect x="30.4" y="54" width="2.6" height="4"/>
+
+      <!-- right tower -->
+      <rect x="67" y="58" width="11" height="36"/>
+      <rect x="67" y="54" width="2.6" height="4"/>
+      <rect x="71.2" y="54" width="2.6" height="4"/>
+      <rect x="75.4" y="54" width="2.6" height="4"/>
+
+      <!-- keep -->
+      <rect x="35" y="62" width="30" height="32"/>
+      <!-- top center tower -->
+      <rect x="42" y="48" width="16" height="14"/>
+      <rect x="42" y="44" width="3" height="4"/>
+      <rect x="48.5" y="44" width="3" height="4"/>
+      <rect x="55" y="44" width="3" height="4"/>
+    </g>
+    <!-- arched door -->
+    <path d="M46 94 L46 84 Q50 80 54 84 L54 94 Z" fill="${shieldFill}"/>
+  </svg>`;
+}
+
+function r1Combo({color='full'}={}){
+  // color: 'full' | 'mono' | 'negative'
+  let markFg='#6B2231', cream='#F0E6D2', gold='#B8923A', textCol='#1B1B1B', accent='#B8923A', mono=false;
+  if(color==='mono'){ mono=true; textCol='#15171A'; accent='#15171A'; }
+  if(color==='negative'){ mono=true; textCol='#fff'; accent='#fff'; }
+  const mark = r1Mark({size:300, mono});
+  return `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:24px">
+      ${mark}
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+        <div style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:56px;line-height:1;letter-spacing:.005em;color:${textCol}">TSV Schloss Treffen</div>
+        <div style="display:flex;align-items:center;gap:12px;color:${accent}">
+          <span style="width:48px;height:1px;background:currentColor"></span>
+          <span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.5em;text-transform:uppercase">Tennis · MCMLXX</span>
+          <span style="width:48px;height:1px;background:currentColor"></span>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* =================================================================
+   RICHTUNG 2 — GEOMETRISCH SPORTLICH
+   Bildmarke: Schloss-Turm zur reinen Form + Terrakotta-Ball
+   ================================================================= */
+function r2Mark({size=240, ink='#0F1012', clay='#C8553D', mono=false, negative=false}={}){
+  let towerFill = ink;
+  let ballFill  = clay;
+  if(mono){ towerFill='#15171A'; ballFill='#15171A'; }
+  if(negative){ towerFill='#fff'; ballFill='#fff'; }
+  return `
+  <svg viewBox="0 0 120 130" width="${size}" height="${size*130/120}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="TSV Schloss Treffen — Turm">
+    <!-- crenellations (3 blocks) -->
+    <rect x="22" y="8"  width="18" height="22" fill="${towerFill}"/>
+    <rect x="51" y="8"  width="18" height="22" fill="${towerFill}"/>
+    <rect x="80" y="8"  width="18" height="22" fill="${towerFill}"/>
+    <!-- tower body -->
+    <rect x="22" y="30" width="76" height="80" fill="${towerFill}"/>
+    <!-- ball (only in color version) -->
+    <circle cx="98" cy="110" r="9" fill="${ballFill}"/>
+  </svg>`;
+}
+
+function r2Combo({color='full'}={}){
+  let ink='#0F1012', clay='#C8553D', textCol='#0F1012', accent='#C8553D', sub='#0F1012';
+  let mono=false, negative=false;
+  if(color==='mono'){ mono=true; textCol='#0F1012'; accent='#0F1012'; sub='#0F1012'; }
+  if(color==='negative'){ negative=true; textCol='#fff'; accent='#fff'; sub='#fff'; }
+  const mark = r2Mark({size:280, mono, negative});
+  return `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:28px">
+      ${mark}
+      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:4px">
+        <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:72px;line-height:.92;letter-spacing:-.025em;color:${textCol}">TSV<span style="color:${accent}">.</span></div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:38px;line-height:1;letter-spacing:-.01em;color:${textCol}">Schloss Treffen</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.42em;color:${sub};text-transform:uppercase;margin-top:12px">Tennis Club · Treffen am See</div>
+      </div>
+    </div>`;
+}
+
+/* =================================================================
+   RICHTUNG 3 — LANDSCHAFT & VEREIN
+   Bildmarke: Berg + Schloss + Seelinien — gerahmt
+   ================================================================= */
+function r3Mark({size=240, stone='#3E4448', lake='#3A6985', sand='#C39265', forest='#4F6B53', paper='#EDE6D8', mono=false, negative=false}={}){
+  let mountain = forest;
+  let castle   = stone;
+  let water    = lake;
+  let frame    = stone;
+  let ball     = sand;
+  let seam     = stone;
+  let bg       = 'none';
+  if(mono){ mountain='#15171A'; castle='#15171A'; water='#15171A'; frame='#15171A'; ball='#15171A'; seam='#fff'; }
+  if(negative){ mountain='#fff'; castle='#fff'; water='#fff'; frame='#fff'; ball='#fff'; seam='#15171A'; }
+  // For mono/negative the ball reads as a solid disc; for color it's filled sand with a darker seam
+  return `
+  <svg viewBox="0 0 160 160" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="TSV Schloss Treffen — Region">
+    <!-- circle frame -->
+    <circle cx="80" cy="80" r="74" fill="${bg}" stroke="${frame}" stroke-width="2.5"/>
+    <!-- inner thin frame -->
+    <circle cx="80" cy="80" r="66" fill="none" stroke="${frame}" stroke-width="0.6" opacity=".4"/>
+
+    <defs>
+      <clipPath id="r3clip">
+        <circle cx="80" cy="80" r="66"/>
+      </clipPath>
+    </defs>
+
+    <g clip-path="url(#r3clip)">
+      <!-- Tennis ball as rising sun (behind the ridges) -->
+      <circle cx="104" cy="54" r="15" fill="${ball}"/>
+      <!-- iconic curved seam -->
+      <path d="M90.5 50 Q104 62 117.5 50"
+            fill="none" stroke="${seam}" stroke-width="1.6"
+            stroke-linecap="round" opacity="${mono||negative?'.9':'.8'}"/>
+      <path d="M90.5 50 Q104 38 117.5 50"
+            fill="none" stroke="${seam}" stroke-width="1.0"
+            stroke-linecap="round" opacity="${mono||negative?'.35':'.3'}"/>
+
+      <!-- back mountain (Gerlitzen) — sits in front of the ball, ball appears to rise -->
+      <path d="M14 100 L40 70 L62 88 L88 50 L120 80 L146 95 L146 110 L14 110 Z" fill="${mountain}" opacity="${mono||negative?'1':'0.92'}"/>
+      <!-- second softer ridge -->
+      <path d="M14 102 L34 88 L56 96 L78 84 L102 96 L124 90 L146 102 L146 110 L14 110 Z" fill="${mountain}" opacity="${mono||negative?'0.6':'0.55'}"/>
+
+      <!-- Schloss silhouette -->
+      <g fill="${castle}">
+        <rect x="62" y="92" width="6" height="22"/>
+        <rect x="62" y="89" width="2" height="3"/>
+        <rect x="66" y="89" width="2" height="3"/>
+
+        <rect x="68" y="98" width="16" height="16"/>
+        <rect x="76" y="86" width="6" height="12"/>
+        <rect x="76" y="83" width="2" height="3"/>
+        <rect x="80" y="83" width="2" height="3"/>
+
+        <rect x="86" y="92" width="6" height="22"/>
+        <rect x="86" y="89" width="2" height="3"/>
+        <rect x="90" y="89" width="2" height="3"/>
+      </g>
+
+      <!-- water lines -->
+      <path d="M16 122 L144 122" stroke="${water}" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M22 130 L138 130" stroke="${water}" stroke-width="2.2" stroke-linecap="round" opacity=".7"/>
+      <path d="M30 138 L130 138" stroke="${water}" stroke-width="1.8" stroke-linecap="round" opacity=".45"/>
+    </g>
+  </svg>`;
+}
+
+function r3Combo({color='full'}={}){
+  let textCol='#3E4448', accent='#C39265', sub='#3E4448', mono=false, negative=false;
+  if(color==='mono'){ mono=true; textCol='#15171A'; accent='#15171A'; sub='#15171A'; }
+  if(color==='negative'){ negative=true; textCol='#fff'; accent='#fff'; sub='#fff'; }
+  const mark = r3Mark({size:280, mono, negative});
+  return `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:26px">
+      ${mark}
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+        <div style="font-family:'Fraunces',serif;font-weight:500;font-size:60px;line-height:.95;letter-spacing:-.005em;color:${textCol}">Schloss Treffen</div>
+        <div style="display:flex;align-items:center;gap:14px;color:${accent}">
+          <span style="width:36px;height:1px;background:currentColor"></span>
+          <span style="font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.42em;color:${sub};text-transform:uppercase">TSV · Tennis · Kärnten</span>
+          <span style="width:36px;height:1px;background:currentColor"></span>
+        </div>
+      </div>
+    </div>`;
+}
+
+
+/* =================================================================
+   MOUNTING — alle Logo-Slots befüllen
+   ================================================================= */
+function setHTML(id, html){
+  const el = document.getElementById(id);
+  if(el) el.innerHTML = html;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  /* ——— OVERVIEW ——— */
+  setHTML('ov-mark-1', r1Mark({size:130}));
+  setHTML('ov-mark-2', r2Mark({size:130}));
+  setHTML('ov-mark-3', r3Mark({size:160}));
+
+  /* ——— RICHTUNG 1 ——— */
+  setHTML('hero-combo-1', r1Combo({color:'full'}));
+
+  setHTML('r1-mark-color', r1Mark({size:240}));
+  setHTML('r1-mark-bw',    r1Mark({size:240, mono:true}));
+  setHTML('r1-mark-neg',   `<div style="filter:invert(1) hue-rotate(180deg)">${r1Mark({size:240, mono:true})}</div>`);
+
+  setHTML('r1-fav-128', r1Mark({size:96}));
+  setHTML('r1-fav-48',  r1Mark({size:36}));
+  setHTML('r1-fav-16',  r1Mark({size:12}));
+
+  /* ——— RICHTUNG 2 ——— */
+  setHTML('hero-combo-2', r2Combo({color:'full'}));
+
+  setHTML('r2-mark-color', r2Mark({size:200}));
+  setHTML('r2-mark-bw',    r2Mark({size:200, mono:true}));
+  setHTML('r2-mark-neg',   r2Mark({size:200, negative:true}));
+
+  setHTML('r2-fav-128', r2Mark({size:96}));
+  setHTML('r2-fav-48',  r2Mark({size:36}));
+  setHTML('r2-fav-16',  r2Mark({size:12}));
+
+  /* ——— RICHTUNG 3 ——— */
+  setHTML('hero-combo-3', r3Combo({color:'full'}));
+
+  setHTML('r3-mark-color', r3Mark({size:240}));
+  setHTML('r3-mark-bw',    r3Mark({size:240, mono:true}));
+  setHTML('r3-mark-neg',   r3Mark({size:240, negative:true}));
+
+  setHTML('r3-fav-128', r3Mark({size:104}));
+  setHTML('r3-fav-48',  r3Mark({size:40}));
+  setHTML('r3-fav-16',  r3Mark({size:14}));
+
+  /* ——— Comparison ——— */
+  setHTML('cmp-1', r1Mark({size:170}));
+  setHTML('cmp-2', r2Mark({size:160}));
+  setHTML('cmp-3', r3Mark({size:200}));
+});
+</script>
+
+</body>
+</html>

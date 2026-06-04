@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="512" height="512" role="img" aria-label="TSV Schloss Treffen">
+  <rect width="160" height="160" fill="#1F2224"/>
+  <g transform="translate(20,20) scale(0.75)">
+    <circle cx="80" cy="80" r="74" fill="none" stroke="#FBF8F1" stroke-width="3"/>
+    <defs>
+      <clipPath id="mcp">
+        <circle cx="80" cy="80" r="74"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#mcp)">
+      <circle cx="104" cy="54" r="15" fill="#C39265"/>
+      <path d="M90.5 50 Q104 62 117.5 50" fill="none" stroke="#1F2224" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/>
+      <path d="M14 100 L40 70 L62 88 L88 50 L120 80 L146 95 L146 110 L14 110 Z" fill="#FBF8F1"/>
+      <g fill="#1F2224">
+        <rect x="62" y="92" width="6" height="22"/>
+        <rect x="68" y="98" width="16" height="16"/>
+        <rect x="76" y="86" width="6" height="12"/>
+        <rect x="86" y="92" width="6" height="22"/>
+      </g>
+      <path d="M16 122 L144 122" stroke="#FBF8F1" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M22 130 L138 130" stroke="#FBF8F1" stroke-width="2.2" stroke-linecap="round" opacity="0.7"/>
+      <path d="M30 138 L130 138" stroke="#FBF8F1" stroke-width="1.8" stroke-linecap="round" opacity="0.45"/>
+    </g>
+  </g>
+</svg>

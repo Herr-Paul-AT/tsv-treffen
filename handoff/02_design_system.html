@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>TSV Schloss Treffen — Design System</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  /* ============================================================
+     TSV BRAND TOKENS — Richtung 03 "Landschaft & Verein"
+     ============================================================ */
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          /* Lake — primary (Ossiachersee) */
+          lake: {
+            50:  '#F2F6F9',
+            100: '#E0EAF1',
+            200: '#BCCFDC',
+            300: '#92B0C4',
+            400: '#6691AC',
+            500: '#3A6985',   /* base */
+            600: '#2F586F',
+            700: '#244658',
+            800: '#1C3645',
+            900: '#142733',
+          },
+          /* Sand — accent (Sandplatz) */
+          sand: {
+            50:  '#FBF6F0',
+            100: '#F5EADB',
+            200: '#EAD2B5',
+            300: '#DCB388',
+            400: '#D0A075',
+            500: '#C39265',   /* base */
+            600: '#A6794E',
+            700: '#8A5F3D',
+            800: '#6E4A30',
+            900: '#523724',
+          },
+          /* Forest — secondary / success (Gerlitzen-Wald) */
+          forest: {
+            50:  '#F2F6F2',
+            100: '#E0EBE1',
+            200: '#BFD3C1',
+            300: '#94B498',
+            400: '#6F9374',
+            500: '#4F6B53',   /* base */
+            600: '#3F5742',
+            700: '#324434',
+            800: '#263429',
+            900: '#1A241D',
+          },
+          /* Stone — text / chrome (Schiefer) */
+          stone: {
+            50:  '#F7F6F3',
+            100: '#ECEAE3',
+            200: '#D6D2C8',
+            300: '#B3AFA3',
+            400: '#7E7C73',
+            500: '#5A595A',
+            600: '#3E4448',  /* base */
+            700: '#2D3134',
+            800: '#1F2224',
+            900: '#121314',
+          },
+          /* Paper — warm bg (Kalkstein) */
+          paper: {
+            50:  '#FBF8F1',
+            100: '#F5F1E5',
+            200: '#EDE6D8',  /* base */
+            300: '#DCD2BD',
+            400: '#C7B999',
+          },
+          /* Semantic */
+          success: '#4F6B53',
+          warning: '#B07A3D',
+          danger:  '#A14841',
+          info:    '#3A6985',
+        },
+        fontFamily: {
+          display: ['Fraunces', 'serif'],
+          sans:    ['Manrope', 'system-ui', 'sans-serif'],
+          mono:    ['DM Mono', 'ui-monospace', 'monospace'],
+        },
+        borderRadius: {
+          'xs': '2px',
+          'sm': '4px',
+          'md': '8px',
+          'lg': '12px',
+          'xl': '16px',
+          '2xl': '24px',
+        },
+        boxShadow: {
+          'card':  '0 1px 0 rgba(62,68,72,.04), 0 1px 2px rgba(62,68,72,.06)',
+          'pop':   '0 4px 12px -2px rgba(62,68,72,.10), 0 2px 4px -2px rgba(62,68,72,.06)',
+          'modal': '0 24px 60px -12px rgba(20,30,40,.25), 0 8px 24px -8px rgba(20,30,40,.15)',
+          'press': 'inset 0 1px 0 rgba(255,255,255,.06)',
+        },
+        fontSize: {
+          'display': ['56px', { lineHeight: '1.04', letterSpacing: '-0.02em', fontWeight: '500' }],
+          'h1':      ['40px', { lineHeight: '1.08', letterSpacing: '-0.015em', fontWeight: '500' }],
+          'h2':      ['32px', { lineHeight: '1.15', letterSpacing: '-0.01em',  fontWeight: '500' }],
+          'h3':      ['24px', { lineHeight: '1.2',  letterSpacing: '-0.005em', fontWeight: '600' }],
+          'h4':      ['20px', { lineHeight: '1.3',  fontWeight: '600' }],
+          'body-lg': ['18px', { lineHeight: '1.55', fontWeight: '400' }],
+          'body':    ['16px', { lineHeight: '1.55', fontWeight: '400' }],
+          'small':   ['14px', { lineHeight: '1.5',  fontWeight: '500' }],
+          'caption': ['12px', { lineHeight: '1.4',  fontWeight: '500', letterSpacing: '0.12em' }],
+        },
+      },
+    },
+  };
+</script>
+
+<style>
+  html, body { background: #F5F1E5; color: #1F2224; }
+  body { font-family: 'Manrope', system-ui, sans-serif; }
+  .font-display { font-family: 'Fraunces', serif; }
+  .font-mono    { font-family: 'DM Mono', monospace; }
+
+  /* Custom scrollbar minimal */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #B3AFA3; border-radius: 999px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+
+  /* Striped placeholder pattern */
+  .ph-stripe {
+    background-image: repeating-linear-gradient(
+      135deg,
+      rgba(62,68,72,.06) 0 8px,
+      rgba(62,68,72,.02) 8px 16px
+    );
+  }
+  .ph-stripe-dark {
+    background-image: repeating-linear-gradient(
+      135deg,
+      rgba(255,255,255,.08) 0 8px,
+      rgba(255,255,255,.02) 8px 16px
+    );
+  }
+  .ph-lake {
+    background-image: repeating-linear-gradient(
+      135deg,
+      rgba(58,105,133,.18) 0 8px,
+      rgba(58,105,133,.06) 8px 16px
+    );
+    background-color: #E0EAF1;
+  }
+  .ph-sand {
+    background-image: repeating-linear-gradient(
+      135deg,
+      rgba(195,146,101,.22) 0 8px,
+      rgba(195,146,101,.08) 8px 16px
+    );
+    background-color: #F5EADB;
+  }
+
+  /* Smooth scroll anchors */
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+  /* Section heading rule */
+  .rule-eyebrow::before{
+    content:''; display:inline-block; width:32px; height:1px;
+    background:currentColor; vertical-align:middle; margin-right:14px;
+    opacity:.5;
+  }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="ds/icons.jsx"></script>
+<script type="text/babel" src="ds/logo.jsx"></script>
+<script type="text/babel" src="ds/foundations.jsx"></script>
+<script type="text/babel" src="ds/components.jsx"></script>
+<script type="text/babel" src="ds/mockups.jsx"></script>
+<script type="text/babel" src="ds/app.jsx"></script>
+
+</body>
+</html>
