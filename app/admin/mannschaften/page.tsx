@@ -1,13 +1,17 @@
+import Link from 'next/link';
 import { AvatarGroup } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
-import { listTeamsWithRoster } from '@/lib/db/queries/teams';
+import { listTeamsWithRoster, getUnassignedMemberCount } from '@/lib/db/queries/teams';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminTeamsPage() {
-  const teams = await listTeamsWithRoster();
+  const [teams, unassigned] = await Promise.all([
+    listTeamsWithRoster(),
+    getUnassignedMemberCount(),
+  ]);
   const adultTeams = teams.filter((t) => !/^Jugend/.test(t.name));
   const youthTeams = teams.filter((t) => /^Jugend/.test(t.name));
 
@@ -27,10 +31,23 @@ export default async function AdminTeamsPage() {
             für ihre Mannschaft.
           </p>
         </div>
-        <Button variant="primary" icon={<Icon.Plus size={16} />}>
-          Mannschaft anlegen
-        </Button>
+        <Link href="/admin/mannschaften/neu">
+          <Button variant="primary" icon={<Icon.Plus size={16} />}>
+            Mannschaft anlegen
+          </Button>
+        </Link>
       </div>
+
+      {unassigned > 0 && (
+        <div className="mt-5 flex items-center gap-3 bg-sand-50 border border-sand-200 rounded-lg px-5 py-3.5">
+          <Icon.Info size={18} className="text-sand-700 flex-none" />
+          <span className="text-[14px] text-stone-700">
+            <strong>{unassigned}</strong>{' '}
+            {unassigned === 1 ? 'Mitglied ist' : 'Mitglieder sind'} noch keiner Mannschaft
+            zugeordnet. Über „Kader öffnen" kannst du sie zuteilen.
+          </span>
+        </div>
+      )}
 
       <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {teams.map((t) => {
@@ -99,12 +116,12 @@ export default async function AdminTeamsPage() {
                 ) : (
                   <span className="text-[12.5px] text-stone-500">Noch keine Spieler:innen</span>
                 )}
-                <button
-                  type="button"
-                  className="text-[12.5px] font-medium text-lake-700 inline-flex items-center gap-1"
+                <Link
+                  href={`/admin/mannschaften/${t.id}`}
+                  className="text-[12.5px] font-medium text-lake-700 inline-flex items-center gap-1 hover:text-lake-800"
                 >
                   Kader öffnen <Icon.ChevronRight size={14} />
-                </button>
+                </Link>
               </div>
             </article>
           );
