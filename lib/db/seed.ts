@@ -1,9 +1,13 @@
+import { readFileSync, existsSync } from 'node:fs';
+import path from 'node:path';
 import { PGlite } from '@electric-sql/pglite';
 import { drizzle } from 'drizzle-orm/pglite';
 import { sql } from 'drizzle-orm';
 import * as schema from './schema';
+import { parseMembersCsv, initialsFor, toneFor } from '../members-csv';
 
 const dataDir = process.env.PGLITE_DATA_DIR ?? './data/pglite';
+const MEMBERS_CSV = path.resolve(process.cwd(), 'data/mitglieder.csv');
 
 const MEMBERS = [
   { email: 'm.hofmann@tsv-treffen.at', firstName: 'Martin', lastName: 'Hofmann', initials: 'MH', avatarTone: 'lake', role: 'obmann', status: 'active', memberSince: '2014-04-01', lkRating: '11.3', paymentStatus: 'paid', birthdate: '1984-05-28', phone: '+43 660 1234567', category: 'aktiv' },
@@ -379,7 +383,43 @@ async function main() {
     await db.insert(schema.attendances).values(sample);
   }
 
-  console.log(`Done. ${memberRows.length} members, ${teamRows.length} teams, ${trainingRows.length} trainings, ${invoiceRows.length} invoices.`);
+  // Optionaler Import echter Mitglieder aus data/mitglieder.csv (gitignored).
+  // Duplikat-E-Mails werden genullt, damit alle Personen angelegt werden.
+  let importedReal = 0;
+  if (existsSync(MEMBERS_CSV)) {
+    console.log('Importing real members from data/mitglieder.csv…');
+    const { rows } = parseMembersCsv(readFileSync(MEMBERS_CSV, 'utf8'));
+    const seen = new Set<string>(MEMBERS.map((m) => m.email.toLowerCase()));
+    const toInsert: (typeof schema.members.$inferInsert)[] = [];
+    for (const r of rows) {
+      if (!r.valid) continue;
+      let email: string | null = r.email;
+      if (email && seen.has(email)) email = null;
+      if (email) seen.add(email);
+      toInsert.push({
+        firstName: r.firstName,
+        lastName: r.lastName,
+        email,
+        initials: initialsFor(r.firstName, r.lastName),
+        avatarTone: toneFor(email || `${r.firstName} ${r.lastName}`),
+        role: r.role,
+        status: r.status,
+        phone: r.phone,
+        street: r.street,
+        postalCode: r.postalCode,
+        city: r.city,
+        birthdate: r.birthdate,
+        lkRating: r.lkRating,
+        updatedAt: new Date(),
+      });
+    }
+    if (toInsert.length) await db.insert(schema.members).values(toInsert);
+    importedReal = toInsert.length;
+  }
+
+  console.log(
+    `Done. ${memberRows.length + importedReal} members (${importedReal} aus CSV), ${teamRows.length} teams, ${trainingRows.length} trainings, ${invoiceRows.length} invoices.`,
+  );
   await client.close();
 }
 

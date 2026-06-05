@@ -15,10 +15,9 @@ const FILTERS: { id: Filter; label: string }[] = [
   { id: 'event', label: 'Events' },
 ];
 
-const HOURS = [14, 15, 16, 17, 18, 19, 20, 21];
-
 type Block = {
   href: string;
+  clickable: boolean;
   startHour: number;
   durationH: number;
   label: string;
@@ -93,6 +92,7 @@ export default async function KalenderPage({
     const end = t.endsAt.getHours() + t.endsAt.getMinutes() / 60;
     blocks.push({
       href: `/app/trainings/${t.id}`,
+      clickable: true,
       startHour: start,
       durationH: Math.max(0.5, end - start),
       label: t.title,
@@ -111,7 +111,8 @@ export default async function KalenderPage({
       ? e.endsAt.getHours() + e.endsAt.getMinutes() / 60
       : start + 2;
     blocks.push({
-      href: '#',
+      href: '',
+      clickable: false,
       startHour: start,
       durationH: Math.max(1, end - start),
       label: e.title,
@@ -123,13 +124,15 @@ export default async function KalenderPage({
   const weekListItems = [
     ...trainings.map((t) => ({
       href: `/app/trainings/${t.id}`,
+      clickable: true,
       title: t.title,
       when: t.startsAt,
       tone: 'forest' as const,
       time: formatTimeRange(t.startsAt, t.endsAt),
     })),
     ...events.map((e) => ({
-      href: '#',
+      href: '',
+      clickable: false,
       title: e.title,
       when: e.startsAt,
       tone: (e.kind === 'match' ? 'lake' : 'sand') as 'lake' | 'sand',
@@ -139,6 +142,17 @@ export default async function KalenderPage({
     .filter((x) => x.when >= new Date())
     .sort((a, b) => a.when.getTime() - b.when.getTime())
     .slice(0, 6);
+
+  // Stundenraster dynamisch: deckt immer 14–21 Uhr ab, erweitert bei früheren/späteren Terminen.
+  let minHour = 14;
+  let maxHour = 21;
+  for (const b of blocks) {
+    minHour = Math.min(minHour, Math.floor(b.startHour));
+    maxHour = Math.max(maxHour, Math.ceil(b.startHour));
+  }
+  minHour = Math.max(7, minHour);
+  maxHour = Math.min(22, maxHour);
+  const hours = Array.from({ length: maxHour - minHour + 1 }, (_, i) => minHour + i);
 
   const TONE_BG = {
     forest: 'bg-forest-50 border-forest-200 text-forest-800',
@@ -155,23 +169,54 @@ export default async function KalenderPage({
   const week = isoWeek(weekStart);
   const monthName = MONTHS_DE[selected.getMonth()];
 
+  const filterSuffix = filter === 'all' ? '' : `&filter=${filter}`;
+  const prevWeekDate = new Date(weekStart);
+  prevWeekDate.setDate(weekStart.getDate() - 7);
+  const nextWeekDate = new Date(weekStart);
+  nextWeekDate.setDate(weekStart.getDate() + 7);
+  const prevHref = `/app/kalender?day=${isoDate(prevWeekDate)}${filterSuffix}`;
+  const nextHref = `/app/kalender?day=${isoDate(nextWeekDate)}${filterSuffix}`;
+  const todayHref = `/app/kalender?day=${isoDate(new Date())}${filterSuffix}`;
+  const isCurrentWeek = sameDay(weekStart, startOfWeek(new Date()));
+
   return (
     <>
       <MobileHeader
         lead={`KW ${week} · ${monthName} ${selected.getFullYear()}`}
         title="Kalender"
-        action={
-          <button
-            type="button"
-            aria-label="Neuer Termin"
-            className="w-11 h-11 inline-flex items-center justify-center rounded-full bg-white border border-stone-200 text-stone-700"
-          >
-            <Icon.Plus size={18} />
-          </button>
-        }
       />
 
       <div className="px-5">
+        {/* Wochen-Navigation */}
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <Link
+            href={prevHref}
+            aria-label="Vorherige Woche"
+            className="w-11 h-11 inline-flex items-center justify-center rounded-full bg-white border border-stone-200 text-stone-700 hover:bg-paper-50"
+          >
+            <Icon.ArrowLeft size={18} />
+          </Link>
+          {isCurrentWeek ? (
+            <span className="font-mono text-[12px] uppercase tracking-[0.16em] text-stone-500">
+              Diese Woche
+            </span>
+          ) : (
+            <Link
+              href={todayHref}
+              className="px-4 h-9 inline-flex items-center rounded-full bg-white border border-stone-200 text-[13px] font-medium text-lake-700"
+            >
+              Heute
+            </Link>
+          )}
+          <Link
+            href={nextHref}
+            aria-label="Nächste Woche"
+            className="w-11 h-11 inline-flex items-center justify-center rounded-full bg-white border border-stone-200 text-stone-700 hover:bg-paper-50"
+          >
+            <Icon.ArrowRight size={18} />
+          </Link>
+        </div>
+
         <div className="flex items-center gap-1.5 mb-3 overflow-x-auto -mx-1 px-1">
           {FILTERS.map((f) => {
             const active = f.id === filter;
@@ -221,7 +266,7 @@ export default async function KalenderPage({
 
       <div className="px-5 mt-4 pb-8">
         <div className="relative bg-white rounded-lg border border-stone-200">
-          {HOURS.map((h) => (
+          {hours.map((h) => (
             <div key={h} className="grid grid-cols-[48px_1fr] border-t first:border-t-0 border-stone-100">
               <div className="font-mono text-[11px] text-stone-400 pt-1.5 pl-3 uppercase tracking-[0.12em]">
                 {h}:00
@@ -231,18 +276,23 @@ export default async function KalenderPage({
                   .filter((b) => Math.floor(b.startHour) === h)
                   .map((b, j) => {
                     const heightPx = b.durationH * 56 - 8;
-                    return (
-                      <Link
-                        key={j}
-                        href={b.href}
-                        className={`absolute left-2 right-3 top-1 rounded-md border px-3 py-2 ${TONE_BG[b.tone]}`}
-                        style={{ height: `${heightPx}px` }}
-                      >
+                    const cls = `absolute left-2 right-3 top-1 rounded-md border px-3 py-2 ${TONE_BG[b.tone]}`;
+                    const inner = (
+                      <>
                         <div className="font-mono text-[10px] uppercase tracking-[0.14em] opacity-70">
                           {b.timeLabel}
                         </div>
                         <div className="text-[14px] font-medium leading-tight mt-0.5">{b.label}</div>
+                      </>
+                    );
+                    return b.clickable ? (
+                      <Link key={j} href={b.href} className={cls} style={{ height: `${heightPx}px` }}>
+                        {inner}
                       </Link>
+                    ) : (
+                      <div key={j} className={cls} style={{ height: `${heightPx}px` }}>
+                        {inner}
+                      </div>
                     );
                   })}
               </div>
@@ -263,22 +313,36 @@ export default async function KalenderPage({
             {weekListItems.length === 0 && (
               <div className="text-[14px] text-stone-500">Nichts mehr in dieser Woche.</div>
             )}
-            {weekListItems.map((b, i) => (
-              <Link
-                key={i}
-                href={b.href}
-                className="bg-white rounded-md border border-stone-200 p-3 flex items-center gap-3"
-              >
-                <div className={`w-1 h-10 rounded-full ${TONE_STRIPE[b.tone]}`} />
-                <div className="flex-1">
-                  <div className="text-[14px] font-medium text-stone-800 leading-tight">{b.title}</div>
-                  <div className="font-mono text-[10.5px] text-stone-500 uppercase tracking-[0.14em] mt-1">
-                    {WEEKDAYS_DE_SHORT[b.when.getDay()]} · {b.time}
+            {weekListItems.map((b, i) => {
+              const inner = (
+                <>
+                  <div className={`w-1 h-10 rounded-full ${TONE_STRIPE[b.tone]}`} />
+                  <div className="flex-1">
+                    <div className="text-[14px] font-medium text-stone-800 leading-tight">{b.title}</div>
+                    <div className="font-mono text-[10.5px] text-stone-500 uppercase tracking-[0.14em] mt-1">
+                      {WEEKDAYS_DE_SHORT[b.when.getDay()]} · {b.time}
+                    </div>
                   </div>
+                  {b.clickable && <Icon.ChevronRight size={16} className="text-stone-400" />}
+                </>
+              );
+              return b.clickable ? (
+                <Link
+                  key={i}
+                  href={b.href}
+                  className="bg-white rounded-md border border-stone-200 p-3 flex items-center gap-3 hover:bg-paper-50"
+                >
+                  {inner}
+                </Link>
+              ) : (
+                <div
+                  key={i}
+                  className="bg-white rounded-md border border-stone-200 p-3 flex items-center gap-3"
+                >
+                  {inner}
                 </div>
-                <Icon.ChevronRight size={16} className="text-stone-400" />
-              </Link>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
