@@ -1,4 +1,4 @@
-import { sql, eq, asc, inArray } from 'drizzle-orm';
+import { sql, eq, asc, inArray, and, or, ilike } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { rawRows } from '@/lib/db/raw';
 import { members, teamMembers, teams, type Member } from '@/lib/db/schema';
@@ -34,6 +34,71 @@ export async function listTrainerOptions(): Promise<{ id: string; name: string }
     .where(inArray(members.role, ['trainer', 'jugendleiter', 'obmann', 'admin']))
     .orderBy(asc(members.lastName), asc(members.firstName));
   return rows.map((r) => ({ id: r.id, name: `${r.firstName} ${r.lastName}` }));
+}
+
+export type MemberFilter = {
+  search?: string;
+  status?: Member['status'];
+  dues?: Member['paymentStatus'];
+  page?: number;
+  pageSize?: number;
+};
+
+export type FilteredMembers = {
+  rows: MemberRow[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+};
+
+/** Mitgliederliste mit Suche, Status-/Beitragsfilter und Paginierung. */
+export async function listMembersFiltered(f: MemberFilter): Promise<FilteredMembers> {
+  const pageSize = f.pageSize ?? 25;
+  const page = Math.max(1, f.page ?? 1);
+
+  const conds = [];
+  if (f.search) {
+    const q = `%${f.search}%`;
+    conds.push(or(ilike(members.firstName, q), ilike(members.lastName, q), ilike(members.email, q)));
+  }
+  if (f.status) conds.push(eq(members.status, f.status));
+  if (f.dues) conds.push(eq(members.paymentStatus, f.dues));
+  const where = conds.length ? and(...conds) : undefined;
+
+  const countRows = await db
+    .select({ c: sql<number>`count(*)::int` })
+    .from(members)
+    .where(where);
+  const total = countRows[0]?.c ?? 0;
+
+  const rows = await db
+    .select()
+    .from(members)
+    .where(where)
+    .orderBy(asc(members.lastName), asc(members.firstName))
+    .limit(pageSize)
+    .offset((page - 1) * pageSize);
+
+  // Erste Team-Zugehörigkeit je Mitglied nachladen.
+  const ids = rows.map((r) => r.id);
+  const teamMap = new Map<string, string>();
+  if (ids.length) {
+    const tr = await db
+      .select({ memberId: teamMembers.memberId, name: teams.name })
+      .from(teamMembers)
+      .innerJoin(teams, eq(teams.id, teamMembers.teamId))
+      .where(inArray(teamMembers.memberId, ids));
+    for (const r of tr) if (!teamMap.has(r.memberId)) teamMap.set(r.memberId, r.name);
+  }
+
+  return {
+    rows: rows.map((m) => ({ ...m, teamName: teamMap.get(m.id) ?? null })),
+    total,
+    page,
+    pageSize,
+    totalPages: Math.max(1, Math.ceil(total / pageSize)),
+  };
 }
 
 export async function getMember(id: string): Promise<Member | null> {

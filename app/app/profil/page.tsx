@@ -72,9 +72,11 @@ export default async function ProfilPage() {
               </div>
             </div>
           </div>
-          <Button variant="secondary" size="md" icon={<Icon.Edit size={16} />} className="mt-4 w-full">
-            Profil bearbeiten
-          </Button>
+          <Link href="/app/profil/bearbeiten" className="mt-4 block">
+            <Button variant="secondary" size="md" icon={<Icon.Edit size={16} />} className="w-full">
+              Profil bearbeiten
+            </Button>
+          </Link>
         </div>
 
         {/* Stats */}
