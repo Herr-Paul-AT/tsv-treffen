@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { getCurrentMember } from '@/lib/db/queries/session';
 import { getProfileStats, getProfileTeams } from '@/lib/db/queries/profile';
+import { signOut } from '@/lib/actions/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -139,12 +140,14 @@ export default async function ProfilPage() {
           ))}
         </div>
 
-        <Link
-          href="/"
-          className="mt-6 w-full h-12 inline-flex items-center justify-center gap-2 rounded-md text-danger font-medium text-[15px] border border-danger/20 bg-white"
-        >
-          Abmelden
-        </Link>
+        <form action={signOut} className="mt-6">
+          <button
+            type="submit"
+            className="w-full h-12 inline-flex items-center justify-center gap-2 rounded-md text-danger font-medium text-[15px] border border-danger/20 bg-white hover:bg-danger/5"
+          >
+            Abmelden
+          </button>
+        </form>
       </div>
     </>
   );

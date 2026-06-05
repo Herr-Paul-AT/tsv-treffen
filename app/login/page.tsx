@@ -3,8 +3,29 @@ import { TSVMark } from '@/components/brand/Logo';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { TextField } from '@/components/ui/TextField';
+import { signInWithMagicLink, signInWithPassword } from '@/lib/actions/auth';
+import { isSupabaseConfigured } from '@/lib/supabase/config';
 
-export default function LoginPage() {
+export const dynamic = 'force-dynamic';
+
+const ERRORS: Record<string, string> = {
+  credentials: 'E-Mail oder Passwort ist nicht korrekt.',
+  missing: 'Bitte E-Mail und Passwort eingeben.',
+  magiclink: 'Magic-Link konnte nicht gesendet werden. Bitte erneut versuchen.',
+  callback: 'Anmeldung fehlgeschlagen. Bitte fordere einen neuen Link an.',
+};
+
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ redirect?: string; error?: string; sent?: string }>;
+}) {
+  const sp = await searchParams;
+  const redirectTo = sp.redirect && sp.redirect.startsWith('/') ? sp.redirect : '/app/dashboard';
+  const errorMsg = sp.error ? ERRORS[sp.error] ?? 'Anmeldung fehlgeschlagen.' : null;
+  const sent = sp.sent === '1';
+  const configured = isSupabaseConfigured();
+
   return (
     <main className="min-h-dvh bg-paper-100 flex flex-col">
       <div className="pt-12 px-7 max-w-md w-full mx-auto">
@@ -27,7 +48,22 @@ export default function LoginPage() {
         </p>
       </div>
 
-      <form action="/app/dashboard" className="flex-1 px-7 mt-7 max-w-md w-full mx-auto">
+      <form className="flex-1 px-7 mt-7 max-w-md w-full mx-auto">
+        <input type="hidden" name="redirect" value={redirectTo} />
+
+        {errorMsg && (
+          <div className="mb-4 flex items-start gap-2.5 rounded-md bg-danger/5 border border-danger/20 px-4 py-3 text-[13.5px] text-danger">
+            <Icon.Info size={16} className="flex-none mt-0.5" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
+        {sent && (
+          <div className="mb-4 flex items-start gap-2.5 rounded-md bg-forest-50 border border-forest-200 px-4 py-3 text-[13.5px] text-forest-800">
+            <Icon.Mail size={16} className="flex-none mt-0.5" />
+            <span>Magic-Link gesendet — schau in dein E-Mail-Postfach.</span>
+          </div>
+        )}
+
         <div className="space-y-4">
           <TextField
             label="E-Mail"
@@ -36,6 +72,7 @@ export default function LoginPage() {
             type="email"
             name="email"
             autoComplete="email"
+            required
           />
           <TextField
             label="Passwort"
@@ -45,33 +82,37 @@ export default function LoginPage() {
             name="password"
             autoComplete="current-password"
           />
-          <div className="text-right -mt-1">
-            <Link
-              href="#"
-              className="font-mono text-[11px] uppercase tracking-[0.14em] text-lake-700"
-            >
-              Passwort vergessen?
-            </Link>
-          </div>
         </div>
 
         <div className="mt-8 space-y-3">
-          <Button type="submit" variant="primary" size="xl" className="w-full">
+          <Button type="submit" formAction={signInWithPassword} variant="primary" size="xl" className="w-full">
             Anmelden
           </Button>
-          <Link href="/" className="block">
-            <Button variant="ghost" size="lg" className="w-full !text-stone-700">
-              Als Gast fortfahren
-            </Button>
-          </Link>
+          <Button
+            type="submit"
+            formAction={signInWithMagicLink}
+            variant="secondary"
+            size="lg"
+            icon={<Icon.Mail size={16} />}
+            className="w-full"
+          >
+            Stattdessen Magic-Link per E-Mail
+          </Button>
+          {!configured && (
+            <Link href={redirectTo} className="block">
+              <Button variant="ghost" size="lg" className="w-full !text-stone-700">
+                Als Gast fortfahren (Dev)
+              </Button>
+            </Link>
+          )}
         </div>
       </form>
 
       <div className="px-7 py-7 max-w-md w-full mx-auto text-center font-mono text-[11px] text-stone-500 uppercase tracking-[0.16em]">
         Neu hier?{' '}
-        <Link href="#" className="text-lake-700">
+        <a href="mailto:office@tsv-treffen.at" className="text-lake-700">
           Mitglied werden
-        </Link>
+        </a>
       </div>
     </main>
   );
