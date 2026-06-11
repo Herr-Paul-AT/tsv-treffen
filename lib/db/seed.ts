@@ -1,8 +1,11 @@
+import { config } from 'dotenv';
+config({ path: '.env.local' });
+config();
+
 import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
-import { PGlite } from '@electric-sql/pglite';
-import { drizzle } from 'drizzle-orm/pglite';
 import { sql } from 'drizzle-orm';
+import type { PgDatabase } from 'drizzle-orm/pg-core';
 import * as schema from './schema';
 import { parseMembersCsv, initialsFor, toneFor } from '../members-csv';
 
@@ -192,8 +195,28 @@ function trainingsForWeek(baseMonday: Date, teamId: (name: string) => string | n
 }
 
 async function main() {
-  const client = new PGlite(dataDir);
-  const db = drizzle(client, { schema });
+  const url = process.env.DATABASE_URL;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let db: PgDatabase<any, typeof schema>;
+  let close: () => Promise<void>;
+  if (url) {
+    const postgres = (await import('postgres')).default;
+    const { drizzle } = await import('drizzle-orm/postgres-js');
+    const client = postgres(url, { max: 1, prepare: false });
+    db = drizzle(client, { schema });
+    close = async () => {
+      await client.end();
+    };
+    console.log('Seeding Postgres (DATABASE_URL)…');
+  } else {
+    const { PGlite } = await import('@electric-sql/pglite');
+    const { drizzle } = await import('drizzle-orm/pglite');
+    const client = new PGlite(dataDir);
+    db = drizzle(client, { schema });
+    close = async () => {
+      await client.close();
+    };
+  }
 
   console.log('Truncating existing data…');
   await db.execute(sql`
@@ -420,7 +443,7 @@ async function main() {
   console.log(
     `Done. ${memberRows.length + importedReal} members (${importedReal} aus CSV), ${teamRows.length} teams, ${trainingRows.length} trainings, ${invoiceRows.length} invoices.`,
   );
-  await client.close();
+  await close();
 }
 
 function startOfWeek(d: Date) {
