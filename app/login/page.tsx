@@ -3,7 +3,7 @@ import { TSVMark } from '@/components/brand/Logo';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { TextField } from '@/components/ui/TextField';
-import { signInWithMagicLink, signInWithPassword } from '@/lib/actions/auth';
+import { signInWithPassword } from '@/lib/actions/auth';
 import { isSupabaseConfigured } from '@/lib/supabase/config';
 
 export const dynamic = 'force-dynamic';
@@ -11,19 +11,16 @@ export const dynamic = 'force-dynamic';
 const ERRORS: Record<string, string> = {
   credentials: 'E-Mail oder Passwort ist nicht korrekt.',
   missing: 'Bitte E-Mail und Passwort eingeben.',
-  magiclink: 'Magic-Link konnte nicht gesendet werden. Bitte erneut versuchen.',
-  callback: 'Anmeldung fehlgeschlagen. Bitte fordere einen neuen Link an.',
 };
 
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ redirect?: string; error?: string; sent?: string }>;
+  searchParams: Promise<{ redirect?: string; error?: string; registered?: string; reset?: string }>;
 }) {
   const sp = await searchParams;
   const redirectTo = sp.redirect && sp.redirect.startsWith('/') ? sp.redirect : '/app/dashboard';
   const errorMsg = sp.error ? ERRORS[sp.error] ?? 'Anmeldung fehlgeschlagen.' : null;
-  const sent = sp.sent === '1';
   const configured = isSupabaseConfigured();
 
   return (
@@ -43,12 +40,11 @@ export default async function LoginPage({
           zurück.
         </h1>
         <p className="text-[16px] text-stone-600 mt-3 leading-[1.55] max-w-[320px]">
-          Melde dich an, um Trainings zu bestätigen, Plätze zu buchen und News deiner Mannschaft
-          zu sehen.
+          Melde dich mit E-Mail und Passwort an.
         </p>
       </div>
 
-      <form className="flex-1 px-7 mt-7 max-w-md w-full mx-auto">
+      <form action={signInWithPassword} className="flex-1 px-7 mt-7 max-w-md w-full mx-auto">
         <input type="hidden" name="redirect" value={redirectTo} />
 
         {errorMsg && (
@@ -57,10 +53,16 @@ export default async function LoginPage({
             <span>{errorMsg}</span>
           </div>
         )}
-        {sent && (
+        {sp.registered === '1' && (
           <div className="mb-4 flex items-start gap-2.5 rounded-md bg-forest-50 border border-forest-200 px-4 py-3 text-[13.5px] text-forest-800">
             <Icon.Mail size={16} className="flex-none mt-0.5" />
-            <span>Magic-Link gesendet — schau in dein E-Mail-Postfach.</span>
+            <span>Fast fertig — bestätige kurz deine E-Mail, danach kannst du dich anmelden.</span>
+          </div>
+        )}
+        {sp.reset === '1' && (
+          <div className="mb-4 flex items-start gap-2.5 rounded-md bg-forest-50 border border-forest-200 px-4 py-3 text-[13.5px] text-forest-800">
+            <Icon.Check size={16} className="flex-none mt-0.5" />
+            <span>Passwort geändert. Du kannst dich jetzt anmelden.</span>
           </div>
         )}
 
@@ -81,22 +83,21 @@ export default async function LoginPage({
             placeholder="••••••••"
             name="password"
             autoComplete="current-password"
+            required
           />
+          <div className="text-right -mt-1">
+            <Link
+              href="/login/passwort-vergessen"
+              className="font-mono text-[11px] uppercase tracking-[0.14em] text-lake-700"
+            >
+              Passwort vergessen?
+            </Link>
+          </div>
         </div>
 
         <div className="mt-8 space-y-3">
-          <Button type="submit" formAction={signInWithPassword} variant="primary" size="xl" className="w-full">
+          <Button type="submit" variant="primary" size="xl" className="w-full">
             Anmelden
-          </Button>
-          <Button
-            type="submit"
-            formAction={signInWithMagicLink}
-            variant="secondary"
-            size="lg"
-            icon={<Icon.Mail size={16} />}
-            className="w-full"
-          >
-            Stattdessen Magic-Link per E-Mail
           </Button>
           {!configured && (
             <Link href={redirectTo} className="block">
@@ -108,11 +109,11 @@ export default async function LoginPage({
         </div>
       </form>
 
-      <div className="px-7 py-7 max-w-md w-full mx-auto text-center font-mono text-[11px] text-stone-500 uppercase tracking-[0.16em]">
-        Neu hier?{' '}
-        <a href="mailto:office@tsv-treffen.at" className="text-lake-700">
-          Mitglied werden
-        </a>
+      <div className="px-7 py-7 max-w-md w-full mx-auto text-center text-[13.5px] text-stone-600">
+        Zum ersten Mal hier?{' '}
+        <Link href="/login/registrieren" className="text-lake-700 font-medium">
+          Konto einrichten
+        </Link>
       </div>
     </main>
   );
