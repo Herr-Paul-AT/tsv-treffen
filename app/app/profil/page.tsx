@@ -109,6 +109,9 @@ export default async function ProfilPage() {
         {/* Sections */}
         <div className="mt-6 bg-white rounded-lg border border-stone-200 overflow-hidden">
           {[
+            ...(['admin', 'obmann'].includes(me.role)
+              ? [{ href: '/admin', icon: <Icon.Settings />, label: 'Adminbereich', hint: 'Verein verwalten' }]
+              : []),
             { href: '/app/kalender', icon: <Icon.Calendar />, label: 'Meine Termine', hint: `${stats.upcomingThisWeek} kommend` },
             { href: '#', icon: <Icon.Bell />, label: 'Benachrichtigungen', hint: 'Push & E-Mail' },
             { href: '/app/platzbuchung', icon: <Icon.Court />, label: 'Platzbuchungen', hint: 'eTennis' },
