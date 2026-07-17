@@ -114,7 +114,7 @@ export default async function ProfilPage() {
               : []),
             { href: '/app/kalender', icon: <Icon.Calendar />, label: 'Meine Termine', hint: `${stats.upcomingThisWeek} kommend` },
             { href: '#', icon: <Icon.Bell />, label: 'Benachrichtigungen', hint: 'Push & E-Mail' },
-            { href: '/app/platzbuchung', icon: <Icon.Court />, label: 'Platzbuchungen', hint: 'eTennis' },
+            { href: '/app/platzbuchung', icon: <Icon.Court />, label: 'Platz buchen', hint: 'tennisplatz.info' },
             ...(primaryTeam
               ? [{ href: '/admin/mannschaften', icon: <Icon.Trophy />, label: `Mannschaft ${primaryTeam.name}`, hint: primaryTeam.league }]
               : []),

@@ -25,7 +25,7 @@ const dmMono = DM_Mono({
 
 const APP_NAME = 'TSV Schloss Treffen';
 const APP_DESCRIPTION =
-  'Tennisverein in Treffen am Ossiachersee — Sandplatz-Tennis am Fuße der Gerlitzen, zwischen Schloss und See.';
+  'Tennisverein in Treffen am Ossiachersee — Sandplatz-Tennis beim Schloss, am Treffnerbach, mit Blick auf die Gerlitzen.';
 
 export const metadata: Metadata = {
   applicationName: APP_NAME,

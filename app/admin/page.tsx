@@ -92,7 +92,7 @@ export default async function AdminLandingPage() {
       href: '/admin/platzbuchung',
       label: 'Platzbuchung',
       icon: <Icon.Court size={20} />,
-      hint: 'eTennis-Sync',
+      hint: 'tennisplatz.info',
       tone: 'forest',
     },
   ];

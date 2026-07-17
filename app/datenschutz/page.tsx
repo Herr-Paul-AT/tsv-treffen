@@ -73,8 +73,8 @@ export default function DatenschutzPage() {
             </h2>
             <ul className="space-y-1.5 list-disc pl-5">
               <li>
-                eTennis (externer Platzbuchungs-Dienstleister) — Vor- und Nachname sowie
-                Vereinszugehörigkeit zur SSO-Authentifizierung
+                tennisplatz.info (externer Platzbuchungs-Dienstleister) — Vor- und Nachname sowie
+                Vereinszugehörigkeit zur Reservierung
               </li>
               <li>Hosting-Provider innerhalb der EU für App und Datenbank</li>
               <li>Kärntner Tennisverband — sportbezogene Pflichtmeldungen (z. B. LK-Wertung)</li>

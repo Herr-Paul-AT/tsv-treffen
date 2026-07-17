@@ -4,7 +4,6 @@ import { AvatarGroup } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
-import { StatusDot } from '@/components/ui/StatusDot';
 import { listNews } from '@/lib/db/queries/news';
 import { listUpcomingEvents } from '@/lib/db/queries/events';
 import { listTeamsWithRoster } from '@/lib/db/queries/teams';
@@ -14,20 +13,21 @@ import { formatDayMonth, formatDayMonthCaps, MONTHS_DE } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
 
+const RESERVATION_URL = 'https://treffen.tennisplatz.info/reservierung';
+
 const NEWS_EYEBROW_TONES: Record<string, string> = {
   Saisoneröffnung: 'text-sand-700',
   Mannschaftsspiel: 'text-lake-700',
   Vereinsmeisterschaft: 'text-sand-700',
-  Bezirksliga: 'text-lake-700',
 };
 
 const TRAININGS = [
   { day: 'Mo', time: '17:00 – 18:30', who: 'Damen 35+ / 50+', trainer: 'K. Wallner', court: 'Platz 3' },
-  { day: 'Di', time: '16:30 – 18:00', who: 'Jugend U14 / U16', trainer: 'M. Pirker', court: 'Platz 2 & 4' },
+  { day: 'Di', time: '16:30 – 18:00', who: 'Jugend U14 / U16', trainer: 'M. Pirker', court: 'Platz 2 & 3' },
   { day: 'Di', time: '19:00 – 21:00', who: 'Herren I · Mannschaft', trainer: 'M. Pirker', court: 'Platz 1 & 2' },
-  { day: 'Mi', time: '14:30 – 16:30', who: 'Jugend U10 / U12', trainer: 'A. Brunner', court: 'Platz 4' },
+  { day: 'Mi', time: '14:30 – 16:30', who: 'Jugend U10 / U12', trainer: 'A. Brunner', court: 'Platz 3' },
   { day: 'Mi', time: '18:00 – 20:00', who: 'Herren II · Mannschaft', trainer: 'M. Pirker', court: 'Platz 1 & 2' },
-  { day: 'Do', time: '16:30 – 18:00', who: 'Jugend U14 / U16', trainer: 'M. Pirker', court: 'Platz 2 & 4' },
+  { day: 'Do', time: '16:30 – 18:00', who: 'Jugend U14 / U16', trainer: 'M. Pirker', court: 'Platz 2 & 3' },
   { day: 'Do', time: '19:00 – 21:00', who: 'Herren I · Mannschaft', trainer: 'M. Pirker', court: 'Platz 1 & 2' },
 ];
 
@@ -40,7 +40,7 @@ const PRICING = [
       'Mitgliedsbeitrag pro Saison',
       'Kindertraining inklusive',
       'Leihschläger im Vereinsheim',
-      'Mannschaftsantritt bei Bezirks-Cup',
+      'Mannschaftsantritt bei Turnieren',
     ],
     tone: 'forest' as const,
   },
@@ -50,7 +50,7 @@ const PRICING = [
     price: '280',
     perks: [
       'Mitgliedsbeitrag pro Saison',
-      'Freies Spielen auf allen 4 Plätzen',
+      'Freies Spielen auf allen Plätzen',
       'Vereinsmeisterschaft inklusive',
       '2 Gastspiele/Saison frei',
       'Hallensaison im Winter zu Sonderkonditionen',
@@ -94,7 +94,7 @@ const FAQS = [
   },
   {
     q: 'Ich bin nicht Mitglied — kann ich trotzdem spielen?',
-    a: 'Mit einem Vereinsmitglied als Begleitung ja — Gastspiel kostet 15 € pro Stunde, gebucht über eTennis. Mitglieder haben 2 bis 4 Gastspiele pro Saison frei.',
+    a: 'Mit einem Vereinsmitglied als Begleitung ja — Gastspiel kostet 15 € pro Stunde, gebucht über das Online-Reservierungssystem. Mitglieder haben 2 bis 4 Gastspiele pro Saison frei.',
   },
   {
     q: 'Gibt es Schläger zum Ausleihen?',
@@ -102,7 +102,7 @@ const FAQS = [
   },
   {
     q: 'Was passiert im Winter?',
-    a: 'Outdoor pausiert von Mitte Oktober bis April. Für die Hallensaison kooperieren wir mit der Tennis-Halle Villach (Halle 3). Mannschaftstraining läuft dort, Einzelbuchungen zu Sonderkonditionen.',
+    a: 'Outdoor pausiert von Mitte Oktober bis April. Für die Hallensaison kooperieren wir mit der Tennis-Halle Villach. Mannschaftstraining läuft dort, Einzelbuchungen zu Sonderkonditionen.',
   },
   {
     q: 'Wie kommt man am besten hin?',
@@ -157,14 +157,14 @@ export default async function LandingPage() {
             <span className="font-mono text-[10.5px] uppercase tracking-[0.22em] text-sand-300">
               Saison 2026 · Eröffnung am 12. April
             </span>
-            <h1 className="font-display text-[44px] sm:text-[72px] leading-[1.0] tracking-[-0.015em] mt-3 max-w-[760px]">
-              Tennis am Fuße
+            <h1 className="font-display text-[40px] sm:text-[64px] leading-[1.02] tracking-[-0.015em] mt-3 max-w-[820px]">
+              Tennis beim Schloss
               <br />
-              der Gerlitzen.
+              mit Blick auf die Gerlitzen.
             </h1>
-            <p className="text-[16px] sm:text-[19px] text-paper-100/85 mt-4 leading-[1.55] max-w-[520px]">
-              Vier Sandplätze, ein See, ein Schloss im Rücken. Spielen, trainieren, dazugehören —
-              seit 1972.
+            <p className="text-[16px] sm:text-[19px] text-paper-100/85 mt-4 leading-[1.55] max-w-[540px]">
+              Drei Sandplätze beim Schloss, direkt am Treffnerbach, mit Blick auf die Gerlitzen.
+              Spielen, trainieren, dazugehören — seit 1972.
             </p>
             <div className="flex gap-2 mt-6 flex-wrap">
               <a href="#mitgliedschaft">
@@ -172,7 +172,7 @@ export default async function LandingPage() {
                   Mitglied werden
                 </Button>
               </a>
-              <Link href="/app/platzbuchung">
+              <a href={RESERVATION_URL} target="_blank" rel="noopener noreferrer">
                 <Button
                   variant="ghost"
                   size="lg"
@@ -181,7 +181,7 @@ export default async function LandingPage() {
                 >
                   Platz buchen
                 </Button>
-              </Link>
+              </a>
             </div>
           </div>
         </div>
@@ -189,21 +189,13 @@ export default async function LandingPage() {
 
       {/* ─── QUICK STATS ────────────────────────────────────── */}
       <section className="max-w-[1080px] mx-auto px-5">
-        <div className="-mt-8 relative z-10 bg-white rounded-xl border border-stone-200 shadow-card p-5 grid grid-cols-3 gap-3">
+        <div className="-mt-8 relative z-10 bg-white rounded-xl border border-stone-200 shadow-card p-5 grid grid-cols-2 gap-3 max-w-md mx-auto">
           <div className="text-center">
             <div className="font-display text-[28px] sm:text-[40px] text-stone-800 leading-none">
               {stats.courts}
             </div>
             <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-stone-500 mt-1">
               Sandplätze
-            </div>
-          </div>
-          <div className="text-center border-l border-stone-100">
-            <div className="font-display text-[28px] sm:text-[40px] text-stone-800 leading-none">
-              {stats.members}
-            </div>
-            <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-stone-500 mt-1">
-              Mitglieder
             </div>
           </div>
           <div className="text-center border-l border-stone-100">
@@ -225,46 +217,44 @@ export default async function LandingPage() {
               Seit 1972 · der Verein
             </div>
             <h2 className="font-display text-[32px] sm:text-[44px] leading-[1.05] tracking-[-0.01em] text-stone-800 mt-5">
-              Ein Sandplatz im
+              Tennis beim Schloss,
               <br />
-              Tal — und der Berg
+              am Treffnerbach,
               <br />
-              hinten dran.
+              vor der Gerlitzen.
             </h2>
           </div>
           <div className="space-y-5 text-[16px] sm:text-[17px] text-stone-700 leading-[1.6]">
             <p>
-              Der TSV Schloss Treffen wurde 1972 gegründet — direkt am Fuß der Gerlitzen, zwei
-              Gehminuten vom Ossiachersee. Die Bildmarke ist kein Zufall: Tennisball als Sonne über
-              dem Berg, das Schloss Treffen im Tal, drei Seelinien davor.
+              Der TSV Schloss Treffen wurde 1972 gegründet — beim Schloss Treffen, direkt am
+              Treffnerbach, mit Blick auf die Gerlitzen. Die Bildmarke ist kein Zufall: Tennisball
+              als Sonne über dem Berg, das Schloss im Tal, drei Wasserlinien davor.
             </p>
             <p>
-              Heute sind wir <strong className="text-stone-800">{stats.members} Mitglieder</strong> in{' '}
-              {stats.teams} Mannschaften — von Jugend U10 bis Damen 50+. Wir spielen Bezirksliga und
-              Landesliga, ernst genug für die Tabelle und entspannt genug für ein Bier nach dem Match.
+              Von der Jugend bis zu den Aktiven: Bei uns spielt man ernst genug für die Tabelle und
+              entspannt genug für ein Bier nach dem Match.
             </p>
             <p>
-              Was uns trägt: <strong className="text-stone-800">vier perfekt gepflegte
-              Sandplätze</strong>, ein gemütliches Vereinsheim mit Blick auf den See, und eine
-              Mitgliedschaft, die sich nicht wie ein SaaS-Abo anfühlt, sondern wie der Verein, der
-              wir seit fünf Jahrzehnten sind.
+              Was uns trägt: <strong className="text-stone-800">drei perfekt gepflegte
+              Sandplätze</strong>, ein gemütliches Vereinsheim und eine Mitgliedschaft, die sich
+              anfühlt wie der Verein, der wir seit fünf Jahrzehnten sind.
             </p>
             <ul className="grid grid-cols-2 gap-x-6 gap-y-3 mt-6 text-[14.5px] text-stone-600">
               <li className="flex items-start gap-2.5">
                 <Icon.Mountain size={18} className="text-forest-600 mt-0.5 flex-none" />
-                <span>1.911 m Gerlitzen direkt hinter den Plätzen</span>
+                <span>Blick auf die Gerlitzen</span>
               </li>
               <li className="flex items-start gap-2.5">
                 <Icon.Wave size={18} className="text-lake-600 mt-0.5 flex-none" />
-                <span>Ossiachersee · 200 m Fußweg vom Vereinsheim</span>
+                <span>Direkt am Treffnerbach</span>
               </li>
               <li className="flex items-start gap-2.5">
-                <Icon.Sun size={18} className="text-sand-600 mt-0.5 flex-none" />
-                <span>Süd-Ausrichtung, lange Sonnenstunden</span>
+                <Icon.MapPin size={18} className="text-sand-600 mt-0.5 flex-none" />
+                <span>Beim Schloss in Treffen am Ossiachersee</span>
               </li>
               <li className="flex items-start gap-2.5">
                 <Icon.Trophy size={18} className="text-stone-500 mt-0.5 flex-none" />
-                <span>{seasons} Saisons · ungebrochen Bezirksliga</span>
+                <span>{seasons} Saisons Vereinsgeschichte</span>
               </li>
             </ul>
           </div>
@@ -277,15 +267,15 @@ export default async function LandingPage() {
           Die Anlage
         </div>
         <h2 className="font-display text-[28px] sm:text-[36px] leading-[1.1] tracking-[-0.01em] text-stone-800 mt-4 max-w-2xl">
-          Vier Plätze, ein Vereinsheim, eine Aussicht.
+          Drei Plätze, ein Vereinsheim, eine Aussicht.
         </h2>
 
         <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {[
-            { name: '4 Sandplätze', sub: 'Granulat-Belag · 2024 erneuert', icon: <Icon.Court /> },
-            { name: 'Flutlicht', sub: 'Platz 1 & 2 · bis 22 Uhr', icon: <Icon.Sun /> },
+            { name: '3 Sandplätze', sub: 'Gepflegter Sandplatz-Belag', icon: <Icon.Court /> },
             { name: 'Vereinsheim', sub: 'Umkleide, Dusche, kleine Küche', icon: <Icon.Home /> },
-            { name: 'Schlägerverleih', sub: 'Für Schnupperer & Kinder', icon: <Icon.Ball /> },
+            { name: 'Schläger & Ballmaschine', sub: 'Leihschläger + mietbare Ballmaschine', icon: <Icon.Ball /> },
+            { name: 'Beim Schloss', sub: 'Ruhige Lage am Treffnerbach', icon: <Icon.MapPin /> },
           ].map((f) => (
             <div key={f.name} className="bg-white rounded-lg border border-stone-200 p-5 transition-all hover:border-stone-300 hover:shadow-card">
               <div className="w-10 h-10 rounded-full bg-paper-100 text-stone-700 inline-flex items-center justify-center">
@@ -300,21 +290,18 @@ export default async function LandingPage() {
         <div className="mt-3 bg-stone-800 text-paper-50 rounded-xl p-5 sm:p-6 flex items-center gap-4 flex-wrap">
           <div className="flex-1 min-w-[200px]">
             <div className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-sand-300">
-              Live-Auslastung
+              Platzreservierung
             </div>
-            <div className="font-display text-[20px] mt-1">Plätze gerade jetzt</div>
+            <div className="font-display text-[20px] mt-1">Online einen Platz buchen</div>
+            <p className="text-[13.5px] text-paper-100/75 mt-1">
+              Freie Zeiten ansehen und direkt reservieren.
+            </p>
           </div>
-          <div className="flex items-center gap-5 flex-wrap">
-            <StatusDot tone="forest" label="Platz 1 frei" />
-            <StatusDot tone="forest" label="Platz 2 frei" />
-            <StatusDot tone="sand" label="Platz 3 wenig" />
-            <StatusDot tone="danger" label="Platz 4 belegt" />
-          </div>
-          <Link href="/app/platzbuchung">
+          <a href={RESERVATION_URL} target="_blank" rel="noopener noreferrer">
             <Button variant="accent" iconAfter={<Icon.ArrowRight size={14} />}>
-              Platz buchen
+              Zur Reservierung
             </Button>
-          </Link>
+          </a>
         </div>
       </section>
 
@@ -363,7 +350,7 @@ export default async function LandingPage() {
           Trainingszeiten · Saison 2026
         </div>
         <h2 className="font-display text-[28px] sm:text-[36px] leading-[1.1] tracking-[-0.01em] text-stone-800 mt-4 max-w-2xl">
-          Wer wann am Platz steht.
+          Was passiert am Platz.
         </h2>
         <p className="text-[15px] text-stone-600 mt-3 max-w-xl leading-[1.6]">
           Mannschaftstrainings sind für die Mannschaftsmitglieder reserviert. Außerhalb dieser
@@ -678,7 +665,7 @@ export default async function LandingPage() {
         </h2>
 
         <div className="mt-8 grid lg:grid-cols-[1.2fr_1fr] gap-4">
-          {/* Map placeholder mit Anlagen-Skizze */}
+          {/* Karten-Platzhalter — echte Google-Karte folgt */}
           <div className="relative rounded-xl overflow-hidden border border-stone-200 bg-forest-50 h-[320px] sm:h-[400px]">
             <div className="absolute inset-0 ph-lake opacity-40" />
             <div className="absolute inset-0 flex items-center justify-center">
@@ -689,12 +676,7 @@ export default async function LandingPage() {
                 Standort
               </div>
               <div className="font-display text-[18px] text-stone-800 mt-1">
-                Schlossweg 1, 9521 Treffen
-              </div>
-              <div className="mt-2 flex items-center gap-3 text-[13px] text-stone-600">
-                <span className="inline-flex items-center gap-1.5">
-                  <Icon.MapPin size={14} /> 46.6692° N, 13.8336° O
-                </span>
+                Schlossweg 1, 9521 Treffen am Ossiachersee
               </div>
               <a
                 href="https://maps.apple.com/?q=Schlossweg+1+Treffen+am+Ossiachersee"
@@ -714,8 +696,7 @@ export default async function LandingPage() {
               </div>
               <p className="text-[14.5px] text-stone-700 mt-2 leading-[1.55]">
                 A10 Tauernautobahn → Abfahrt Villach Süd → Richtung Treffen am Ossiachersee. Vom
-                Ortskern dem Schlossweg folgen, 8 Min ab Autobahn. Kostenlose Parkplätze direkt am
-                Vereinsheim.
+                Ortskern dem Schlossweg folgen. Kostenlose Parkplätze direkt am Vereinsheim.
               </p>
             </div>
             <div className="bg-white rounded-lg border border-stone-200 p-5">
@@ -724,7 +705,7 @@ export default async function LandingPage() {
               </div>
               <p className="text-[14.5px] text-stone-700 mt-2 leading-[1.55]">
                 Zug bis Villach Hbf, dann Bus 5176 Richtung Ossiachersee. Haltestelle „Treffen
-                Ortsmitte", von dort 6 Minuten zu Fuß über den Schlossweg.
+                Ortsmitte", von dort wenige Minuten zu Fuß über den Schlossweg.
               </p>
             </div>
             <div className="bg-white rounded-lg border border-stone-200 p-5">
@@ -736,12 +717,6 @@ export default async function LandingPage() {
                   <Icon.Mail size={14} className="text-stone-400" />
                   <a href="mailto:office@tsv-treffen.at" className="text-lake-700">
                     office@tsv-treffen.at
-                  </a>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Icon.Phone size={14} className="text-stone-400" />
-                  <a href="tel:+4342480000" className="text-lake-700">
-                    +43 4248 0000
                   </a>
                 </div>
                 <div className="flex items-center gap-2">
@@ -816,8 +791,8 @@ export default async function LandingPage() {
           <div className="lg:col-span-2">
             <TSVLockup height={40} color="#FBF8F1" accent="#C39265" />
             <p className="text-[14px] mt-5 leading-[1.6] max-w-md">
-              Tennisverein in Treffen am Ossiachersee · Kärnten · Österreich. Sandplatz-Tennis am
-              Fuße der Gerlitzen, zwischen Schloss und See.
+              Tennisverein in Treffen am Ossiachersee · Kärnten · Österreich. Sandplatz-Tennis beim
+              Schloss, direkt am Treffnerbach, mit Blick auf die Gerlitzen.
             </p>
           </div>
           <div>
@@ -840,13 +815,15 @@ export default async function LandingPage() {
               <li><Link href="/login">Anmelden</Link></li>
               <li><Link href="/app/dashboard">Dashboard</Link></li>
               <li><Link href="/app/kalender">Kalender</Link></li>
-              <li><Link href="/app/platzbuchung">Platzbuchung</Link></li>
+              <li>
+                <a href={RESERVATION_URL} target="_blank" rel="noopener noreferrer">Platz buchen</a>
+              </li>
             </ul>
           </div>
         </div>
         <div className="border-t border-white/10">
           <div className="max-w-[1080px] mx-auto px-5 sm:px-8 py-4 flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.18em] text-paper-100/45 gap-4 flex-wrap">
-            <span>TSV Schloss Treffen · v0.1 · Mai 2026</span>
+            <span>TSV Schloss Treffen · Saison 2026</span>
             <span className="flex items-center gap-4">
               <Link href="/impressum" className="hover:text-paper-100">
                 Impressum

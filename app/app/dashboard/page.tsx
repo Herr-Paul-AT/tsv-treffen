@@ -4,10 +4,6 @@ import { RsvpControls } from '@/components/feedback/RsvpControls';
 import { MobileHeader } from '@/components/nav/MobileHeader';
 import { Badge } from '@/components/ui/Badge';
 import { Icon } from '@/components/ui/Icon';
-import { StatusDot, type StatusDotTone } from '@/components/ui/StatusDot';
-import { db } from '@/lib/db';
-import { courts } from '@/lib/db/schema';
-import { asc } from 'drizzle-orm';
 import { getCurrentMember } from '@/lib/db/queries/session';
 import { getNextTrainingForMember } from '@/lib/db/queries/trainings';
 import { listNews } from '@/lib/db/queries/news';
@@ -29,21 +25,15 @@ const QUICK = [
 
 const NEWS_BADGE_TONES = ['sand', 'lake', 'forest'] as const;
 
-const COURT_STATUS_SEED: { state: string; tone: StatusDotTone }[] = [
-  { state: 'frei', tone: 'forest' },
-  { state: 'frei', tone: 'forest' },
-  { state: 'belegt', tone: 'danger' },
-  { state: 'wenig', tone: 'sand' },
-];
+const RESERVATION_URL = 'https://treffen.tennisplatz.info/reservierung';
 
 export default async function DashboardPage() {
   const me = await getCurrentMember();
   const greeting = me ? `Servus, ${me.firstName}` : 'Servus';
 
-  const [nextTraining, latestNews, courtList] = await Promise.all([
+  const [nextTraining, latestNews] = await Promise.all([
     me ? getNextTrainingForMember(me.id) : Promise.resolve(null),
     listNews(2),
-    db.select().from(courts).orderBy(asc(courts.number)),
   ]);
 
   const now = new Date();
@@ -164,28 +154,26 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Court status */}
-        <div className="mt-7 bg-white rounded-lg border border-stone-200 p-4">
-          <div className="flex items-baseline justify-between">
-            <h3 className="font-display text-[18px] text-stone-800">Plätze · jetzt</h3>
-            <span className="font-mono text-[10.5px] text-stone-500 uppercase tracking-[0.14em]">
-              Aktualisiert {String(now.getHours()).padStart(2, '0')}:{String(now.getMinutes()).padStart(2, '0')}
-            </span>
+        {/* Platz reservieren */}
+        <a
+          href={RESERVATION_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-7 block bg-white rounded-lg border border-stone-200 p-4 transition-all hover:border-stone-300 hover:shadow-card"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-11 h-11 flex-none rounded-full bg-paper-100 text-stone-700 inline-flex items-center justify-center">
+              <Icon.Court size={20} />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-display text-[18px] text-stone-800 leading-tight">Platz reservieren</h3>
+              <p className="text-[13.5px] text-stone-600 mt-0.5 leading-snug">
+                Freie Zeiten ansehen und direkt online buchen.
+              </p>
+            </div>
+            <Icon.External size={16} className="text-stone-400 flex-none" />
           </div>
-          <div className="grid grid-cols-4 gap-2 mt-3">
-            {courtList.map((c, i) => {
-              const seed = COURT_STATUS_SEED[i % COURT_STATUS_SEED.length];
-              return (
-                <div key={c.id} className="rounded-md border border-stone-200 p-3 text-center">
-                  <div className="font-display text-[24px] text-stone-800 leading-none">{c.number}</div>
-                  <div className="mt-2">
-                    <StatusDot tone={seed.tone} label={seed.state} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        </a>
       </div>
     </>
   );
