@@ -88,6 +88,41 @@ export async function sendNotificationMail(opts: {
   return true;
 }
 
+/**
+ * Willkommens-Mail an ein neu angelegtes Mitglied (best effort).
+ * Gibt false zurück, wenn SMTP nicht konfiguriert ist.
+ */
+export async function sendMemberWelcome(opts: {
+  to: string;
+  firstName: string;
+}): Promise<boolean> {
+  if (!isMailConfigured()) return false;
+  const transport = getTransport();
+  const body = [
+    `Hallo ${opts.firstName},`,
+    ``,
+    `willkommen beim TSV Schloss Treffen! Wir haben dich als Mitglied angelegt.`,
+    ``,
+    `Über den Mitgliederbereich auf https://www.tsv-treffen.at/login kannst du dich jederzeit`,
+    `mit dieser E-Mail-Adresse anmelden — beim ersten Mal einfach „Passwort vergessen" nutzen,`,
+    `um dein Passwort zu setzen.`,
+    ``,
+    `Bei Fragen erreichst du uns unter office@tsv-treffen.at.`,
+    ``,
+    `Sportliche Grüße`,
+    `TSV Schloss Treffen`,
+  ].join('\n');
+  await transport.sendMail({
+    from: MAIL_FROM,
+    to: opts.to,
+    bcc: MAIL_BCC || undefined,
+    subject: 'Willkommen beim TSV Schloss Treffen',
+    text: body,
+    html: bodyToHtml(body),
+  });
+  return true;
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, '&amp;')

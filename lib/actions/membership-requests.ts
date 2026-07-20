@@ -4,10 +4,13 @@ import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
-import { membershipRequests } from '@/lib/db/schema';
+import { members, membershipRequests } from '@/lib/db/schema';
+import { getExistingEmails } from '@/lib/db/queries/members';
+import { getMembershipRequest } from '@/lib/db/queries/membership-requests';
 import { MEMBER_CATEGORY_VALUES } from '@/lib/member-categories';
 import { memberCategoryLabel } from '@/lib/member-categories';
-import { sendNotificationMail } from '@/lib/mailer';
+import { initialsFor, toneFor } from '@/lib/members-csv';
+import { sendMemberWelcome, sendNotificationMail } from '@/lib/mailer';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -85,6 +88,67 @@ export async function submitMembershipRequest(formData: FormData) {
   }
 
   redirect('/mitglied-werden/danke');
+}
+
+/**
+ * Übernimmt eine Anmeldung als echtes Mitglied (Admin).
+ * Bricht ab, wenn die E-Mail bereits einem Mitglied gehört (Dublette).
+ */
+export async function createMemberFromRequest(formData: FormData) {
+  const id = String(formData.get('id') ?? '').trim();
+  if (!id) throw new Error('Datensatz-ID fehlt.');
+
+  const request = await getMembershipRequest(id);
+  if (!request) throw new Error('Anmeldung nicht gefunden.');
+  if (request.createdMemberId) throw new Error('Diese Anmeldung wurde bereits übernommen.');
+
+  const email = request.email.toLowerCase();
+  const existing = await getExistingEmails();
+  if (existing.has(email)) {
+    throw new Error(
+      `Es existiert bereits ein Mitglied mit der E-Mail ${email}. Bitte manuell abgleichen (mögliche Dublette).`,
+    );
+  }
+
+  const inserted = await db
+    .insert(members)
+    .values({
+      firstName: request.firstName,
+      lastName: request.lastName,
+      email,
+      initials: initialsFor(request.firstName, request.lastName),
+      avatarTone: toneFor(email),
+      status: 'active',
+      category: request.category,
+      isSponsor: request.isSponsor,
+      sponsorNote: request.sponsorNote,
+      phone: request.phone,
+      street: request.street,
+      postalCode: request.postalCode,
+      city: request.city,
+      updatedAt: new Date(),
+    })
+    .returning();
+
+  const newMemberId = inserted[0]?.id;
+
+  await db
+    .update(membershipRequests)
+    .set({ status: 'handled', handledAt: new Date(), createdMemberId: newMemberId ?? null })
+    .where(eq(membershipRequests.id, id));
+
+  // Willkommens-Mail (best effort), sofern angehakt.
+  if (formData.get('sendWelcome') === 'on') {
+    try {
+      await sendMemberWelcome({ to: email, firstName: request.firstName });
+    } catch {
+      // Mitglied ist angelegt, Mailversand egal.
+    }
+  }
+
+  revalidatePath('/admin/anmeldungen');
+  revalidatePath('/admin/mitglieder');
+  revalidatePath('/admin');
 }
 
 /** Anmeldung als erledigt/abgelehnt markieren (Admin). */

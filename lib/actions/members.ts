@@ -7,6 +7,8 @@ import { db } from '@/lib/db';
 import { members } from '@/lib/db/schema';
 import { getExistingEmails } from '@/lib/db/queries/members';
 import { initialsFor, parseMembersCsv, toneFor } from '@/lib/members-csv';
+import { MEMBER_CATEGORY_VALUES } from '@/lib/member-categories';
+import { sendMemberWelcome } from '@/lib/mailer';
 
 const ROLES = ['member', 'trainer', 'jugendleiter', 'obmann', 'admin'] as const;
 const STATUSES = ['active', 'probe', 'paused', 'inactive'] as const;
@@ -37,6 +39,13 @@ function parseMemberForm(formData: FormData) {
   const status = pick(STATUSES, String(formData.get('status') ?? ''), 'active') as Status;
   const paymentStatus = pick(PAYMENTS, String(formData.get('paymentStatus') ?? ''), 'paid') as Payment;
 
+  const categoryRaw = String(formData.get('category') ?? '').trim();
+  const category = (MEMBER_CATEGORY_VALUES as string[]).includes(categoryRaw)
+    ? (categoryRaw as (typeof MEMBER_CATEGORY_VALUES)[number])
+    : null;
+  const isSponsor = formData.get('isSponsor') === 'on';
+  const sponsorNote = String(formData.get('sponsorNote') ?? '').trim();
+
   const lkRaw = String(formData.get('lkRating') ?? '').trim();
   const lkRating = lkRaw && /^\d+(\.\d+)?$/.test(lkRaw) ? lkRaw : null;
 
@@ -51,6 +60,9 @@ function parseMemberForm(formData: FormData) {
     avatarTone: toneFor(email || `${firstName} ${lastName}`),
     role,
     status,
+    category,
+    isSponsor,
+    sponsorNote: isSponsor ? sponsorNote || null : null,
     paymentStatus,
     paymentDueCents: eurosToCents(String(formData.get('paymentDueEuros') ?? '0')),
     lkRating,
@@ -79,6 +91,16 @@ export async function createMember(formData: FormData) {
     }
   }
   await db.insert(members).values({ ...values, updatedAt: new Date() });
+
+  // Willkommens-Mail ans neue Mitglied (best effort; nur wenn angehakt + E-Mail vorhanden).
+  if (values.email && formData.get('sendWelcome') === 'on') {
+    try {
+      await sendMemberWelcome({ to: values.email, firstName: values.firstName });
+    } catch {
+      // Mailversand fehlgeschlagen — Mitglied ist trotzdem angelegt.
+    }
+  }
+
   revalidateMemberViews();
   redirect('/admin/mitglieder');
 }

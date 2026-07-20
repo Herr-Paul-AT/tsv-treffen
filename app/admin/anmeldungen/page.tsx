@@ -4,7 +4,7 @@ import { Icon } from '@/components/ui/Icon';
 import { listMembershipRequests } from '@/lib/db/queries/membership-requests';
 import { getExistingEmails } from '@/lib/db/queries/members';
 import { memberCategoryLabel } from '@/lib/member-categories';
-import { setMembershipRequestStatus } from '@/lib/actions/membership-requests';
+import { createMemberFromRequest, setMembershipRequestStatus } from '@/lib/actions/membership-requests';
 import type { MembershipRequest } from '@/lib/db/schema';
 
 export const dynamic = 'force-dynamic';
@@ -129,11 +129,32 @@ export default async function AdminMembershipRequestsPage() {
               )}
 
               <div className="mt-4 flex items-center gap-2 flex-wrap border-t border-stone-100 pt-4">
-                {r.status !== 'handled' && (
+                {r.createdMemberId ? (
+                  <span className="inline-flex items-center gap-1.5 text-[13.5px] font-medium text-forest-700">
+                    <Icon.Check size={16} /> Als Mitglied übernommen
+                  </span>
+                ) : (
+                  <form action={createMemberFromRequest} className="flex items-center gap-3 flex-wrap">
+                    <input type="hidden" name="id" value={r.id} />
+                    <Button type="submit" variant="primary" size="sm" icon={<Icon.Plus size={14} />}>
+                      Als Mitglied übernehmen
+                    </Button>
+                    <label className="inline-flex items-center gap-2 text-[13px] text-stone-600 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        name="sendWelcome"
+                        defaultChecked
+                        className="w-4 h-4 rounded border-stone-300 text-lake-700 focus:ring-lake-500/30"
+                      />
+                      Willkommens-Mail senden
+                    </label>
+                  </form>
+                )}
+                {!r.createdMemberId && r.status !== 'handled' && (
                   <form action={setMembershipRequestStatus}>
                     <input type="hidden" name="id" value={r.id} />
                     <input type="hidden" name="status" value="handled" />
-                    <Button type="submit" variant="primary" size="sm" icon={<Icon.Check size={14} />}>
+                    <Button type="submit" variant="secondary" size="sm" icon={<Icon.Check size={14} />}>
                       Als erledigt markieren
                     </Button>
                   </form>
