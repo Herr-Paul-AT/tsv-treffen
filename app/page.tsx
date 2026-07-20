@@ -627,13 +627,17 @@ export default async function LandingPage() {
         </h2>
 
         <div className="mt-8 grid lg:grid-cols-[1.2fr_1fr] gap-4">
-          {/* Karten-Platzhalter — echte Google-Karte folgt */}
+          {/* Eingebettete Google-Karte (kein API-Key nötig) */}
           <div className="relative rounded-xl overflow-hidden border border-stone-200 bg-forest-50 h-[320px] sm:h-[400px]">
-            <div className="absolute inset-0 ph-lake opacity-40" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <TSVMark size={140} variant="mono" className="opacity-40" />
-            </div>
-            <div className="absolute bottom-4 left-4 right-4 bg-white rounded-lg border border-stone-200 p-4 shadow-card">
+            <iframe
+              title="Karte — TSV Schloss Treffen, Treffen am Ossiachersee"
+              src="https://www.google.com/maps?q=Schlossweg%201%2C%209521%20Treffen%20am%20Ossiachersee&z=15&output=embed"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="absolute inset-0 w-full h-full border-0"
+              allowFullScreen
+            />
+            <div className="absolute bottom-4 left-4 right-4 bg-white rounded-lg border border-stone-200 p-4 shadow-card pointer-events-none">
               <div className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-stone-500">
                 Standort
               </div>
@@ -641,12 +645,12 @@ export default async function LandingPage() {
                 Schlossweg 1, 9521 Treffen am Ossiachersee
               </div>
               <a
-                href="https://maps.apple.com/?q=Schlossweg+1+Treffen+am+Ossiachersee"
+                href="https://www.google.com/maps/search/?api=1&query=Schlossweg%201%2C%209521%20Treffen%20am%20Ossiachersee"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-3 inline-flex items-center gap-1.5 text-[13.5px] font-medium text-lake-700"
+                className="mt-3 inline-flex items-center gap-1.5 text-[13.5px] font-medium text-lake-700 pointer-events-auto"
               >
-                In Karten öffnen <Icon.External size={12} />
+                In Google Maps öffnen <Icon.External size={12} />
               </a>
             </div>
           </div>
