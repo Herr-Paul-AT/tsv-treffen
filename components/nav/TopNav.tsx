@@ -18,6 +18,7 @@ const ITEMS = [
   { href: '/admin/beitraege', label: 'Beiträge' },
   { href: '/admin/rundmail', label: 'Rundmail' },
   { href: '/admin/dokumente', label: 'Dokumente' },
+  { href: '/admin/sponsoren', label: 'Sponsoren' },
   { href: '/admin/platzbuchung', label: 'Plätze' },
 ];
 

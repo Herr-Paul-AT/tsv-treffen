@@ -706,14 +706,37 @@ export default async function LandingPage() {
           Danke an unsere Sponsoren.
         </h2>
         <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-          {sponsors.map((s) => (
-            <div
-              key={s.id}
-              className="bg-white border border-stone-200 rounded-md h-20 flex items-center justify-center text-center px-2"
-            >
+          {sponsors.map((s) => {
+            const inner = s.logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={s.logoUrl}
+                alt={s.name}
+                className="max-h-12 max-w-[85%] object-contain"
+                loading="lazy"
+              />
+            ) : (
               <span className="font-display text-[13.5px] text-stone-700 leading-tight">{s.name}</span>
-            </div>
-          ))}
+            );
+            const tileClass =
+              'bg-white border border-stone-200 rounded-md h-20 flex items-center justify-center text-center px-2';
+            return s.website ? (
+              <a
+                key={s.id}
+                href={s.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={s.name}
+                className={`${tileClass} transition-colors hover:border-stone-300`}
+              >
+                {inner}
+              </a>
+            ) : (
+              <div key={s.id} title={s.name} className={tileClass}>
+                {inner}
+              </div>
+            );
+          })}
         </div>
       </section>
 

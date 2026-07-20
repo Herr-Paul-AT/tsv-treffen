@@ -105,6 +105,13 @@ export default async function AdminLandingPage() {
       tone: 'stone',
     },
     {
+      href: '/admin/sponsoren',
+      label: 'Sponsoren',
+      icon: <Icon.Star size={20} />,
+      hint: 'Logos & Links auf der Startseite',
+      tone: 'sand',
+    },
+    {
       href: '/admin/platzbuchung',
       label: 'Platzbuchung',
       icon: <Icon.Court size={20} />,
