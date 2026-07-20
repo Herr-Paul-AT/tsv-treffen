@@ -9,6 +9,7 @@ import { listUpcomingEvents } from '@/lib/db/queries/events';
 import { listTeamsWithRoster } from '@/lib/db/queries/teams';
 import { listActiveSponsors } from '@/lib/db/queries/sponsors';
 import { listActiveMembershipPlans } from '@/lib/db/queries/membership-plans';
+import { listActiveCourtProgram } from '@/lib/db/queries/court-program';
 import { getClubStats } from '@/lib/db/queries/stats';
 import { formatDayMonth, formatDayMonthCaps, MONTHS_DE } from '@/lib/format';
 
@@ -21,16 +22,6 @@ const NEWS_EYEBROW_TONES: Record<string, string> = {
   Mannschaftsspiel: 'text-lake-700',
   Vereinsmeisterschaft: 'text-sand-700',
 };
-
-const TRAININGS = [
-  { day: 'Mo', time: '17:00 – 18:30', who: 'Damen 35+ / 50+', trainer: 'K. Wallner', court: 'Platz 3' },
-  { day: 'Di', time: '16:30 – 18:00', who: 'Jugend U14 / U16', trainer: 'M. Pirker', court: 'Platz 2 & 3' },
-  { day: 'Di', time: '19:00 – 21:00', who: 'Herren I · Mannschaft', trainer: 'M. Pirker', court: 'Platz 1 & 2' },
-  { day: 'Mi', time: '14:30 – 16:30', who: 'Jugend U10 / U12', trainer: 'A. Brunner', court: 'Platz 3' },
-  { day: 'Mi', time: '18:00 – 20:00', who: 'Herren II · Mannschaft', trainer: 'M. Pirker', court: 'Platz 1 & 2' },
-  { day: 'Do', time: '16:30 – 18:00', who: 'Jugend U14 / U16', trainer: 'M. Pirker', court: 'Platz 2 & 3' },
-  { day: 'Do', time: '19:00 – 21:00', who: 'Herren I · Mannschaft', trainer: 'M. Pirker', court: 'Platz 1 & 2' },
-];
 
 function formatPlanPrice(cents: number): string {
   return new Intl.NumberFormat('de-AT', {
@@ -78,13 +69,14 @@ const FAQS = [
 ];
 
 export default async function LandingPage() {
-  const [stats, news, events, teams, sponsors, plans] = await Promise.all([
+  const [stats, news, events, teams, sponsors, plans, program] = await Promise.all([
     getClubStats(),
     listNews(3, { publicOnly: true }),
     listUpcomingEvents(8),
     listTeamsWithRoster(),
     listActiveSponsors(),
     listActiveMembershipPlans(),
+    listActiveCourtProgram(),
   ]);
   const adultTeams = teams.filter((t) => !/^Jugend/.test(t.name));
   const youthTeams = teams.filter((t) => /^Jugend/.test(t.name));
@@ -313,6 +305,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ─── TRAININGSZEITEN ───────────────────────────────── */}
+      {program.length > 0 && (
       <section id="training" className="max-w-[1080px] mx-auto px-5 mt-20">
         <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-stone-500 rule-eyebrow">
           Trainingszeiten · Saison 2026
@@ -333,9 +326,9 @@ export default async function LandingPage() {
             <span>Trainer</span>
             <span>Platz</span>
           </div>
-          {TRAININGS.map((t, i) => (
+          {program.map((t, i) => (
             <div
-              key={`${t.day}-${t.time}-${i}`}
+              key={t.id}
               className={[
                 'grid grid-cols-[60px_1fr] sm:grid-cols-[80px_140px_minmax(180px,1fr)_140px_120px] gap-x-3 gap-y-1 px-5 py-3.5 items-center',
                 'border-b border-stone-100 last:border-b-0',
@@ -343,13 +336,13 @@ export default async function LandingPage() {
               ].join(' ')}
             >
               <div className="font-display text-[18px] text-stone-800 leading-none row-span-2 sm:row-span-1">
-                {t.day}
+                {t.weekday}
               </div>
               <div className="font-mono text-[12.5px] text-stone-700 tracking-[0.05em]">
                 {t.time}
               </div>
               <div className="text-[14px] text-stone-800 font-medium col-span-2 sm:col-span-1">
-                {t.who}
+                {t.title}
               </div>
               <div className="text-[13px] text-stone-600 col-start-2 sm:col-start-auto">
                 {t.trainer}
@@ -361,6 +354,7 @@ export default async function LandingPage() {
           ))}
         </div>
       </section>
+      )}
 
       {/* ─── MITGLIEDSCHAFT ────────────────────────────────── */}
       <section id="mitgliedschaft" className="max-w-[1080px] mx-auto px-5 mt-20">

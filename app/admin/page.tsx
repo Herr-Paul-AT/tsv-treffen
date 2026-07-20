@@ -105,6 +105,13 @@ export default async function AdminLandingPage() {
       tone: 'stone',
     },
     {
+      href: '/admin/platz-programm',
+      label: 'Was passiert am Platz',
+      icon: <Icon.Calendar size={20} />,
+      hint: 'Trainings, Jugendspiele, Cups',
+      tone: 'forest',
+    },
+    {
       href: '/admin/sponsoren',
       label: 'Sponsoren',
       icon: <Icon.Star size={20} />,

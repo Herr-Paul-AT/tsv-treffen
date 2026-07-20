@@ -354,7 +354,22 @@ export type News = typeof news.$inferSelect;
 export type Event = typeof events.$inferSelect;
 export type Sponsor = typeof sponsors.$inferSelect;
 export type Court = typeof courts.$inferSelect;
+// „Was passiert am Platz" — vom Admin gepflegte Programm-Einträge
+// (Kindertrainings, Jugendspiele, Cups …). Anzeige auf der Startseite.
+export const courtProgram = pgTable('court_program', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  weekday: text('weekday').notNull(), // 'Mo'..'So'
+  weekdayOrder: integer('weekday_order').notNull().default(0), // 0=Mo … 6=So
+  time: text('time').notNull(), // z. B. '17:00 – 18:30'
+  title: text('title').notNull(), // Gruppe / was passiert
+  trainer: text('trainer'),
+  court: text('court'),
+  active: boolean('active').notNull().default(true),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
 export type MembershipPlan = typeof membershipPlans.$inferSelect;
 export type MembershipRequest = typeof membershipRequests.$inferSelect;
+export type CourtProgramEntry = typeof courtProgram.$inferSelect;
 
 export const __schemaVersion = sql`'1'`;
