@@ -8,6 +8,7 @@ import { listNews } from '@/lib/db/queries/news';
 import { listUpcomingEvents } from '@/lib/db/queries/events';
 import { listTeamsWithRoster } from '@/lib/db/queries/teams';
 import { listActiveSponsors } from '@/lib/db/queries/sponsors';
+import { listActiveMembershipPlans } from '@/lib/db/queries/membership-plans';
 import { getClubStats } from '@/lib/db/queries/stats';
 import { formatDayMonth, formatDayMonthCaps, MONTHS_DE } from '@/lib/format';
 
@@ -31,46 +32,12 @@ const TRAININGS = [
   { day: 'Do', time: '19:00 – 21:00', who: 'Herren I · Mannschaft', trainer: 'M. Pirker', court: 'Platz 1 & 2' },
 ];
 
-const PRICING = [
-  {
-    label: 'Jugend',
-    age: 'bis 18 Jahre',
-    price: '120',
-    perks: [
-      'Mitgliedsbeitrag pro Saison',
-      'Kindertraining inklusive',
-      'Leihschläger im Vereinsheim',
-      'Mannschaftsantritt bei Turnieren',
-    ],
-    tone: 'forest' as const,
-  },
-  {
-    label: 'Aktiv',
-    age: 'Erwachsene · 19–69',
-    price: '280',
-    perks: [
-      'Mitgliedsbeitrag pro Saison',
-      'Freies Spielen auf allen Plätzen',
-      'Vereinsmeisterschaft inklusive',
-      '2 Gastspiele/Saison frei',
-      'Hallensaison im Winter zu Sonderkonditionen',
-    ],
-    featured: true,
-    tone: 'lake' as const,
-  },
-  {
-    label: 'Familie',
-    age: '2 Erw. + Kinder bis 18',
-    price: '480',
-    perks: [
-      'Mitgliedsbeitrag pro Saison',
-      'Bis zu 4 Personen aus einem Haushalt',
-      'Kindertraining inklusive',
-      '4 Gastspiele/Saison frei',
-    ],
-    tone: 'sand' as const,
-  },
-];
+function formatPlanPrice(cents: number): string {
+  return new Intl.NumberFormat('de-AT', {
+    minimumFractionDigits: cents % 100 === 0 ? 0 : 2,
+    maximumFractionDigits: 2,
+  }).format(cents / 100);
+}
 
 function formatEventDate(start: Date, end: Date | null): string {
   if (end && (end.getDate() !== start.getDate() || end.getMonth() !== start.getMonth())) {
@@ -111,12 +78,13 @@ const FAQS = [
 ];
 
 export default async function LandingPage() {
-  const [stats, news, events, teams, sponsors] = await Promise.all([
+  const [stats, news, events, teams, sponsors, plans] = await Promise.all([
     getClubStats(),
     listNews(3, { publicOnly: true }),
     listUpcomingEvents(8),
     listTeamsWithRoster(),
     listActiveSponsors(),
+    listActiveMembershipPlans(),
   ]);
   const adultTeams = teams.filter((t) => !/^Jugend/.test(t.name));
   const youthTeams = teams.filter((t) => /^Jugend/.test(t.name));
@@ -408,9 +376,9 @@ export default async function LandingPage() {
         </p>
 
         <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {PRICING.map((p) => (
+          {plans.map((p) => (
             <article
-              key={p.label}
+              key={p.id}
               className={[
                 'rounded-xl border p-6 flex flex-col',
                 p.featured
@@ -426,7 +394,7 @@ export default async function LandingPage() {
                       p.featured ? 'text-sand-300' : 'text-stone-500',
                     ].join(' ')}
                   >
-                    {p.age}
+                    {p.eyebrow}
                   </div>
                   <div
                     className={[
@@ -434,7 +402,7 @@ export default async function LandingPage() {
                       p.featured ? 'text-paper-50' : 'text-stone-800',
                     ].join(' ')}
                   >
-                    {p.label}
+                    {p.name}
                   </div>
                 </div>
                 {p.featured && <Badge tone="sand">Beliebteste</Badge>}
@@ -447,7 +415,7 @@ export default async function LandingPage() {
                     p.featured ? 'text-paper-50' : 'text-stone-800',
                   ].join(' ')}
                 >
-                  € {p.price}
+                  € {formatPlanPrice(p.priceCents)}
                 </span>
                 <span
                   className={[
@@ -455,7 +423,7 @@ export default async function LandingPage() {
                     p.featured ? 'text-paper-100/65' : 'text-stone-500',
                   ].join(' ')}
                 >
-                  / Saison
+                  / {p.period}
                 </span>
               </div>
 
@@ -465,7 +433,7 @@ export default async function LandingPage() {
                   p.featured ? 'text-paper-100/85' : 'text-stone-700',
                 ].join(' ')}
               >
-                {p.perks.map((perk) => (
+                {p.perks.split('\n').filter(Boolean).map((perk) => (
                   <li key={perk} className="flex items-start gap-2.5">
                     <Icon.Check
                       size={16}
@@ -480,7 +448,7 @@ export default async function LandingPage() {
               </ul>
 
               <div className="mt-6">
-                <Link href={`/login?intent=join&plan=${p.label.toLowerCase()}`}>
+                <Link href={`/login?intent=join&plan=${p.slug}`}>
                   <Button
                     variant={p.featured ? 'accent' : 'primary'}
                     size="lg"

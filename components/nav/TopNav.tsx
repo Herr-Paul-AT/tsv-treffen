@@ -13,6 +13,7 @@ const ITEMS = [
   { href: '/admin/trainings', label: 'Trainings' },
   { href: '/admin/veranstaltungen', label: 'Veranstaltungen' },
   { href: '/admin/news', label: 'News' },
+  { href: '/admin/tarife', label: 'Tarife' },
   { href: '/admin/beitraege', label: 'Beiträge' },
   { href: '/admin/rundmail', label: 'Rundmail' },
   { href: '/admin/dokumente', label: 'Dokumente' },

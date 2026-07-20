@@ -29,6 +29,13 @@
       "when": 1780608711338,
       "tag": "0003_sloppy_fenris",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1784577679660,
+      "tag": "0004_bored_proudstar",
+      "breakpoints": true
     }
   ]
 }

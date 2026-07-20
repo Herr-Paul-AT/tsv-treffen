@@ -205,6 +205,24 @@ export const courts = pgTable('courts', {
   active: boolean('active').notNull().default(true),
 });
 
+// Mitgliedspakete/Tarife — im Admin bearbeitbar, auf der Startseite angezeigt.
+// perks: eine Leistung pro Zeile (newline-getrennt). priceCents: Preis in Cent.
+// slug: für die spätere Anmeldemaske (Tarif vorausgewählt), z. B. 'jugend'.
+export const membershipPlans = pgTable('membership_plans', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  slug: text('slug').notNull().unique(),
+  name: text('name').notNull(),
+  eyebrow: text('eyebrow'),
+  priceCents: integer('price_cents').notNull().default(0),
+  period: text('period').notNull().default('Saison'),
+  perks: text('perks').notNull().default(''),
+  featured: boolean('featured').notNull().default(false),
+  active: boolean('active').notNull().default(true),
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const documentCategory = pgEnum('document_category', [
   'statuten',
   'beitraege',
@@ -293,5 +311,6 @@ export type News = typeof news.$inferSelect;
 export type Event = typeof events.$inferSelect;
 export type Sponsor = typeof sponsors.$inferSelect;
 export type Court = typeof courts.$inferSelect;
+export type MembershipPlan = typeof membershipPlans.$inferSelect;
 
 export const __schemaVersion = sql`'1'`;

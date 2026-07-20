@@ -68,6 +68,13 @@ export default async function AdminLandingPage() {
       tone: 'sand',
     },
     {
+      href: '/admin/tarife',
+      label: 'Tarife & Pakete',
+      icon: <Icon.Trophy size={20} />,
+      hint: 'Preise & Mitgliedspakete',
+      tone: 'forest',
+    },
+    {
       href: '/admin/beitraege',
       label: 'Beiträge',
       icon: <Icon.Mail size={20} />,
