@@ -9,6 +9,7 @@ import { Icon } from '@/components/ui/Icon';
 const ITEMS = [
   { href: '/admin', label: 'Übersicht' },
   { href: '/admin/mitglieder', label: 'Mitglieder' },
+  { href: '/admin/anmeldungen', label: 'Anmeldungen' },
   { href: '/admin/mannschaften', label: 'Mannschaften' },
   { href: '/admin/trainings', label: 'Trainings' },
   { href: '/admin/veranstaltungen', label: 'Veranstaltungen' },

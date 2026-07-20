@@ -448,7 +448,7 @@ export default async function LandingPage() {
               </ul>
 
               <div className="mt-6">
-                <Link href={`/login?intent=join&plan=${p.slug}`}>
+                <Link href={`/mitglied-werden?plan=${p.slug}`}>
                   <Button
                     variant={p.featured ? 'accent' : 'primary'}
                     size="lg"

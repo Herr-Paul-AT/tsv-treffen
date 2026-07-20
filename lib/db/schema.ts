@@ -23,6 +23,15 @@ export const memberRole = pgEnum('member_role', [
 export const memberStatus = pgEnum('member_status', ['active', 'probe', 'paused', 'inactive']);
 export const paymentStatus = pgEnum('payment_status', ['paid', 'open', 'partial', 'waived']);
 
+// Mitglieds-Kategorien (bei Anlage/Anmeldung wählbar)
+export const memberCategory = pgEnum('member_category', [
+  'kinder',
+  'jugend',
+  'vollmitglied',
+  'std_abo',
+  'unterstuetzend',
+]);
+
 export const teamRole = pgEnum('team_role', ['player', 'captain', 'reserve']);
 
 export const attendanceStatus = pgEnum('attendance_status', ['yes', 'maybe', 'no']);
@@ -46,6 +55,9 @@ export const members = pgTable('members', {
   avatarUrl: text('avatar_url'),
   role: memberRole('role').notNull().default('member'),
   status: memberStatus('status').notNull().default('active'),
+  category: memberCategory('category'),
+  isSponsor: boolean('is_sponsor').notNull().default(false),
+  sponsorNote: text('sponsor_note'),
   memberSince: date('member_since').notNull().defaultNow(),
   lkRating: numeric('lk_rating', { precision: 4, scale: 1 }),
   paymentStatus: paymentStatus('payment_status').notNull().default('paid'),
@@ -213,6 +225,8 @@ export const membershipPlans = pgTable('membership_plans', {
   slug: text('slug').notNull().unique(),
   name: text('name').notNull(),
   eyebrow: text('eyebrow'),
+  // Verknüpft das Paket mit einer Mitglieds-Kategorie → in der Anmeldung vorausgewählt.
+  category: memberCategory('category'),
   priceCents: integer('price_cents').notNull().default(0),
   period: text('period').notNull().default('Saison'),
   perks: text('perks').notNull().default(''),
@@ -221,6 +235,35 @@ export const membershipPlans = pgTable('membership_plans', {
   sortOrder: integer('sort_order').notNull().default(0),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const membershipRequestStatus = pgEnum('membership_request_status', [
+  'new',
+  'handled',
+  'rejected',
+]);
+
+// Beitritts-Anmeldungen von der Startseite (Selbst-Anmeldung).
+// Werden von Gert im Admin gesichtet und zu echten Mitgliedern übernommen.
+export const membershipRequests = pgTable('membership_requests', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  firstName: text('first_name').notNull(),
+  lastName: text('last_name').notNull(),
+  email: text('email').notNull(),
+  phone: text('phone').notNull(),
+  street: text('street').notNull(),
+  postalCode: text('postal_code').notNull(),
+  city: text('city').notNull(),
+  category: memberCategory('category'),
+  planSlug: text('plan_slug'),
+  planName: text('plan_name'),
+  isSponsor: boolean('is_sponsor').notNull().default(false),
+  sponsorNote: text('sponsor_note'),
+  message: text('message'),
+  status: membershipRequestStatus('status').notNull().default('new'),
+  createdMemberId: uuid('created_member_id').references(() => members.id, { onDelete: 'set null' }),
+  handledAt: timestamp('handled_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const documentCategory = pgEnum('document_category', [
@@ -312,5 +355,6 @@ export type Event = typeof events.$inferSelect;
 export type Sponsor = typeof sponsors.$inferSelect;
 export type Court = typeof courts.$inferSelect;
 export type MembershipPlan = typeof membershipPlans.$inferSelect;
+export type MembershipRequest = typeof membershipRequests.$inferSelect;
 
 export const __schemaVersion = sql`'1'`;

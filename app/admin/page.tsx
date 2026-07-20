@@ -9,6 +9,7 @@ import { getTrainingAdminStats, getMembersNeedingAttention } from '@/lib/db/quer
 import { getUpcomingBirthdays } from '@/lib/db/queries/birthdays';
 import { listNewsletters } from '@/lib/db/queries/newsletters';
 import { listUpcomingEvents } from '@/lib/db/queries/events';
+import { countNewMembershipRequests } from '@/lib/db/queries/membership-requests';
 import { MONTHS_DE } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
@@ -19,7 +20,7 @@ function eur(cents: number) {
 
 export default async function AdminLandingPage() {
   const year = new Date().getFullYear();
-  const [memberStats, newsStats, duesStats, trainingStats, birthdays, attention, drafts, upcoming] = await Promise.all([
+  const [memberStats, newsStats, duesStats, trainingStats, birthdays, attention, drafts, upcoming, newRequests] = await Promise.all([
     getMemberStats(),
     getNewsAdminStats(),
     getDuesStats(year),
@@ -28,6 +29,7 @@ export default async function AdminLandingPage() {
     getMembersNeedingAttention(3),
     listNewsletters(),
     listUpcomingEvents(4),
+    countNewMembershipRequests(),
   ]);
   const draftCount = drafts.filter((d) => d.status === 'draft').length;
 
@@ -66,6 +68,13 @@ export default async function AdminLandingPage() {
       icon: <Icon.News size={20} />,
       hint: `${newsStats.published} veröffentlicht · ${newsStats.drafts} Entwürfe`,
       tone: 'sand',
+    },
+    {
+      href: '/admin/anmeldungen',
+      label: 'Anmeldungen',
+      icon: <Icon.Users size={20} />,
+      hint: newRequests > 0 ? `${newRequests} neue Anmeldung${newRequests === 1 ? '' : 'en'}` : 'Keine offenen Anmeldungen',
+      tone: 'lake',
     },
     {
       href: '/admin/tarife',

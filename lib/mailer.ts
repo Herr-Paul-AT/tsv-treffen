@@ -65,6 +65,29 @@ export async function sendBulkMail(opts: {
   return { sent, failed };
 }
 
+/**
+ * Einzelne Benachrichtigung an die Vereinsadresse (z. B. neue Anmeldung).
+ * Gibt false zurück, wenn SMTP nicht konfiguriert ist — der Aufrufer speichert
+ * dann trotzdem und zeigt die Info im Admin.
+ */
+export async function sendNotificationMail(opts: {
+  subject: string;
+  body: string;
+  replyTo?: string;
+}): Promise<boolean> {
+  if (!isMailConfigured()) return false;
+  const transport = getTransport();
+  await transport.sendMail({
+    from: MAIL_FROM,
+    to: MAIL_BCC || MAIL_FROM,
+    replyTo: opts.replyTo,
+    subject: opts.subject,
+    text: opts.body,
+    html: bodyToHtml(opts.body),
+  });
+  return true;
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, '&amp;')

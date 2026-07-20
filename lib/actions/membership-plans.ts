@@ -5,11 +5,13 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import { membershipPlans } from '@/lib/db/schema';
+import { MEMBER_CATEGORY_VALUES } from '@/lib/member-categories';
 
 type PlanValues = {
   slug: string;
   name: string;
   eyebrow: string | null;
+  category: (typeof MEMBER_CATEGORY_VALUES)[number] | null;
   priceCents: number;
   period: string;
   perks: string;
@@ -60,10 +62,16 @@ function parsePlanForm(formData: FormData): PlanValues {
 
   const sortOrder = Number.parseInt(sortOrderRaw, 10);
 
+  const categoryRaw = String(formData.get('category') ?? '').trim();
+  const category = (MEMBER_CATEGORY_VALUES as string[]).includes(categoryRaw)
+    ? (categoryRaw as (typeof MEMBER_CATEGORY_VALUES)[number])
+    : null;
+
   return {
     slug,
     name,
     eyebrow: eyebrow || null,
+    category,
     priceCents: parsePriceToCents(priceRaw),
     period,
     perks,

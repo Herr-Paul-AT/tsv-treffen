@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/Button';
 import { TextField } from '@/components/ui/TextField';
 import { Icon } from '@/components/ui/Icon';
 import type { MembershipPlan } from '@/lib/db/schema';
+import { MEMBER_CATEGORIES } from '@/lib/member-categories';
 
 const fieldLabel = 'font-mono text-[11px] uppercase tracking-[0.16em] text-stone-500';
 
@@ -35,6 +36,25 @@ export function MembershipPlanForm({
         defaultValue={plan?.eyebrow ?? ''}
         placeholder="z. B. Erwachsene · 19–69"
       />
+
+      <div>
+        <label htmlFor="plan-category" className="block">
+          <span className={fieldLabel}>Mitglieds-Kategorie (für die Anmeldung vorausgewählt)</span>
+          <select
+            id="plan-category"
+            name="category"
+            defaultValue={plan?.category ?? ''}
+            className="mt-2 w-full h-12 px-4 bg-white rounded-md border border-stone-200 text-[16px] text-stone-800 outline-none focus:border-lake-500 focus:ring-2 focus:ring-lake-500/15"
+          >
+            <option value="">— keine —</option>
+            {MEMBER_CATEGORIES.map((c) => (
+              <option key={c.value} value={c.value}>
+                {c.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
 
       <div className="grid sm:grid-cols-2 gap-4">
         <TextField
