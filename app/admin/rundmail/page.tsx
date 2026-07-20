@@ -24,7 +24,9 @@ const AUDIENCE_LABEL: Record<string, string> = {
   active: 'Aktive Mitglieder',
   probe: 'Probemitglieder',
   team: 'Mannschaft',
-  custom: 'Auswahl',
+  custom: 'Einzelauswahl',
+  category: 'Nach Kategorie',
+  sponsors: 'Alle Sponsoren',
 };
 
 export default async function AdminNewslettersPage({

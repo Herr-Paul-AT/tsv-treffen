@@ -3,11 +3,12 @@ import { Icon } from '@/components/ui/Icon';
 import { NewsletterComposer } from '@/components/admin/NewsletterComposer';
 import { createDraft } from '@/lib/actions/newsletters';
 import { listTeamOptions } from '@/lib/db/queries/teams';
+import { listMailMemberOptions } from '@/lib/db/queries/newsletters';
 
 export const dynamic = 'force-dynamic';
 
 export default async function NewNewsletterPage() {
-  const teamOptions = await listTeamOptions();
+  const [teamOptions, memberOptions] = await Promise.all([listTeamOptions(), listMailMemberOptions()]);
   return (
     <main className="px-8 py-6 max-w-[1280px] mx-auto">
       <Link
@@ -26,7 +27,12 @@ export default async function NewNewsletterPage() {
           versenden.
         </p>
       </div>
-      <NewsletterComposer action={createDraft} teamOptions={teamOptions} submitLabel="Als Entwurf speichern" />
+      <NewsletterComposer
+        action={createDraft}
+        teamOptions={teamOptions}
+        memberOptions={memberOptions}
+        submitLabel="Als Entwurf speichern"
+      />
     </main>
   );
 }

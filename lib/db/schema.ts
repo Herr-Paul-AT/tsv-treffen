@@ -297,6 +297,8 @@ export const newsletterAudience = pgEnum('newsletter_audience', [
   'probe',
   'team',
   'custom',
+  'category',
+  'sponsors',
 ]);
 
 export const newsletters = pgTable('newsletters', {
@@ -305,6 +307,8 @@ export const newsletters = pgTable('newsletters', {
   body: text('body').notNull(),
   audience: newsletterAudience('audience').notNull().default('active'),
   audienceTeamId: uuid('audience_team_id').references(() => teams.id, { onDelete: 'set null' }),
+  audienceCategory: memberCategory('audience_category'),
+  audienceMemberIds: text('audience_member_ids'), // kommagetrennte Mitglieds-IDs (Einzelauswahl)
   status: newsletterStatus('status').notNull().default('draft'),
   authorId: uuid('author_id').references(() => members.id, { onDelete: 'set null' }),
   sentAt: timestamp('sent_at', { withTimezone: true }),

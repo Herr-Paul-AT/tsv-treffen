@@ -6,7 +6,12 @@ import { Icon } from '@/components/ui/Icon';
 import { NewsletterComposer } from '@/components/admin/NewsletterComposer';
 import { MailtoButton } from '@/components/admin/MailtoButton';
 import { DeleteButton } from '@/components/admin/DeleteButton';
-import { getNewsletter, resolveRecipients } from '@/lib/db/queries/newsletters';
+import {
+  audienceSpecFromNewsletter,
+  getNewsletter,
+  listMailMemberOptions,
+  resolveRecipients,
+} from '@/lib/db/queries/newsletters';
 import { listTeamOptions } from '@/lib/db/queries/teams';
 import { deleteNewsletter, sendNewsletter, updateDraft } from '@/lib/actions/newsletters';
 import { isMailConfigured } from '@/lib/mailer';
@@ -18,9 +23,10 @@ export default async function NewsletterDetailPage({ params }: { params: Promise
   const nl = await getNewsletter(id);
   if (!nl) notFound();
 
-  const [teamOptions, recipients] = await Promise.all([
+  const [teamOptions, memberOptions, recipients] = await Promise.all([
     listTeamOptions(),
-    resolveRecipients(nl.audience, nl.audienceTeamId),
+    listMailMemberOptions(),
+    resolveRecipients(audienceSpecFromNewsletter(nl)),
   ]);
   const mailConfigured = isMailConfigured();
   const isSent = nl.status === 'sent';
@@ -58,6 +64,7 @@ export default async function NewsletterDetailPage({ params }: { params: Promise
             action={updateDraft}
             newsletter={nl}
             teamOptions={teamOptions}
+            memberOptions={memberOptions}
             submitLabel="Entwurf aktualisieren"
           />
         )}

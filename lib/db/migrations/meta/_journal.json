@@ -50,6 +50,13 @@
       "when": 1784582819830,
       "tag": "0006_sturdy_dexter_bennett",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1784584716105,
+      "tag": "0007_bright_killmonger",
+      "breakpoints": true
     }
   ]
 }
