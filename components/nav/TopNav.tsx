@@ -19,6 +19,7 @@ const ITEMS = [
   { href: '/admin/rundmail', label: 'Rundmail' },
   { href: '/admin/dokumente', label: 'Dokumente' },
   { href: '/admin/platz-programm', label: 'Am Platz' },
+  { href: '/admin/faq', label: 'FAQ' },
   { href: '/admin/sponsoren', label: 'Sponsoren' },
   { href: '/admin/platzbuchung', label: 'Plätze' },
 ];

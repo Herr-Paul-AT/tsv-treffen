@@ -112,6 +112,13 @@ export default async function AdminLandingPage() {
       tone: 'forest',
     },
     {
+      href: '/admin/faq',
+      label: 'Häufige Fragen',
+      icon: <Icon.Info size={20} />,
+      hint: 'FAQ auf der Startseite',
+      tone: 'stone',
+    },
+    {
       href: '/admin/sponsoren',
       label: 'Sponsoren',
       icon: <Icon.Star size={20} />,

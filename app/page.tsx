@@ -10,6 +10,7 @@ import { listTeamsWithRoster } from '@/lib/db/queries/teams';
 import { listActiveSponsors } from '@/lib/db/queries/sponsors';
 import { listActiveMembershipPlans } from '@/lib/db/queries/membership-plans';
 import { listActiveCourtProgram } from '@/lib/db/queries/court-program';
+import { listActiveFaqs } from '@/lib/db/queries/faqs';
 import { getClubStats } from '@/lib/db/queries/stats';
 import { LandingMobileMenu } from '@/components/LandingMobileMenu';
 import { formatDayMonth, formatDayMonthCaps, MONTHS_DE } from '@/lib/format';
@@ -42,35 +43,8 @@ function formatEventDate(start: Date, end: Date | null): string {
   return formatDayMonthCaps(start);
 }
 
-const FAQS = [
-  {
-    q: 'Wann startet die Saison 2026?',
-    a: 'Am Samstag, 12. April. Vorbereitungstrainings beginnen Ende März, sobald die Plätze trocken sind. Die Outdoor-Saison endet üblicherweise Mitte Oktober.',
-  },
-  {
-    q: 'Kann ich vor einer Mitgliedschaft schnuppern?',
-    a: 'Ja, jederzeit. Schreib uns an office@tsv-treffen.at oder ruf an — wir finden einen Trainings-Slot, an dem du eine Stunde mitspielen kannst. Kostenlos, ohne Verpflichtung.',
-  },
-  {
-    q: 'Ich bin nicht Mitglied — kann ich trotzdem spielen?',
-    a: 'Mit einem Vereinsmitglied als Begleitung ja — Gastspiel kostet 15 € pro Stunde, gebucht über das Online-Reservierungssystem. Mitglieder haben 2 bis 4 Gastspiele pro Saison frei.',
-  },
-  {
-    q: 'Gibt es Schläger zum Ausleihen?',
-    a: 'Wir haben einen kleinen Bestand an Leihschlägern im Vereinsheim — speziell für Schnupperer und Kinder. Für regelmäßiges Spielen empfehlen wir einen eigenen Schläger.',
-  },
-  {
-    q: 'Was passiert im Winter?',
-    a: 'Outdoor pausiert von Mitte Oktober bis April. Für die Hallensaison kooperieren wir mit der Tennis-Halle Villach. Mannschaftstraining läuft dort, Einzelbuchungen zu Sonderkonditionen.',
-  },
-  {
-    q: 'Wie kommt man am besten hin?',
-    a: 'Mit dem Auto über A10 Abfahrt Villach Süd, dann Richtung Treffen — 8 Minuten. Parkplätze direkt am Vereinsheim. Mit der Bahn nach Villach, dann Bus 5176 bis Treffen Ortsmitte.',
-  },
-];
-
 export default async function LandingPage() {
-  const [stats, news, events, teams, sponsors, plans, program] = await Promise.all([
+  const [stats, news, events, teams, sponsors, plans, program, faqs] = await Promise.all([
     getClubStats(),
     listNews(3, { publicOnly: true }),
     listUpcomingEvents(8),
@@ -78,6 +52,7 @@ export default async function LandingPage() {
     listActiveSponsors(),
     listActiveMembershipPlans(),
     listActiveCourtProgram(),
+    listActiveFaqs(),
   ]);
   const adultTeams = teams.filter((t) => !/^Jugend/.test(t.name));
   const youthTeams = teams.filter((t) => /^Jugend/.test(t.name));
@@ -573,6 +548,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ─── FAQ ───────────────────────────────────────────── */}
+      {faqs.length > 0 && (
       <section id="faq" className="max-w-[1080px] mx-auto px-5 mt-20">
         <div className="grid lg:grid-cols-[1fr_1.4fr] gap-10">
           <div>
@@ -595,22 +571,23 @@ export default async function LandingPage() {
             </p>
           </div>
           <div className="bg-white rounded-lg border border-stone-200 divide-y divide-stone-100">
-            {FAQS.map((f) => (
-              <details key={f.q} className="group p-5 sm:p-6">
+            {faqs.map((f) => (
+              <details key={f.id} className="group p-5 sm:p-6">
                 <summary className="flex items-start justify-between gap-4 cursor-pointer list-none">
                   <span className="font-display text-[17px] sm:text-[18px] text-stone-800 leading-snug pr-2">
-                    {f.q}
+                    {f.question}
                   </span>
                   <span className="flex-none w-7 h-7 rounded-full bg-paper-100 text-stone-700 inline-flex items-center justify-center transition-transform group-open:rotate-45">
                     <Icon.Plus size={14} />
                   </span>
                 </summary>
-                <p className="mt-3 text-[14.5px] text-stone-600 leading-[1.65]">{f.a}</p>
+                <p className="mt-3 text-[14.5px] text-stone-600 leading-[1.65]">{f.answer}</p>
               </details>
             ))}
           </div>
         </div>
       </section>
+      )}
 
       {/* ─── ANFAHRT + KONTAKT ─────────────────────────────── */}
       <section id="anfahrt" className="max-w-[1080px] mx-auto px-5 mt-20">

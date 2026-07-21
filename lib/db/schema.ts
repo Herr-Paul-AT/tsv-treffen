@@ -372,8 +372,19 @@ export const courtProgram = pgTable('court_program', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
+// Häufige Fragen (FAQ) — vom Admin gepflegt, Anzeige auf der Startseite.
+export const faqs = pgTable('faqs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  question: text('question').notNull(),
+  answer: text('answer').notNull(),
+  sortOrder: integer('sort_order').notNull().default(0),
+  active: boolean('active').notNull().default(true),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
 export type MembershipPlan = typeof membershipPlans.$inferSelect;
 export type MembershipRequest = typeof membershipRequests.$inferSelect;
 export type CourtProgramEntry = typeof courtProgram.$inferSelect;
+export type Faq = typeof faqs.$inferSelect;
 
 export const __schemaVersion = sql`'1'`;
