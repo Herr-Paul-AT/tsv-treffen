@@ -26,7 +26,12 @@ function formatWhen(d: Date): string {
   ).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
-export default async function AdminMembershipRequestsPage() {
+export default async function AdminMembershipRequestsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; converted?: string }>;
+}) {
+  const sp = await searchParams;
   const [requests, existingEmails] = await Promise.all([
     listMembershipRequests(),
     getExistingEmails(),
@@ -47,6 +52,19 @@ export default async function AdminMembershipRequestsPage() {
           Dubletten-Hinweis.
         </p>
       </div>
+
+      {sp.error && (
+        <div className="mt-5 flex items-start gap-2.5 rounded-md bg-danger/5 border border-danger/20 px-4 py-3 text-[14px] text-danger">
+          <Icon.Info size={16} className="flex-none mt-0.5" />
+          <span>{sp.error}</span>
+        </div>
+      )}
+      {sp.converted && (
+        <div className="mt-5 flex items-start gap-2.5 rounded-md bg-forest-50 border border-forest-200 px-4 py-3 text-[14px] text-forest-800">
+          <Icon.Check size={16} className="flex-none mt-0.5" />
+          <span>Mitglied erfolgreich übernommen.</span>
+        </div>
+      )}
 
       <div className="mt-6 grid grid-cols-2 lg:grid-cols-3 gap-3">
         <div className="bg-white rounded-lg border border-stone-200 p-5">

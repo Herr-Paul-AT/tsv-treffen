@@ -97,58 +97,65 @@ export async function submitMembershipRequest(formData: FormData) {
 export async function createMemberFromRequest(formData: FormData) {
   const id = String(formData.get('id') ?? '').trim();
   if (!id) throw new Error('Datensatz-ID fehlt.');
+  const sendWelcome = formData.get('sendWelcome') === 'on';
 
-  const request = await getMembershipRequest(id);
-  if (!request) throw new Error('Anmeldung nicht gefunden.');
-  if (request.createdMemberId) throw new Error('Diese Anmeldung wurde bereits übernommen.');
+  try {
+    const request = await getMembershipRequest(id);
+    if (!request) throw new Error('Anmeldung nicht gefunden.');
+    if (request.createdMemberId) throw new Error('Diese Anmeldung wurde bereits übernommen.');
 
-  const email = request.email.toLowerCase();
-  const existing = await getExistingEmails();
-  if (existing.has(email)) {
-    throw new Error(
-      `Es existiert bereits ein Mitglied mit der E-Mail ${email}. Bitte manuell abgleichen (mögliche Dublette).`,
-    );
-  }
-
-  const inserted = await db
-    .insert(members)
-    .values({
-      firstName: request.firstName,
-      lastName: request.lastName,
-      email,
-      initials: initialsFor(request.firstName, request.lastName),
-      avatarTone: toneFor(email),
-      status: 'active',
-      category: request.category,
-      isSponsor: request.isSponsor,
-      sponsorNote: request.sponsorNote,
-      phone: request.phone,
-      street: request.street,
-      postalCode: request.postalCode,
-      city: request.city,
-      updatedAt: new Date(),
-    })
-    .returning();
-
-  const newMemberId = inserted[0]?.id;
-
-  await db
-    .update(membershipRequests)
-    .set({ status: 'handled', handledAt: new Date(), createdMemberId: newMemberId ?? null })
-    .where(eq(membershipRequests.id, id));
-
-  // Willkommens-Mail (best effort), sofern angehakt.
-  if (formData.get('sendWelcome') === 'on') {
-    try {
-      await sendMemberWelcome({ to: email, firstName: request.firstName });
-    } catch {
-      // Mitglied ist angelegt, Mailversand egal.
+    const email = request.email.toLowerCase();
+    const existing = await getExistingEmails();
+    if (existing.has(email)) {
+      throw new Error(
+        `Es existiert bereits ein Mitglied mit der E-Mail ${email} — mögliche Dublette. Bitte manuell abgleichen.`,
+      );
     }
+
+    const inserted = await db
+      .insert(members)
+      .values({
+        firstName: request.firstName,
+        lastName: request.lastName,
+        email,
+        initials: initialsFor(request.firstName, request.lastName),
+        avatarTone: toneFor(email),
+        status: 'active',
+        category: request.category,
+        isSponsor: request.isSponsor,
+        sponsorNote: request.sponsorNote,
+        phone: request.phone,
+        street: request.street,
+        postalCode: request.postalCode,
+        city: request.city,
+        updatedAt: new Date(),
+      })
+      .returning();
+
+    const newMemberId = inserted[0]?.id;
+
+    await db
+      .update(membershipRequests)
+      .set({ status: 'handled', handledAt: new Date(), createdMemberId: newMemberId ?? null })
+      .where(eq(membershipRequests.id, id));
+
+    // Willkommens-Mail (best effort) — blockiert die Übernahme NICHT.
+    if (sendWelcome) {
+      try {
+        await sendMemberWelcome({ to: email, firstName: request.firstName });
+      } catch {
+        // Mitglied ist angelegt, Mailversand egal.
+      }
+    }
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : 'Übernahme fehlgeschlagen.';
+    redirect(`/admin/anmeldungen?error=${encodeURIComponent(msg)}`);
   }
 
   revalidatePath('/admin/anmeldungen');
   revalidatePath('/admin/mitglieder');
   revalidatePath('/admin');
+  redirect('/admin/anmeldungen?converted=1');
 }
 
 /** Anmeldung als erledigt/abgelehnt markieren (Admin). */

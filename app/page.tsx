@@ -11,6 +11,7 @@ import { listActiveSponsors } from '@/lib/db/queries/sponsors';
 import { listActiveMembershipPlans } from '@/lib/db/queries/membership-plans';
 import { listActiveCourtProgram } from '@/lib/db/queries/court-program';
 import { getClubStats } from '@/lib/db/queries/stats';
+import { LandingMobileMenu } from '@/components/LandingMobileMenu';
 import { formatDayMonth, formatDayMonthCaps, MONTHS_DE } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
@@ -105,13 +106,7 @@ export default async function LandingPage() {
                 Anmelden
               </Link>
             </nav>
-            <button
-              type="button"
-              aria-label="Menü"
-              className="sm:hidden text-paper-50/90 w-11 h-11 inline-flex items-center justify-center"
-            >
-              <Icon.Menu />
-            </button>
+            <LandingMobileMenu />
           </div>
           <div>
             <span className="font-mono text-[10.5px] uppercase tracking-[0.22em] text-sand-300">
@@ -542,7 +537,7 @@ export default async function LandingPage() {
             </h2>
           </div>
           <Link
-            href="/app/news"
+            href="/news"
             className="font-mono text-[11px] uppercase tracking-[0.14em] text-lake-700"
           >
             Alle ansehen →
@@ -555,7 +550,7 @@ export default async function LandingPage() {
             return (
               <Link
                 key={n.id}
-                href={`/app/news/${n.slug}`}
+                href={`/news/${n.slug}`}
                 className="bg-white rounded-lg border border-stone-200 overflow-hidden group transition-all hover:border-stone-300 hover:shadow-card hover:-translate-y-0.5"
               >
                 <div className={`h-44 ${n.imageKind === 'sand' ? 'ph-sand' : n.imageKind === 'forest' ? 'ph-forest' : 'ph-lake'}`} />

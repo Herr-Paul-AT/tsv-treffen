@@ -39,11 +39,19 @@ function revalidateSponsorViews() {
   revalidatePath('/');
 }
 
+function errMsg(e: unknown): string {
+  return e instanceof Error ? e.message : 'Unbekannter Fehler beim Speichern.';
+}
+
 export async function createSponsor(formData: FormData) {
-  const base = parseBase(formData);
-  const logo = formData.get('logo');
-  const logoUrl = await uploadPublicImage(logo instanceof File ? logo : null, 'sponsors');
-  await db.insert(sponsors).values({ ...base, logoUrl });
+  try {
+    const base = parseBase(formData);
+    const logo = formData.get('logo');
+    const logoUrl = await uploadPublicImage(logo instanceof File ? logo : null, 'sponsors');
+    await db.insert(sponsors).values({ ...base, logoUrl });
+  } catch (e) {
+    redirect(`/admin/sponsoren/neu?error=${encodeURIComponent(errMsg(e))}`);
+  }
   revalidateSponsorViews();
   redirect('/admin/sponsoren');
 }
@@ -51,15 +59,19 @@ export async function createSponsor(formData: FormData) {
 export async function updateSponsor(formData: FormData) {
   const id = String(formData.get('id') ?? '').trim();
   if (!id) throw new Error('Datensatz-ID fehlt.');
-  const base = parseBase(formData);
-  const logo = formData.get('logo');
-  const uploaded = await uploadPublicImage(logo instanceof File ? logo : null, 'sponsors');
-  // Neues Logo hochgeladen? sonst bestehendes behalten.
-  const currentLogoUrl = String(formData.get('currentLogoUrl') ?? '').trim() || null;
-  await db
-    .update(sponsors)
-    .set({ ...base, logoUrl: uploaded ?? currentLogoUrl })
-    .where(eq(sponsors.id, id));
+  try {
+    const base = parseBase(formData);
+    const logo = formData.get('logo');
+    const uploaded = await uploadPublicImage(logo instanceof File ? logo : null, 'sponsors');
+    // Neues Logo hochgeladen? sonst bestehendes behalten.
+    const currentLogoUrl = String(formData.get('currentLogoUrl') ?? '').trim() || null;
+    await db
+      .update(sponsors)
+      .set({ ...base, logoUrl: uploaded ?? currentLogoUrl })
+      .where(eq(sponsors.id, id));
+  } catch (e) {
+    redirect(`/admin/sponsoren/${id}?error=${encodeURIComponent(errMsg(e))}`);
+  }
   revalidateSponsorViews();
   redirect('/admin/sponsoren');
 }
