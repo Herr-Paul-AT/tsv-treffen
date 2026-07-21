@@ -11,6 +11,7 @@ import { listActiveSponsors } from '@/lib/db/queries/sponsors';
 import { listActiveMembershipPlans } from '@/lib/db/queries/membership-plans';
 import { listActiveCourtProgram } from '@/lib/db/queries/court-program';
 import { listActiveFaqs } from '@/lib/db/queries/faqs';
+import { listActivePartners } from '@/lib/db/queries/partners';
 import { getClubStats } from '@/lib/db/queries/stats';
 import { LandingMobileMenu } from '@/components/LandingMobileMenu';
 import { formatDayMonth, formatDayMonthCaps, MONTHS_DE } from '@/lib/format';
@@ -44,7 +45,7 @@ function formatEventDate(start: Date, end: Date | null): string {
 }
 
 export default async function LandingPage() {
-  const [stats, news, events, teams, sponsors, plans, program, faqs] = await Promise.all([
+  const [stats, news, events, teams, sponsors, plans, program, faqs, partners] = await Promise.all([
     getClubStats(),
     listNews(3, { publicOnly: true }),
     listUpcomingEvents(8),
@@ -53,6 +54,7 @@ export default async function LandingPage() {
     listActiveMembershipPlans(),
     listActiveCourtProgram(),
     listActiveFaqs(),
+    listActivePartners(),
   ]);
   const adultTeams = teams.filter((t) => !/^Jugend/.test(t.name));
   const youthTeams = teams.filter((t) => /^Jugend/.test(t.name));
@@ -666,6 +668,55 @@ export default async function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* ─── SPORTLICHE PARTNER ───────────────────────────── */}
+      {partners.length > 0 && (
+      <section id="partner" className="max-w-[1080px] mx-auto px-5 mt-20">
+        <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-stone-500 rule-eyebrow">
+          Vernetzt in Treffen
+        </div>
+        <h2 className="font-display text-[28px] sm:text-[36px] leading-[1.1] tracking-[-0.01em] text-stone-800 mt-4">
+          Sportliche Partner.
+        </h2>
+        <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          {partners.map((p) => {
+            const inner = (
+              <>
+                {p.logoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={p.logoUrl} alt={p.name} className="max-h-10 max-w-[70%] object-contain" loading="lazy" />
+                ) : (
+                  <span className="font-display text-[15px] text-stone-800 leading-tight">{p.name}</span>
+                )}
+                {p.url && (
+                  <span className="mt-1 inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.14em] text-lake-700">
+                    Website <Icon.External size={11} />
+                  </span>
+                )}
+              </>
+            );
+            const tile =
+              'bg-white border border-stone-200 rounded-lg h-24 flex flex-col items-center justify-center text-center px-3 gap-1';
+            return p.url ? (
+              <a
+                key={p.id}
+                href={p.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={p.name}
+                className={`${tile} transition-colors hover:border-stone-300`}
+              >
+                {inner}
+              </a>
+            ) : (
+              <div key={p.id} title={p.name} className={tile}>
+                {inner}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+      )}
 
       {/* ─── SPONSOREN ────────────────────────────────────── */}
       <section className="max-w-[1080px] mx-auto px-5 mt-20 pb-16">

@@ -64,6 +64,13 @@
       "when": 1784673055275,
       "tag": "0008_nebulous_goliath",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1784673618733,
+      "tag": "0009_thin_lizard",
+      "breakpoints": true
     }
   ]
 }

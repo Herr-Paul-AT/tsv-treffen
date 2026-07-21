@@ -119,6 +119,13 @@ export default async function AdminLandingPage() {
       tone: 'stone',
     },
     {
+      href: '/admin/partner',
+      label: 'Sportliche Partner',
+      icon: <Icon.External size={20} />,
+      hint: 'Partner & Links auf der Startseite',
+      tone: 'lake',
+    },
+    {
       href: '/admin/sponsoren',
       label: 'Sponsoren',
       icon: <Icon.Star size={20} />,

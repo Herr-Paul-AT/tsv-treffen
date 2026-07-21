@@ -372,6 +372,17 @@ export const courtProgram = pgTable('court_program', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
+// Sportliche Partner & Links (z. B. KTV, Padel, Nachbarvereine) — admin-gepflegt.
+export const partners = pgTable('partners', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  url: text('url'),
+  logoUrl: text('logo_url'),
+  sortOrder: integer('sort_order').notNull().default(0),
+  active: boolean('active').notNull().default(true),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
 // Häufige Fragen (FAQ) — vom Admin gepflegt, Anzeige auf der Startseite.
 export const faqs = pgTable('faqs', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -386,5 +397,6 @@ export type MembershipPlan = typeof membershipPlans.$inferSelect;
 export type MembershipRequest = typeof membershipRequests.$inferSelect;
 export type CourtProgramEntry = typeof courtProgram.$inferSelect;
 export type Faq = typeof faqs.$inferSelect;
+export type Partner = typeof partners.$inferSelect;
 
 export const __schemaVersion = sql`'1'`;
