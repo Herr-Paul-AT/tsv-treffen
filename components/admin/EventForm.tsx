@@ -31,8 +31,14 @@ export function EventForm({
   submitLabel: string;
 }) {
   return (
-    <form action={action} className="mt-8 max-w-2xl space-y-5">
+    <form action={action} className="mt-8 max-w-2xl space-y-5" encType="multipart/form-data">
       {event && <input type="hidden" name="id" value={event.id} />}
+      {event?.attachmentUrl && (
+        <input type="hidden" name="currentAttachmentUrl" value={event.attachmentUrl} />
+      )}
+      {event?.attachmentName && (
+        <input type="hidden" name="currentAttachmentName" value={event.attachmentName} />
+      )}
 
       <TextField
         label="Titel"
@@ -105,6 +111,29 @@ export function EventForm({
             className="mt-2 w-full px-4 py-3 bg-white rounded-md border border-stone-200 text-[16px] text-stone-800 placeholder-stone-400 outline-none focus:border-lake-500 focus:ring-2 focus:ring-lake-500/15 resize-y"
           />
         </label>
+      </div>
+
+      <div>
+        <span className={fieldLabel}>Flyer / Anhang (optional)</span>
+        {event?.attachmentUrl && (
+          <a
+            href={event.attachmentUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 inline-flex items-center gap-1.5 text-[13.5px] font-medium text-lake-700"
+          >
+            <Icon.Document size={14} /> {event.attachmentName ?? 'Aktueller Anhang'}
+          </a>
+        )}
+        <input
+          type="file"
+          name="attachment"
+          accept="image/png,image/jpeg,image/webp,application/pdf"
+          className="mt-2 block w-full text-[14px] text-stone-700 file:mr-4 file:h-11 file:px-4 file:rounded-md file:border-0 file:bg-stone-800 file:text-paper-50 file:text-[14px] file:font-medium hover:file:bg-stone-700 file:cursor-pointer"
+        />
+        <p className="mt-1.5 text-[12.5px] text-stone-500">
+          Bild oder PDF, max. 5 MB.{event ? ' Leer lassen, um den aktuellen Anhang zu behalten.' : ''}
+        </p>
       </div>
 
       <div className="flex items-center gap-3 pt-2">

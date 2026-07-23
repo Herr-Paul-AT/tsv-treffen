@@ -71,6 +71,13 @@
       "when": 1784673618733,
       "tag": "0009_thin_lizard",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1784674416244,
+      "tag": "0010_daffy_mantis",
+      "breakpoints": true
     }
   ]
 }

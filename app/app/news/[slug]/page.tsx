@@ -96,6 +96,16 @@ export default async function NewsDetailPage({
               <p key={i}>{p}</p>
             ))}
           </div>
+          {article.attachmentUrl && (
+            <a
+              href={article.attachmentUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 inline-flex items-center gap-2 h-11 px-4 rounded-md border border-stone-200 bg-paper-50 text-[14px] font-medium text-stone-800 hover:border-stone-300"
+            >
+              <Icon.Document size={16} /> {article.attachmentName ?? 'Anhang ansehen'}
+            </a>
+          )}
           <div className="mt-6 pt-4 border-t border-stone-100 flex items-center gap-4 flex-wrap">
             <span className="font-mono text-[11px] text-stone-500 uppercase tracking-[0.14em]">
               Noch keine Kommentare

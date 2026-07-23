@@ -71,6 +71,16 @@ export default async function PublicNewsDetailPage({
               <p key={i}>{p}</p>
             ))}
           </div>
+          {article.attachmentUrl && (
+            <a
+              href={article.attachmentUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 inline-flex items-center gap-2 h-11 px-4 rounded-md border border-stone-200 bg-paper-50 text-[14px] font-medium text-stone-800 hover:border-stone-300"
+            >
+              <Icon.Document size={16} /> {article.attachmentName ?? 'Anhang ansehen'}
+            </a>
+          )}
         </article>
 
         <div className="mt-6 text-center">

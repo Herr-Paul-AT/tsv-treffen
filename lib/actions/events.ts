@@ -5,6 +5,11 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import { events } from '@/lib/db/schema';
+import { uploadPublicFile } from '@/lib/supabase/storage';
+
+function errMsg(e: unknown): string {
+  return e instanceof Error ? e.message : 'Unbekannter Fehler beim Speichern.';
+}
 
 const KINDS = ['event', 'match', 'tournament', 'training'] as const;
 type Kind = (typeof KINDS)[number];
@@ -64,8 +69,18 @@ function revalidateEventViews() {
 }
 
 export async function createEvent(formData: FormData) {
-  const values = parseEventForm(formData);
-  await db.insert(events).values(values);
+  try {
+    const values = parseEventForm(formData);
+    const file = formData.get('attachment');
+    const up = await uploadPublicFile(file instanceof File ? file : null, 'events');
+    await db.insert(events).values({
+      ...values,
+      attachmentUrl: up?.url ?? null,
+      attachmentName: up?.name ?? null,
+    });
+  } catch (e) {
+    redirect(`/admin/veranstaltungen/neu?error=${encodeURIComponent(errMsg(e))}`);
+  }
   revalidateEventViews();
   redirect('/admin/veranstaltungen');
 }
@@ -73,8 +88,23 @@ export async function createEvent(formData: FormData) {
 export async function updateEvent(formData: FormData) {
   const id = String(formData.get('id') ?? '').trim();
   if (!id) throw new Error('Datensatz-ID fehlt.');
-  const values = parseEventForm(formData);
-  await db.update(events).set(values).where(eq(events.id, id));
+  try {
+    const values = parseEventForm(formData);
+    const file = formData.get('attachment');
+    const up = await uploadPublicFile(file instanceof File ? file : null, 'events');
+    const currentUrl = String(formData.get('currentAttachmentUrl') ?? '').trim() || null;
+    const currentName = String(formData.get('currentAttachmentName') ?? '').trim() || null;
+    await db
+      .update(events)
+      .set({
+        ...values,
+        attachmentUrl: up?.url ?? currentUrl,
+        attachmentName: up?.name ?? currentName,
+      })
+      .where(eq(events.id, id));
+  } catch (e) {
+    redirect(`/admin/veranstaltungen/${id}?error=${encodeURIComponent(errMsg(e))}`);
+  }
   revalidateEventViews();
   redirect('/admin/veranstaltungen');
 }

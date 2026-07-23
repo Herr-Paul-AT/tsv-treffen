@@ -137,6 +137,8 @@ export const news = pgTable('news', {
   excerpt: text('excerpt').notNull(),
   body: text('body').notNull(),
   imageKind: imageKind('image_kind').notNull().default('none'),
+  attachmentUrl: text('attachment_url'),
+  attachmentName: text('attachment_name'),
   pinned: boolean('pinned').notNull().default(false),
   visibility: newsVisibility('visibility').notNull().default('public'),
   authorId: uuid('author_id').references(() => members.id, { onDelete: 'set null' }),
@@ -195,6 +197,8 @@ export const events = pgTable('events', {
   allDay: boolean('all_day').notNull().default(false),
   description: text('description'),
   location: text('location'),
+  attachmentUrl: text('attachment_url'),
+  attachmentName: text('attachment_name'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 

@@ -20,8 +20,14 @@ export function NewsForm({
   submitLabel: string;
 }) {
   return (
-    <form action={action} className="mt-8 max-w-2xl space-y-5">
+    <form action={action} className="mt-8 max-w-2xl space-y-5" encType="multipart/form-data">
       {article && <input type="hidden" name="id" value={article.id} />}
+      {article?.attachmentUrl && (
+        <input type="hidden" name="currentAttachmentUrl" value={article.attachmentUrl} />
+      )}
+      {article?.attachmentName && (
+        <input type="hidden" name="currentAttachmentName" value={article.attachmentName} />
+      )}
 
       <TextField label="Titel" name="title" required defaultValue={article?.title ?? ''} placeholder="z. B. Saisonstart 2026" />
 
@@ -106,6 +112,29 @@ export function NewsForm({
           />
           <span className="text-[15px] text-stone-700 font-medium">Oben anpinnen</span>
         </label>
+      </div>
+
+      <div>
+        <span className={fieldLabel}>Flyer / Anhang (optional)</span>
+        {article?.attachmentUrl && (
+          <a
+            href={article.attachmentUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 inline-flex items-center gap-1.5 text-[13.5px] font-medium text-lake-700"
+          >
+            <Icon.Document size={14} /> {article.attachmentName ?? 'Aktueller Anhang'}
+          </a>
+        )}
+        <input
+          type="file"
+          name="attachment"
+          accept="image/png,image/jpeg,image/webp,application/pdf"
+          className="mt-2 block w-full text-[14px] text-stone-700 file:mr-4 file:h-11 file:px-4 file:rounded-md file:border-0 file:bg-stone-800 file:text-paper-50 file:text-[14px] file:font-medium hover:file:bg-stone-700 file:cursor-pointer"
+        />
+        <p className="mt-1.5 text-[12.5px] text-stone-500">
+          Bild oder PDF, max. 5 MB.{article ? ' Leer lassen, um den aktuellen Anhang zu behalten.' : ''}
+        </p>
       </div>
 
       <div className="flex items-center gap-3 pt-2">

@@ -5,6 +5,7 @@ import { SUPABASE_URL } from './config';
 const BUCKET = 'public-assets';
 const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
 const ALLOWED = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml', 'image/gif'];
+const ALLOWED_FILE = [...ALLOWED, 'application/pdf'];
 
 function serviceClient() {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -48,4 +49,32 @@ export async function uploadPublicImage(file: File | null, folder: string): Prom
 
   const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
   return data.publicUrl;
+}
+
+export type UploadedFile = { url: string; name: string };
+
+/**
+ * Lädt eine Datei (Bild ODER PDF) hoch — z. B. Flyer für Events/News.
+ * Gibt {url, name} zurück oder null, wenn keine Datei übergeben wurde.
+ */
+export async function uploadPublicFile(file: File | null, folder: string): Promise<UploadedFile | null> {
+  if (!file || file.size === 0) return null;
+  if (file.size > MAX_BYTES) throw new Error('Die Datei ist zu groß (max. 5 MB).');
+  if (file.type && !ALLOWED_FILE.includes(file.type)) {
+    throw new Error('Nur Bilder (PNG, JPG, WEBP, SVG, GIF) oder PDF sind erlaubt.');
+  }
+
+  const supabase = serviceClient();
+  const stamp = Date.now().toString(36);
+  const original = file.name || 'anhang';
+  const path = `${folder}/${stamp}-${slugifyName(original)}`;
+
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const { error } = await supabase.storage
+    .from(BUCKET)
+    .upload(path, bytes, { contentType: file.type || 'application/octet-stream', upsert: false });
+  if (error) throw new Error(`Upload fehlgeschlagen: ${error.message}`);
+
+  const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+  return { url: data.publicUrl, name: original };
 }

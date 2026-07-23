@@ -9,8 +9,15 @@ import { getNews, getActiveMemberCount, listNewsForAdmin } from '@/lib/db/querie
 
 export const dynamic = 'force-dynamic';
 
-export default async function EditNewsPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function EditNewsPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ error?: string }>;
+}) {
   const { id } = await params;
+  const sp = await searchParams;
   const [article, activeCount, adminRows] = await Promise.all([
     getNews(id),
     getActiveMemberCount(),
@@ -48,6 +55,12 @@ export default async function EditNewsPage({ params }: { params: Promise<{ id: s
       </div>
 
       <div className="grid lg:grid-cols-[1fr_300px] gap-8 items-start">
+        {sp.error && (
+          <div className="mb-5 max-w-2xl flex items-start gap-2.5 rounded-md bg-danger/5 border border-danger/20 px-4 py-3 text-[14px] text-danger">
+            <Icon.Info size={16} className="flex-none mt-0.5" />
+            <span>{sp.error}</span>
+          </div>
+        )}
         <NewsForm action={updateNews} article={article} submitLabel="Änderungen speichern" />
 
         <aside className="mt-8 bg-stone-800 text-paper-50 rounded-lg p-5">

@@ -491,8 +491,18 @@ export default async function LandingPage() {
                     <div className="font-display text-[16px] sm:text-[18px] text-stone-800 leading-tight">
                       {e.title}
                     </div>
-                    <div className="mt-1">
+                    <div className="mt-1 flex items-center gap-3 flex-wrap">
                       <Badge tone={tone}>{badgeLabel}</Badge>
+                      {e.attachmentUrl && (
+                        <a
+                          href={e.attachmentUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 font-mono text-[10.5px] uppercase tracking-[0.14em] text-lake-700"
+                        >
+                          <Icon.Document size={12} /> Flyer
+                        </a>
+                      )}
                     </div>
                   </div>
                 </div>

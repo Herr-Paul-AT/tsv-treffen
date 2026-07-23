@@ -6,6 +6,11 @@ import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import { news } from '@/lib/db/schema';
 import { getCurrentMember } from '@/lib/db/queries/session';
+import { uploadPublicFile } from '@/lib/supabase/storage';
+
+function errMsg(e: unknown): string {
+  return e instanceof Error ? e.message : 'Unbekannter Fehler beim Speichern.';
+}
 
 const IMAGE_KINDS = ['none', 'sand', 'lake', 'forest'] as const;
 const VISIBILITIES = ['public', 'internal'] as const;
@@ -78,42 +83,15 @@ function revalidateNewsViews(slug?: string) {
 }
 
 export async function createNews(formData: FormData) {
-  const v = parseNewsForm(formData);
-  const slug = await uniqueSlug(slugify(v.title));
-  const me = await getCurrentMember();
+  let slug = '';
+  try {
+    const v = parseNewsForm(formData);
+    slug = await uniqueSlug(slugify(v.title));
+    const me = await getCurrentMember();
+    const file = formData.get('attachment');
+    const up = await uploadPublicFile(file instanceof File ? file : null, 'news');
 
-  await db.insert(news).values({
-    slug,
-    title: v.title,
-    eyebrow: v.eyebrow,
-    excerpt: v.excerpt,
-    body: v.body,
-    imageKind: v.imageKind,
-    visibility: v.visibility,
-    pinned: v.pinned,
-    authorId: me?.id ?? null,
-    publishedAt: v.published ? new Date() : null,
-    updatedAt: new Date(),
-  });
-  revalidateNewsViews(slug);
-  redirect('/admin/news');
-}
-
-export async function updateNews(formData: FormData) {
-  const id = String(formData.get('id') ?? '').trim();
-  if (!id) throw new Error('Beitrags-ID fehlt.');
-  const v = parseNewsForm(formData);
-
-  const current = await db.select().from(news).where(eq(news.id, id)).limit(1);
-  if (!current[0]) throw new Error('Beitrag nicht gefunden.');
-
-  const slug = await uniqueSlug(slugify(v.title), id);
-  // Veröffentlichungsdatum bewahren, falls schon veröffentlicht; sonst beim Veröffentlichen setzen.
-  const publishedAt = v.published ? current[0].publishedAt ?? new Date() : null;
-
-  await db
-    .update(news)
-    .set({
+    await db.insert(news).values({
       slug,
       title: v.title,
       eyebrow: v.eyebrow,
@@ -121,11 +99,59 @@ export async function updateNews(formData: FormData) {
       body: v.body,
       imageKind: v.imageKind,
       visibility: v.visibility,
+      attachmentUrl: up?.url ?? null,
+      attachmentName: up?.name ?? null,
       pinned: v.pinned,
-      publishedAt,
+      authorId: me?.id ?? null,
+      publishedAt: v.published ? new Date() : null,
       updatedAt: new Date(),
-    })
-    .where(eq(news.id, id));
+    });
+  } catch (e) {
+    redirect(`/admin/news/neu?error=${encodeURIComponent(errMsg(e))}`);
+  }
+  revalidateNewsViews(slug);
+  redirect('/admin/news');
+}
+
+export async function updateNews(formData: FormData) {
+  const id = String(formData.get('id') ?? '').trim();
+  if (!id) throw new Error('Beitrags-ID fehlt.');
+  let slug = '';
+  try {
+    const v = parseNewsForm(formData);
+
+    const current = await db.select().from(news).where(eq(news.id, id)).limit(1);
+    if (!current[0]) throw new Error('Beitrag nicht gefunden.');
+
+    slug = await uniqueSlug(slugify(v.title), id);
+    // Veröffentlichungsdatum bewahren, falls schon veröffentlicht; sonst beim Veröffentlichen setzen.
+    const publishedAt = v.published ? current[0].publishedAt ?? new Date() : null;
+
+    const file = formData.get('attachment');
+    const up = await uploadPublicFile(file instanceof File ? file : null, 'news');
+    const currentUrl = String(formData.get('currentAttachmentUrl') ?? '').trim() || null;
+    const currentName = String(formData.get('currentAttachmentName') ?? '').trim() || null;
+
+    await db
+      .update(news)
+      .set({
+        slug,
+        title: v.title,
+        eyebrow: v.eyebrow,
+        excerpt: v.excerpt,
+        body: v.body,
+        imageKind: v.imageKind,
+        visibility: v.visibility,
+        attachmentUrl: up?.url ?? currentUrl,
+        attachmentName: up?.name ?? currentName,
+        pinned: v.pinned,
+        publishedAt,
+        updatedAt: new Date(),
+      })
+      .where(eq(news.id, id));
+  } catch (e) {
+    redirect(`/admin/news/${id}?error=${encodeURIComponent(errMsg(e))}`);
+  }
   revalidateNewsViews(slug);
   redirect('/admin/news');
 }

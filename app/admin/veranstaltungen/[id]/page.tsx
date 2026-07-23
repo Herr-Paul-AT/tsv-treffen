@@ -10,10 +10,13 @@ export const dynamic = 'force-dynamic';
 
 export default async function EditEventPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   const { id } = await params;
+  const sp = await searchParams;
   const event = await getEvent(id);
   if (!event) notFound();
 
@@ -34,6 +37,12 @@ export default async function EditEventPage({
         </h1>
       </div>
 
+      {sp.error && (
+        <div className="mt-5 max-w-2xl flex items-start gap-2.5 rounded-md bg-danger/5 border border-danger/20 px-4 py-3 text-[14px] text-danger">
+          <Icon.Info size={16} className="flex-none mt-0.5" />
+          <span>{sp.error}</span>
+        </div>
+      )}
       <EventForm action={updateEvent} event={event} submitLabel="Änderungen speichern" />
 
       <div className="mt-12 max-w-2xl border-t border-stone-200 pt-6">
