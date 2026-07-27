@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Fraunces, Manrope, DM_Mono } from 'next/font/google';
 import { SerwistProvider } from '@serwist/turbopack/react';
+import { PwaAutoUpdate } from '@/components/PwaAutoUpdate';
 import './globals.css';
 
 const fraunces = Fraunces({
@@ -66,7 +67,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${fraunces.variable} ${manrope.variable} ${dmMono.variable}`}
     >
       <body>
-        <SerwistProvider swUrl="/serwist/sw.js">{children}</SerwistProvider>
+        <SerwistProvider swUrl="/serwist/sw.js">
+          <PwaAutoUpdate />
+          {children}
+        </SerwistProvider>
       </body>
     </html>
   );
