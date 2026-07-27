@@ -28,7 +28,7 @@ export default function DatenschutzPage() {
               Verantwortlicher
             </h2>
             <p>
-              TSV Schloss Treffen, Schlossweg 1, 9521 Treffen am Ossiachersee. Kontakt:{' '}
+              TSV Schloss Treffen, Schloßstraße 1, 9521 Treffen am Ossiachersee. Kontakt:{' '}
               <a href="mailto:office@tsv-treffen.at" className="text-lake-700">
                 office@tsv-treffen.at
               </a>

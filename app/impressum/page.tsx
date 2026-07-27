@@ -24,7 +24,7 @@ export default function ImpressumPage() {
             <p>
               TSV Schloss Treffen
               <br />
-              Schlossweg 1<br />
+              Schloßstraße 1<br />
               9521 Treffen am Ossiachersee
               <br />
               Österreich

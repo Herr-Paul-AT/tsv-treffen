@@ -615,7 +615,7 @@ export default async function LandingPage() {
           <div className="relative rounded-xl overflow-hidden border border-stone-200 bg-forest-50 h-[320px] sm:h-[400px]">
             <iframe
               title="Karte — TSV Schloss Treffen, Treffen am Ossiachersee"
-              src="https://www.google.com/maps?q=Schlossweg%201%2C%209521%20Treffen%20am%20Ossiachersee&z=15&output=embed"
+              src="https://www.google.com/maps?q=Schlo%C3%9Fstra%C3%9Fe%201%2C%209521%20Treffen%20am%20Ossiachersee&z=15&output=embed"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               className="absolute inset-0 w-full h-full border-0"
@@ -626,10 +626,10 @@ export default async function LandingPage() {
                 Standort
               </div>
               <div className="font-display text-[18px] text-stone-800 mt-1">
-                Schlossweg 1, 9521 Treffen am Ossiachersee
+                Schloßstraße 1, 9521 Treffen am Ossiachersee
               </div>
               <a
-                href="https://www.google.com/maps/search/?api=1&query=Schlossweg%201%2C%209521%20Treffen%20am%20Ossiachersee"
+                href="https://www.google.com/maps/search/?api=1&query=Schlo%C3%9Fstra%C3%9Fe%201%2C%209521%20Treffen%20am%20Ossiachersee"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-3 inline-flex items-center gap-1.5 text-[13.5px] font-medium text-lake-700 pointer-events-auto"
@@ -646,7 +646,7 @@ export default async function LandingPage() {
               </div>
               <p className="text-[14.5px] text-stone-700 mt-2 leading-[1.55]">
                 A10 Tauernautobahn → Abfahrt Villach Süd → Richtung Treffen am Ossiachersee. Vom
-                Ortskern dem Schlossweg folgen. Kostenlose Parkplätze direkt am Vereinsheim.
+                Ortskern der Schloßstraße folgen. Kostenlose Parkplätze direkt am Vereinsheim.
               </p>
             </div>
             <div className="bg-white rounded-lg border border-stone-200 p-5">
@@ -655,7 +655,7 @@ export default async function LandingPage() {
               </div>
               <p className="text-[14.5px] text-stone-700 mt-2 leading-[1.55]">
                 Zug bis Villach Hbf, dann Bus 5176 Richtung Ossiachersee. Haltestelle „Treffen
-                Ortsmitte", von dort wenige Minuten zu Fuß über den Schlossweg.
+                Ortsmitte", von dort wenige Minuten zu Fuß über die Schloßstraße.
               </p>
             </div>
             <div className="bg-white rounded-lg border border-stone-200 p-5">
