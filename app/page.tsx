@@ -12,8 +12,10 @@ import { listActiveMembershipPlans } from '@/lib/db/queries/membership-plans';
 import { listActiveCourtProgram } from '@/lib/db/queries/court-program';
 import { listActiveFaqs } from '@/lib/db/queries/faqs';
 import { listActivePartners } from '@/lib/db/queries/partners';
+import { listActiveContacts } from '@/lib/db/queries/contacts';
 import { getClubStats } from '@/lib/db/queries/stats';
 import { LandingMobileMenu } from '@/components/LandingMobileMenu';
+import { ContactsGrid } from '@/components/ContactsGrid';
 import { formatDayMonth, formatDayMonthCaps, MONTHS_DE } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
@@ -45,7 +47,7 @@ function formatEventDate(start: Date, end: Date | null): string {
 }
 
 export default async function LandingPage() {
-  const [stats, news, events, teams, sponsors, plans, program, faqs, partners] = await Promise.all([
+  const [stats, news, events, teams, sponsors, plans, program, faqs, partners, contacts] = await Promise.all([
     getClubStats(),
     listNews(3, { publicOnly: true }),
     listUpcomingEvents(8),
@@ -55,6 +57,7 @@ export default async function LandingPage() {
     listActiveCourtProgram(),
     listActiveFaqs(),
     listActivePartners(),
+    listActiveContacts(),
   ]);
   const adultTeams = teams.filter((t) => !/^Jugend/.test(t.name));
   const youthTeams = teams.filter((t) => /^Jugend/.test(t.name));
@@ -599,6 +602,25 @@ export default async function LandingPage() {
           </div>
         </div>
       </section>
+      )}
+
+      {/* ─── TRAINER & KONTAKTE ────────────────────────────── */}
+      {contacts.length > 0 && (
+        <section id="trainer" className="max-w-[1080px] mx-auto px-5 mt-20">
+          <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-stone-500 rule-eyebrow">
+            Ansprechpartner
+          </div>
+          <h2 className="font-display text-[28px] sm:text-[36px] leading-[1.1] tracking-[-0.01em] text-stone-800 mt-4">
+            Trainer &amp; Kontakte.
+          </h2>
+          <p className="text-[15px] text-stone-600 mt-3 max-w-xl leading-[1.6]">
+            Fragen zu Training, Jugend oder Mitgliedschaft? Melde dich direkt bei uns. Die
+            Ballmaschine kann übrigens gemietet werden — einfach nachfragen.
+          </p>
+          <div className="mt-6">
+            <ContactsGrid contacts={contacts} />
+          </div>
+        </section>
       )}
 
       {/* ─── ANFAHRT + KONTAKT ─────────────────────────────── */}

@@ -376,6 +376,19 @@ export const courtProgram = pgTable('court_program', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
+// Trainer & Kontakte — admin-gepflegt, auf Startseite + im Mitgliederbereich sichtbar.
+export const contacts = pgTable('contacts', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  role: text('role'), // Funktion, z. B. „Cheftrainer", „Obmann", „Jugend"
+  phone: text('phone'),
+  email: text('email'),
+  photoUrl: text('photo_url'),
+  sortOrder: integer('sort_order').notNull().default(0),
+  active: boolean('active').notNull().default(true),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
 // Sportliche Partner & Links (z. B. KTV, Padel, Nachbarvereine) — admin-gepflegt.
 export const partners = pgTable('partners', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -402,5 +415,6 @@ export type MembershipRequest = typeof membershipRequests.$inferSelect;
 export type CourtProgramEntry = typeof courtProgram.$inferSelect;
 export type Faq = typeof faqs.$inferSelect;
 export type Partner = typeof partners.$inferSelect;
+export type Contact = typeof contacts.$inferSelect;
 
 export const __schemaVersion = sql`'1'`;

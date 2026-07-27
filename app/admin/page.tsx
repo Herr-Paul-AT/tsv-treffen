@@ -119,6 +119,13 @@ export default async function AdminLandingPage() {
       tone: 'stone',
     },
     {
+      href: '/admin/kontakte',
+      label: 'Trainer & Kontakte',
+      icon: <Icon.User size={20} />,
+      hint: 'Ansprechpartner auf der Startseite',
+      tone: 'lake',
+    },
+    {
       href: '/admin/partner',
       label: 'Sportliche Partner',
       icon: <Icon.External size={20} />,
