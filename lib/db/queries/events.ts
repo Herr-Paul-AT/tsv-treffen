@@ -1,6 +1,23 @@
 import { and, asc, desc, eq, gte, lte } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { events, type Event } from '@/lib/db/schema';
+import { events, eventRegistrations, type Event, type EventRegistration } from '@/lib/db/schema';
+
+export async function listEventRegistrations(eventId: string): Promise<EventRegistration[]> {
+  return db
+    .select()
+    .from(eventRegistrations)
+    .where(eq(eventRegistrations.eventId, eventId))
+    .orderBy(desc(eventRegistrations.createdAt));
+}
+
+/** Summe der angemeldeten Teilnehmer (participants) für eine Veranstaltung. */
+export async function countEventParticipants(eventId: string): Promise<number> {
+  const rows = await db
+    .select({ participants: eventRegistrations.participants })
+    .from(eventRegistrations)
+    .where(eq(eventRegistrations.eventId, eventId));
+  return rows.reduce((sum, r) => sum + (r.participants ?? 1), 0);
+}
 
 export async function listEvents(limit = 20): Promise<Event[]> {
   return db.select().from(events).orderBy(asc(events.startsAt)).limit(limit);

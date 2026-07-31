@@ -13,6 +13,7 @@ const KIND_LABEL: Record<Event['kind'], string> = {
   event: 'Veranstaltung',
   match: 'Match',
   training: 'Training',
+  camp: 'Camp',
 };
 
 const KIND_TONE: Record<Event['kind'], BadgeTone> = {
@@ -20,6 +21,7 @@ const KIND_TONE: Record<Event['kind'], BadgeTone> = {
   event: 'forest',
   match: 'lake',
   training: 'neutral',
+  camp: 'lake',
 };
 
 function formatWhen(e: Event): string {

@@ -9,6 +9,7 @@ const KIND_OPTIONS = [
   { value: 'event', label: 'Veranstaltung / Treffen' },
   { value: 'match', label: 'Match / Wettkampf' },
   { value: 'training', label: 'Training' },
+  { value: 'camp', label: 'Camp / Trainingslager / Sommertraining' },
 ];
 
 function toLocalInput(d: Date | null | undefined): string {
@@ -111,6 +112,31 @@ export function EventForm({
             className="mt-2 w-full px-4 py-3 bg-white rounded-md border border-stone-200 text-[16px] text-stone-800 placeholder-stone-400 outline-none focus:border-lake-500 focus:ring-2 focus:ring-lake-500/15 resize-y"
           />
         </label>
+      </div>
+
+      <div className="rounded-lg border border-stone-200 bg-paper-50/60 p-4 space-y-4">
+        <label className="flex items-center gap-3 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            name="registrationOpen"
+            defaultChecked={event?.registrationOpen ?? false}
+            className="w-5 h-5 rounded border-stone-300 text-lake-700 focus:ring-lake-500/30"
+          />
+          <span className="text-[15px] text-stone-700 font-medium">
+            Online-Anmeldung aktivieren (z. B. Sommercamp)
+          </span>
+        </label>
+        <TextField
+          label="Max. Plätze (leer = ohne Limit)"
+          name="maxAttendees"
+          type="number"
+          defaultValue={event?.maxAttendees != null ? String(event.maxAttendees) : ''}
+          placeholder="z. B. 10"
+        />
+        <p className="text-[12.5px] text-stone-500">
+          Bei aktivierter Anmeldung erscheint auf der Startseite ein Anmeldeformular. Ist das Limit
+          erreicht, wird „ausgebucht" angezeigt und die Anmeldung gesperrt.
+        </p>
       </div>
 
       <div>

@@ -477,7 +477,16 @@ export default async function LandingPage() {
             {events.map((e) => {
               const dateLabel = formatEventDate(e.startsAt, e.endsAt);
               const tone = e.kind === 'match' ? 'lake' : 'sand';
-              const badgeLabel = e.kind === 'match' ? 'Match' : e.kind === 'tournament' ? 'Turnier' : 'Event';
+              const badgeLabel =
+                e.kind === 'match'
+                  ? 'Match'
+                  : e.kind === 'tournament'
+                    ? 'Turnier'
+                    : e.kind === 'camp'
+                      ? 'Camp'
+                      : e.kind === 'training'
+                        ? 'Training'
+                        : 'Event';
               return (
                 <div
                   key={e.id}
@@ -496,11 +505,22 @@ export default async function LandingPage() {
                     aria-hidden="true"
                   />
                   <div className="flex-1 pl-3 sm:pl-5">
-                    <div className="font-display text-[16px] sm:text-[18px] text-stone-800 leading-tight">
+                    <Link
+                      href={`/veranstaltung/${e.id}`}
+                      className="font-display text-[16px] sm:text-[18px] text-stone-800 leading-tight hover:text-lake-700"
+                    >
                       {e.title}
-                    </div>
+                    </Link>
                     <div className="mt-1 flex items-center gap-3 flex-wrap">
                       <Badge tone={tone}>{badgeLabel}</Badge>
+                      {e.registrationOpen && (
+                        <Link
+                          href={`/veranstaltung/${e.id}`}
+                          className="inline-flex items-center gap-1 font-mono text-[10.5px] uppercase tracking-[0.14em] text-forest-700"
+                        >
+                          Anmelden <Icon.ArrowRight size={12} />
+                        </Link>
+                      )}
                       {e.attachmentUrl && (
                         <a
                           href={e.attachmentUrl}

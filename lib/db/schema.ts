@@ -38,7 +38,7 @@ export const attendanceStatus = pgEnum('attendance_status', ['yes', 'maybe', 'no
 
 export const imageKind = pgEnum('image_kind', ['sand', 'lake', 'forest', 'none']);
 
-export const eventKind = pgEnum('event_kind', ['event', 'match', 'tournament', 'training']);
+export const eventKind = pgEnum('event_kind', ['event', 'match', 'tournament', 'training', 'camp']);
 
 export const sponsorTier = pgEnum('sponsor_tier', ['gold', 'silver', 'bronze', 'standard']);
 
@@ -201,6 +201,24 @@ export const events = pgTable('events', {
   location: text('location'),
   attachmentUrl: text('attachment_url'),
   attachmentName: text('attachment_name'),
+  // Anmeldung mit Kapazität (z. B. Sommercamp): registrationOpen aktiviert das
+  // öffentliche Anmeldeformular; maxAttendees begrenzt die Plätze (null = ohne Limit).
+  registrationOpen: boolean('registration_open').notNull().default(false),
+  maxAttendees: integer('max_attendees'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+// Öffentliche Anmeldungen zu einer Veranstaltung (Camp/Training) — gehen per Mail an Gert.
+export const eventRegistrations = pgTable('event_registrations', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  eventId: uuid('event_id')
+    .notNull()
+    .references(() => events.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  email: text('email').notNull(),
+  phone: text('phone'),
+  participants: integer('participants').notNull().default(1),
+  message: text('message'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -362,6 +380,7 @@ export type NewTeam = typeof teams.$inferInsert;
 export type Training = typeof trainings.$inferSelect;
 export type News = typeof news.$inferSelect;
 export type Event = typeof events.$inferSelect;
+export type EventRegistration = typeof eventRegistrations.$inferSelect;
 export type Sponsor = typeof sponsors.$inferSelect;
 export type Court = typeof courts.$inferSelect;
 // „Was passiert am Platz" — vom Admin gepflegte Programm-Einträge
