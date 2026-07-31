@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { TSVLockup, TSVMark } from '@/components/brand/Logo';
-import { AvatarGroup } from '@/components/ui/Avatar';
+import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
@@ -258,21 +258,26 @@ export default async function LandingPage() {
               <div className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-stone-500 mt-1.5">
                 {t.league}
               </div>
-              <div className="mt-3.5 flex items-center justify-between gap-2">
-                {t.roster.length > 0 ? (
-                  <>
-                    <AvatarGroup
-                      items={t.roster.map((r) => ({ initials: r.initials, tone: r.tone }))}
-                      max={4}
-                      size={26}
-                    />
-                    <span className="font-mono text-[11px] text-stone-500">
-                      {t.roster.length} {t.roster.length === 1 ? 'Spieler:in' : 'Spieler:innen'}
-                    </span>
-                  </>
-                ) : (
-                  <span className="text-[12.5px] text-stone-500">Kader in Aufstellung</span>
-                )}
+              <div className="mt-3.5">
+                {(() => {
+                  const captain = t.roster.find((r) => r.role === 'captain');
+                  if (!captain) {
+                    return <span className="text-[12.5px] text-stone-500">Mannschaftsführer folgt</span>;
+                  }
+                  return (
+                    <div className="flex items-center gap-2.5">
+                      <Avatar initials={captain.initials} tone={captain.tone} size={28} />
+                      <div className="min-w-0">
+                        <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-500">
+                          Mannschaftsführer
+                        </div>
+                        <div className="text-[13.5px] text-stone-800 font-medium leading-tight truncate">
+                          {captain.name}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             </article>
           ))}

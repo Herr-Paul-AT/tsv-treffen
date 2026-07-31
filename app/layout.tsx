@@ -38,7 +38,9 @@ export const metadata: Metadata = {
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
+    // 'default' statt 'black-translucent': iOS reserviert die Statusleiste,
+    // der Inhalt startet darunter -> keine Überlappung mehr (iPhone-Ränder).
+    statusBarStyle: 'default',
     title: 'TSV Treffen',
   },
   icons: {

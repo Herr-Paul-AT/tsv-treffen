@@ -140,6 +140,23 @@ export function MembershipRequestForm({
         </label>
       </div>
 
+      <label className="flex items-start gap-3 cursor-pointer select-none">
+        <input
+          type="checkbox"
+          name="privacyConsent"
+          required
+          className="mt-0.5 w-5 h-5 flex-none rounded border-stone-300 text-lake-700 focus:ring-lake-500/30"
+        />
+        <span className="text-[14px] text-stone-700 leading-snug">
+          Ich habe die{' '}
+          <a href="/datenschutz" target="_blank" className="text-lake-700 underline">
+            Datenschutzerklärung
+          </a>{' '}
+          gelesen und bin mit der Verarbeitung meiner Daten zur Bearbeitung der Anmeldung
+          einverstanden.
+        </span>
+      </label>
+
       <div className="pt-2">
         <Button type="submit" variant="primary" size="lg" iconAfter={<Icon.ArrowRight size={16} />}>
           Anmeldung absenden

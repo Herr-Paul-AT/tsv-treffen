@@ -5,7 +5,6 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import { members, membershipRequests } from '@/lib/db/schema';
-import { getExistingEmails } from '@/lib/db/queries/members';
 import { getMembershipRequest } from '@/lib/db/queries/membership-requests';
 import { MEMBER_CATEGORY_VALUES } from '@/lib/member-categories';
 import { memberCategoryLabel } from '@/lib/member-categories';
@@ -31,6 +30,9 @@ export async function submitMembershipRequest(formData: FormData) {
   const city = req(formData, 'city', 'Ort');
 
   if (!EMAIL_RE.test(email)) throw new Error('Bitte eine gültige E-Mail-Adresse angeben.');
+  if (formData.get('privacyConsent') !== 'on') {
+    throw new Error('Bitte der Datenschutzerklärung zustimmen.');
+  }
 
   const categoryRaw = String(formData.get('category') ?? '').trim();
   const category = (MEMBER_CATEGORY_VALUES as string[]).includes(categoryRaw)
@@ -105,12 +107,8 @@ export async function createMemberFromRequest(formData: FormData) {
     if (request.createdMemberId) throw new Error('Diese Anmeldung wurde bereits übernommen.');
 
     const email = request.email.toLowerCase();
-    const existing = await getExistingEmails();
-    if (existing.has(email)) {
-      throw new Error(
-        `Es existiert bereits ein Mitglied mit der E-Mail ${email} — mögliche Dublette. Bitte manuell abgleichen.`,
-      );
-    }
+    // Keine harte Sperre bei vorhandener E-Mail (Familien teilen sich Adressen).
+    // Der Dubletten-Hinweis wird in der Anmeldungen-Liste weiterhin angezeigt.
 
     const inserted = await db
       .insert(members)

@@ -5,7 +5,13 @@ import type { AvatarTone } from '@/components/ui/Avatar';
 
 export type TeamWithRoster = Team & {
   trainerName: string | null;
-  roster: { initials: string; tone: AvatarTone; memberId: string; name: string }[];
+  roster: {
+    initials: string;
+    tone: AvatarTone;
+    memberId: string;
+    name: string;
+    role: 'player' | 'captain' | 'reserve';
+  }[];
   nextEventLabel: string | null;
 };
 
@@ -28,6 +34,7 @@ export async function listTeamsWithRoster(): Promise<TeamWithRoster[]> {
       lastName: members.lastName,
       initials: members.initials,
       avatarTone: members.avatarTone,
+      role: teamMembers.role,
     })
     .from(teamMembers)
     .innerJoin(members, eq(members.id, teamMembers.memberId))
@@ -41,6 +48,7 @@ export async function listTeamsWithRoster(): Promise<TeamWithRoster[]> {
       initials: r.initials,
       tone: r.avatarTone as AvatarTone,
       name: `${r.firstName} ${r.lastName}`,
+      role: r.role as 'player' | 'captain' | 'reserve',
     });
     rosterByTeam.set(r.teamId, list);
   }

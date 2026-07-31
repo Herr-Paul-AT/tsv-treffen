@@ -84,12 +84,8 @@ function revalidateMemberViews() {
 
 export async function createMember(formData: FormData) {
   const values = parseMemberForm(formData);
-  if (values.email) {
-    const existing = await getExistingEmails();
-    if (existing.has(values.email)) {
-      throw new Error(`Es existiert bereits ein Mitglied mit der E-Mail ${values.email}.`);
-    }
-  }
+  // Dublette bewusst KEINE Sperre mehr: Familienmitglieder dürfen dieselbe
+  // E-Mail teilen. (Dubletten werden anderswo nur als Hinweis angezeigt.)
   await db.insert(members).values({ ...values, updatedAt: new Date() });
 
   // Willkommens-Mail ans neue Mitglied (best effort; nur wenn angehakt + E-Mail vorhanden).

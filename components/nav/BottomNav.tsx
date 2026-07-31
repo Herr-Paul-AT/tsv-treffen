@@ -16,7 +16,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Hauptnavigation"
-      className="fixed bottom-0 left-0 right-0 z-40 h-[68px] bg-white border-t border-stone-200 grid grid-cols-5 px-2 pb-2 pt-1.5"
+      className="fixed bottom-0 left-0 right-0 z-40 min-h-[68px] bg-white border-t border-stone-200 grid grid-cols-5 px-2 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
     >
       {ITEMS.map(({ href, label, Icon: I }) => {
         const active =

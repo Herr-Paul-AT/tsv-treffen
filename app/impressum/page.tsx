@@ -34,7 +34,7 @@ export default function ImpressumPage() {
           <div>
             <h2 className="font-display text-[20px] text-stone-800 mb-2">Kontakt</h2>
             <p>
-              Telefon: +43 4248 0000
+              Telefon: +43 650 3473434 (Obmann)
               <br />
               E-Mail:{' '}
               <a href="mailto:office@tsv-treffen.at" className="text-lake-700">
@@ -46,18 +46,18 @@ export default function ImpressumPage() {
           <div>
             <h2 className="font-display text-[20px] text-stone-800 mb-2">Vertretungsbefugt</h2>
             <p>
-              Obmann: Martin Hofmann
+              Obmann: Martin Kalin
               <br />
-              Schriftführerin: Katharina Wallner
+              Schriftführer: Thomas Kalin
               <br />
-              Kassier: Markus Pirker
+              Kassier: Alexander Mayer
             </p>
           </div>
 
           <div>
             <h2 className="font-display text-[20px] text-stone-800 mb-2">Vereinsregister</h2>
             <p>
-              ZVR-Zahl: 000000000
+              ZVR-Zahl: 605164489
               <br />
               Vereinsbehörde: Bezirkshauptmannschaft Villach-Land
             </p>

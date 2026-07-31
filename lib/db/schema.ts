@@ -47,7 +47,9 @@ export const newsVisibility = pgEnum('news_visibility', ['internal', 'public']);
 
 export const members = pgTable('members', {
   id: uuid('id').primaryKey().defaultRandom(),
-  email: text('email').unique(),
+  // Bewusst NICHT unique: Familienmitglieder (z. B. Kinder) dürfen dieselbe
+  // E-Mail (der Eltern) teilen. Dublettenprüfung erfolgt als Hinweis, nicht als Sperre.
+  email: text('email'),
   firstName: text('first_name').notNull(),
   lastName: text('last_name').notNull(),
   initials: text('initials').notNull(),
