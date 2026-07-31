@@ -1,6 +1,6 @@
 'use server';
 
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
@@ -119,6 +119,16 @@ export async function deleteMember(formData: FormData) {
   await db.delete(members).where(eq(members.id, id));
   revalidateMemberViews();
   redirect('/admin/mitglieder');
+}
+
+/** Mehrere markierte Mitglieder auf einmal löschen. */
+export async function bulkDeleteMembers(formData: FormData) {
+  const ids = formData.getAll('memberIds').map((v) => String(v).trim()).filter(Boolean);
+  if (ids.length > 0) {
+    await db.delete(members).where(inArray(members.id, ids));
+  }
+  revalidateMemberViews();
+  redirect(`/admin/mitglieder?deleted=${ids.length}`);
 }
 
 /** Importiert alle gültigen, noch nicht vorhandenen Zeilen aus einem CSV-Text. */

@@ -4,6 +4,8 @@ import { Badge, type BadgeTone } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { listMembersFiltered, getMemberStats, type MemberRow } from '@/lib/db/queries/members';
+import { MemberTable } from '@/components/admin/MemberTable';
+import { bulkDeleteMembers } from '@/lib/actions/members';
 import type { Member } from '@/lib/db/schema';
 
 const STATUSES: Member['status'][] = ['active', 'probe', 'paused', 'inactive'];
@@ -58,6 +60,7 @@ export default async function AdminMembersPage({
     status?: string;
     dues?: string;
     page?: string;
+    deleted?: string;
   }>;
 }) {
   const sp = await searchParams;
@@ -146,6 +149,14 @@ export default async function AdminMembersPage({
           </span>
         </div>
       )}
+      {sp.deleted && Number(sp.deleted) > 0 && (
+        <div className="mt-5 flex items-center gap-3 bg-forest-50 border border-forest-200 rounded-lg px-5 py-3.5">
+          <Icon.Check size={18} className="text-forest-700" />
+          <span className="text-[14px] text-forest-800">
+            <strong>{sp.deleted}</strong> Mitglied(er) gelöscht.
+          </span>
+        </div>
+      )}
 
       {/* Stat tiles */}
       <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -215,54 +226,8 @@ export default async function AdminMembersPage({
         </span>
       </form>
 
-      {/* Table */}
-      <div className="mt-4 bg-white rounded-lg border border-stone-200 overflow-hidden">
-        <div className="grid grid-cols-[minmax(220px,1fr)_140px_120px_80px_120px_40px] gap-3 px-5 py-3 font-mono text-[10.5px] uppercase tracking-[0.14em] text-stone-500 bg-paper-50 border-b border-stone-200">
-          <span>Name · E-Mail</span>
-          <span>Mannschaft</span>
-          <span>Status</span>
-          <span>LK</span>
-          <span>Beitrag {String(new Date().getFullYear()).slice(2)}</span>
-          <span />
-        </div>
-        {rows.length === 0 && (
-          <div className="px-5 py-10 text-center text-[14px] text-stone-500">
-            Keine Mitglieder gefunden{hasFilter ? ' — Filter anpassen oder zurücksetzen.' : '.'}
-          </div>
-        )}
-        {rows.map((r: MemberRow, i: number) => {
-          const statusLabel = STATUS_LABEL[r.status];
-          const duesLabel = DUES_LABEL[r.paymentStatus];
-          return (
-            <Link
-              key={r.id}
-              href={`/admin/mitglieder/${r.id}`}
-              className={[
-                'grid grid-cols-[minmax(220px,1fr)_140px_120px_80px_120px_40px] gap-3 px-5 py-3 items-center',
-                i % 2 ? '' : 'bg-paper-50/40',
-                'border-b border-stone-100 last:border-b-0 hover:bg-paper-50 transition-colors',
-              ].join(' ')}
-            >
-              <div className="flex items-center gap-3 min-w-0">
-                <Avatar initials={r.initials} size={36} tone={r.avatarTone as AvatarTone} />
-                <div className="min-w-0">
-                  <div className="text-[14px] font-medium text-stone-800 leading-tight truncate">
-                    {r.firstName} {r.lastName}
-                  </div>
-                  <div className="font-mono text-[11px] text-stone-500 truncate">{r.email ?? '—'}</div>
-                </div>
-              </div>
-              <span className="text-[13.5px] text-stone-700">{r.teamName ?? '—'}</span>
-              <Badge tone={STATUS_TONE[statusLabel]}>{statusLabel}</Badge>
-              <span className="font-mono text-[12.5px] text-stone-700">{r.lkRating ?? '—'}</span>
-              <Badge tone={DUES_TONE[duesLabel]}>{duesLabel}</Badge>
-              <span className="text-stone-400 inline-flex justify-end">
-                <Icon.Edit size={16} />
-              </span>
-            </Link>
-          );
-        })}
-      </div>
+      {/* Table mit Mehrfachauswahl */}
+      <MemberTable rows={rows} action={bulkDeleteMembers} hasFilter={hasFilter} />
 
       {/* Pagination */}
       {totalPages > 1 && (
