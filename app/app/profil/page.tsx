@@ -121,6 +121,7 @@ export default async function ProfilPage() {
             { href: '/app/beitragskonto', icon: <Icon.Mail />, label: 'Beitragskonto', hint: `${year} ${PAYMENT_LABEL[me.paymentStatus] ?? me.paymentStatus}` },
             { href: '/app/dokumente', icon: <Icon.Document />, label: 'Dokumente', hint: 'Statuten · Beitragsordnung · Protokolle' },
             { href: '/app/kontakte', icon: <Icon.User />, label: 'Trainer & Kontakte', hint: 'Ansprechpartner im Verein' },
+            { href: '/app/veranstaltungen', icon: <Icon.Calendar />, label: 'Veranstaltungen', hint: 'Zu- & Absagen zu Terminen' },
             { href: '/', icon: <Icon.Home />, label: 'Zur öffentlichen Website', hint: 'tsv-treffen.at' },
           ].map((it, i, arr) => (
             <Link

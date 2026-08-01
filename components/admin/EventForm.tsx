@@ -162,6 +162,20 @@ export function EventForm({
         </p>
       </div>
 
+      {!event && (
+        <label className="flex items-center gap-3 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            name="notifyMembers"
+            defaultChecked
+            className="w-5 h-5 rounded border-stone-300 text-lake-700 focus:ring-lake-500/30"
+          />
+          <span className="text-[15px] text-stone-700">
+            Mitglieder per E-Mail über diesen Termin informieren (sofern Mailversand aktiv)
+          </span>
+        </label>
+      )}
+
       <div className="flex items-center gap-3 pt-2">
         <Button type="submit" variant="primary" icon={<Icon.Check size={16} />}>
           {submitLabel}

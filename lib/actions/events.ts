@@ -6,8 +6,10 @@ import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import { events, eventRegistrations } from '@/lib/db/schema';
 import { getEvent, countEventParticipants } from '@/lib/db/queries/events';
+import { resolveRecipients } from '@/lib/db/queries/newsletters';
 import { uploadPublicFile } from '@/lib/supabase/storage';
-import { sendNotificationMail } from '@/lib/mailer';
+import { sendBulkMail, sendNotificationMail } from '@/lib/mailer';
+import { formatGermanDate } from '@/lib/format';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -91,6 +93,35 @@ export async function createEvent(formData: FormData) {
       attachmentUrl: up?.url ?? null,
       attachmentName: up?.name ?? null,
     });
+
+    // Mitglieder über den neuen Termin informieren (best effort, nur wenn angehakt).
+    if (formData.get('notifyMembers') === 'on') {
+      try {
+        const recipients = await resolveRecipients({
+          audience: 'all',
+          teamId: null,
+          category: null,
+          memberIds: [],
+        });
+        if (recipients.length > 0) {
+          const body = [
+            `Neuer Termin beim TSV Schloss Treffen:`,
+            ``,
+            `${values.title}`,
+            `${formatGermanDate(values.startsAt)}`,
+            values.location ? `Ort: ${values.location}` : ``,
+            values.description ? `\n${values.description}` : ``,
+            ``,
+            `Details & Kalendereintrag auf www.tsv-treffen.at.`,
+          ]
+            .filter((l) => l !== ``)
+            .join('\n');
+          await sendBulkMail({ recipients, subject: `Neuer Termin: ${values.title}`, body });
+        }
+      } catch {
+        // Termin ist gespeichert, Mailversand egal.
+      }
+    }
   } catch (e) {
     redirect(`/admin/veranstaltungen/neu?error=${encodeURIComponent(errMsg(e))}`);
   }

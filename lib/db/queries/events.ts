@@ -1,6 +1,34 @@
 import { and, asc, desc, eq, gte, lte } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { events, eventRegistrations, type Event, type EventRegistration } from '@/lib/db/schema';
+import {
+  events,
+  eventRegistrations,
+  eventRsvps,
+  type Event,
+  type EventRegistration,
+} from '@/lib/db/schema';
+
+export type RsvpStatus = 'yes' | 'maybe' | 'no';
+
+/** RSVP-Status eines Mitglieds je Veranstaltung als Map (eventId → status). */
+export async function getMemberEventRsvps(memberId: string): Promise<Map<string, RsvpStatus>> {
+  const rows = await db
+    .select({ eventId: eventRsvps.eventId, status: eventRsvps.status })
+    .from(eventRsvps)
+    .where(eq(eventRsvps.memberId, memberId));
+  const map = new Map<string, RsvpStatus>();
+  for (const r of rows) map.set(r.eventId, r.status as RsvpStatus);
+  return map;
+}
+
+/** Anzahl Zusagen (yes) je Veranstaltung. */
+export async function countEventYes(eventId: string): Promise<number> {
+  const rows = await db
+    .select({ id: eventRsvps.memberId })
+    .from(eventRsvps)
+    .where(and(eq(eventRsvps.eventId, eventId), eq(eventRsvps.status, 'yes')));
+  return rows.length;
+}
 
 export async function listEventRegistrations(eventId: string): Promise<EventRegistration[]> {
   return db

@@ -208,6 +208,22 @@ export const events = pgTable('events', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
+// Zu-/Absagen von Mitgliedern zu Veranstaltungen (RSVP, wie attendances bei Trainings).
+export const eventRsvps = pgTable(
+  'event_rsvps',
+  {
+    eventId: uuid('event_id')
+      .notNull()
+      .references(() => events.id, { onDelete: 'cascade' }),
+    memberId: uuid('member_id')
+      .notNull()
+      .references(() => members.id, { onDelete: 'cascade' }),
+    status: attendanceStatus('status').notNull(),
+    respondedAt: timestamp('responded_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.eventId, t.memberId] })],
+);
+
 // Öffentliche Anmeldungen zu einer Veranstaltung (Camp/Training) — gehen per Mail an Gert.
 export const eventRegistrations = pgTable('event_registrations', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -381,6 +397,7 @@ export type Training = typeof trainings.$inferSelect;
 export type News = typeof news.$inferSelect;
 export type Event = typeof events.$inferSelect;
 export type EventRegistration = typeof eventRegistrations.$inferSelect;
+export type EventRsvp = typeof eventRsvps.$inferSelect;
 export type Sponsor = typeof sponsors.$inferSelect;
 export type Court = typeof courts.$inferSelect;
 // „Was passiert am Platz" — vom Admin gepflegte Programm-Einträge
