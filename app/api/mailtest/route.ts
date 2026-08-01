@@ -8,12 +8,13 @@ export async function GET(req: Request) {
   const token = new URL(req.url).searchParams.get('t');
   if (token !== 'diag-7h3k9x2p') return new Response('forbidden', { status: 403 });
 
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT ?? 587);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-  const from = process.env.MAIL_FROM;
-  const bcc = process.env.MAIL_BCC;
+  const trim = (k: string) => process.env[k]?.trim();
+  const host = trim('SMTP_HOST');
+  const port = Number(trim('SMTP_PORT') ?? 587);
+  const user = trim('SMTP_USER');
+  const pass = trim('SMTP_PASS');
+  const from = trim('MAIL_FROM');
+  const bcc = trim('MAIL_BCC');
 
   const present = {
     SMTP_HOST: host ?? null,

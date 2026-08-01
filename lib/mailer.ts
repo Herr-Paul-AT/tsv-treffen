@@ -9,22 +9,27 @@ import nodemailer from 'nodemailer';
  * mailto-Fallback an, es wird nichts automatisch versendet.
  */
 
-export function isMailConfigured(): boolean {
-  return Boolean(
-    process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS && process.env.MAIL_FROM,
-  );
+// Env-Werte defensiv trimmen — beim Einfügen in Vercel schleichen sich leicht
+// Leerzeichen/Tabs ein (z. B. beim Copy-Paste), die sonst den Login brechen.
+function env(key: string): string | undefined {
+  const v = process.env[key];
+  return v == null ? undefined : v.trim();
 }
 
-export const MAIL_FROM = process.env.MAIL_FROM ?? '';
-export const MAIL_BCC = process.env.MAIL_BCC ?? process.env.MAIL_FROM ?? '';
+export function isMailConfigured(): boolean {
+  return Boolean(env('SMTP_HOST') && env('SMTP_USER') && env('SMTP_PASS') && env('MAIL_FROM'));
+}
+
+export const MAIL_FROM = env('MAIL_FROM') ?? '';
+export const MAIL_BCC = env('MAIL_BCC') ?? env('MAIL_FROM') ?? '';
 
 function getTransport() {
-  const port = Number(process.env.SMTP_PORT ?? 587);
+  const port = Number(env('SMTP_PORT') ?? 587);
   return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
+    host: env('SMTP_HOST'),
     port,
     secure: port === 465, // 465 = SSL, 587 = STARTTLS
-    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+    auth: { user: env('SMTP_USER'), pass: env('SMTP_PASS') },
   });
 }
 
