@@ -100,6 +100,7 @@ export async function sendNotificationMail(opts: {
 export async function sendMemberWelcome(opts: {
   to: string;
   firstName: string;
+  packageLabel?: string | null;
 }): Promise<boolean> {
   if (!isMailConfigured()) return false;
   const transport = getTransport();
@@ -107,6 +108,7 @@ export async function sendMemberWelcome(opts: {
     `Hallo ${opts.firstName},`,
     ``,
     `willkommen beim TSV Schloss Treffen! Wir haben dich als Mitglied angelegt.`,
+    opts.packageLabel ? `\nDein Paket: ${opts.packageLabel}` : ``,
     ``,
     `Über den Mitgliederbereich auf https://www.tsv-treffen.at/login kannst du dich jederzeit`,
     `mit dieser E-Mail-Adresse anmelden — beim ersten Mal einfach „Passwort vergessen" nutzen,`,

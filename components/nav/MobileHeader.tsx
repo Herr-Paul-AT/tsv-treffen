@@ -11,7 +11,7 @@ export type MobileHeaderProps = {
 
 export function MobileHeader({ title, lead, action, backHref }: MobileHeaderProps) {
   return (
-    <div className="pt-4 px-5 pb-3 flex items-center gap-3">
+    <div className="pt-[calc(1rem+env(safe-area-inset-top))] px-5 pb-3 flex items-center gap-3">
       {backHref && (
         <Link
           href={backHref}

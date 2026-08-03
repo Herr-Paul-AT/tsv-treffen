@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { Icon } from '@/components/ui/Icon';
 import { EventForm } from '@/components/admin/EventForm';
 import { DeleteButton } from '@/components/admin/DeleteButton';
+import { Button } from '@/components/ui/Button';
 import { getEvent, listEventRegistrations, countEventParticipants } from '@/lib/db/queries/events';
 import { deleteEvent, updateEvent } from '@/lib/actions/events';
 
@@ -52,10 +53,19 @@ export default async function EditEventPage({
         <section className="mt-12 max-w-2xl border-t border-stone-200 pt-6">
           <div className="flex items-baseline justify-between gap-3 flex-wrap">
             <h2 className="font-display text-[20px] text-stone-800">Anmeldungen</h2>
-            <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-stone-500">
-              {taken} Teilnehmer{event.maxAttendees != null ? ` / ${event.maxAttendees} Plätze` : ''} ·{' '}
-              {registrations.length} Anmeldung(en)
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-stone-500">
+                {taken} Teilnehmer{event.maxAttendees != null ? ` / ${event.maxAttendees} Plätze` : ''} ·{' '}
+                {registrations.length} Anmeldung(en)
+              </span>
+              {registrations.length > 0 && (
+                <a href={`/admin/veranstaltungen/${event.id}/export`} download>
+                  <Button variant="secondary" size="sm" icon={<Icon.Download size={14} />}>
+                    CSV
+                  </Button>
+                </a>
+              )}
+            </div>
           </div>
           <div className="mt-4 bg-white rounded-lg border border-stone-200 overflow-hidden">
             {registrations.length === 0 && (

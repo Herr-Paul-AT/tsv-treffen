@@ -37,7 +37,7 @@ export function TeamForm({
       </div>
 
       <label htmlFor="team-trainer" className="block">
-        <span className={fieldLabel}>Trainer / Mannschaftsführer:in</span>
+        <span className={fieldLabel}>Trainer:in</span>
         <select
           id="team-trainer"
           name="trainerId"

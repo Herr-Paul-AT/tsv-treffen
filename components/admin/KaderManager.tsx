@@ -14,7 +14,7 @@ type RosterEntry = {
 };
 
 const ROLE_OPTIONS = [
-  { value: 'captain', label: 'Kapitän' },
+  { value: 'captain', label: 'Mannschaftsführer:in' },
   { value: 'player', label: 'Spieler:in' },
   { value: 'reserve', label: 'Reserve' },
 ];

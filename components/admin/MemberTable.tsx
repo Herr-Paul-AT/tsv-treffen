@@ -7,6 +7,7 @@ import { Badge, type BadgeTone } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import type { MemberRow } from '@/lib/db/queries/members';
+import { memberCategoryLabel } from '@/lib/member-categories';
 import type { Member } from '@/lib/db/schema';
 
 const STATUS_LABEL: Record<Member['status'], string> = {
@@ -136,7 +137,10 @@ export function MemberTable({
                 <div className="text-[14px] font-medium text-stone-800 leading-tight truncate">
                   {r.firstName} {r.lastName}
                 </div>
-                <div className="font-mono text-[11px] text-stone-500 truncate">{r.email ?? '—'}</div>
+                <div className="font-mono text-[11px] text-stone-500 truncate">
+                  {r.email ?? '—'}
+                  {r.category ? ` · ${memberCategoryLabel(r.category)}` : ''}
+                </div>
               </div>
             </Link>
             <span className="text-[13.5px] text-stone-700 truncate">{r.teamName ?? '—'}</span>

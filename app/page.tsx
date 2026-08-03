@@ -72,7 +72,7 @@ export default async function LandingPage() {
           <TSVMark size={320} variant="negative" />
         </div>
         <div className="relative h-full max-w-[1080px] mx-auto flex flex-col justify-end p-6 pb-8 text-paper-50">
-          <div className="flex items-center justify-between absolute top-6 left-6 right-6">
+          <div className="flex items-center justify-between absolute top-[calc(1.5rem+env(safe-area-inset-top))] left-6 right-6">
             <TSVLockup height={36} color="#FBF8F1" accent="#C39265" />
             <nav className="hidden sm:flex items-center gap-6 text-[14px] text-paper-100/80">
               <a href="#anlage" className="hover:text-paper-50">Anlage</a>

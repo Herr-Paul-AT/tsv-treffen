@@ -40,7 +40,7 @@ export function TopNav() {
   }, [pathname]);
 
   return (
-    <header className="bg-paper-50/95 backdrop-blur-sm border-b border-stone-200 sticky top-0 z-30">
+    <header className="bg-paper-50/95 backdrop-blur-sm border-b border-stone-200 sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
       <div className="h-16 px-4 sm:px-6 flex items-center gap-3">
         <Link href="/admin" className="shrink-0">
           <TSVLockup height={36} />

@@ -140,7 +140,11 @@ export async function createMemberFromRequest(formData: FormData) {
     // Willkommens-Mail (best effort) — blockiert die Übernahme NICHT.
     if (sendWelcome) {
       try {
-        await sendMemberWelcome({ to: email, firstName: request.firstName });
+        await sendMemberWelcome({
+          to: email,
+          firstName: request.firstName,
+          packageLabel: request.planName ?? memberCategoryLabel(request.category),
+        });
       } catch {
         // Mitglied ist angelegt, Mailversand egal.
       }

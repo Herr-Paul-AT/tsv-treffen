@@ -7,7 +7,7 @@ import { db } from '@/lib/db';
 import { members } from '@/lib/db/schema';
 import { getExistingEmails } from '@/lib/db/queries/members';
 import { initialsFor, parseMembersCsv, toneFor } from '@/lib/members-csv';
-import { MEMBER_CATEGORY_VALUES } from '@/lib/member-categories';
+import { MEMBER_CATEGORY_VALUES, memberCategoryLabel } from '@/lib/member-categories';
 import { sendMemberWelcome } from '@/lib/mailer';
 
 const ROLES = ['member', 'trainer', 'jugendleiter', 'obmann', 'admin'] as const;
@@ -91,7 +91,11 @@ export async function createMember(formData: FormData) {
   // Willkommens-Mail ans neue Mitglied (best effort; nur wenn angehakt + E-Mail vorhanden).
   if (values.email && formData.get('sendWelcome') === 'on') {
     try {
-      await sendMemberWelcome({ to: values.email, firstName: values.firstName });
+      await sendMemberWelcome({
+        to: values.email,
+        firstName: values.firstName,
+        packageLabel: values.category ? memberCategoryLabel(values.category) : null,
+      });
     } catch {
       // Mailversand fehlgeschlagen — Mitglied ist trotzdem angelegt.
     }

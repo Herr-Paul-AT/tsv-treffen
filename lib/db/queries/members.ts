@@ -40,6 +40,7 @@ export type MemberFilter = {
   search?: string;
   status?: Member['status'];
   dues?: Member['paymentStatus'];
+  category?: NonNullable<Member['category']>;
   page?: number;
   pageSize?: number;
 };
@@ -64,6 +65,7 @@ export async function listMembersFiltered(f: MemberFilter): Promise<FilteredMemb
   }
   if (f.status) conds.push(eq(members.status, f.status));
   if (f.dues) conds.push(eq(members.paymentStatus, f.dues));
+  if (f.category) conds.push(eq(members.category, f.category));
   const where = conds.length ? and(...conds) : undefined;
 
   const countRows = await db

@@ -6,6 +6,12 @@ import { Icon } from '@/components/ui/Icon';
 import { listMembersFiltered, getMemberStats, type MemberRow } from '@/lib/db/queries/members';
 import { MemberTable } from '@/components/admin/MemberTable';
 import { bulkDeleteMembers } from '@/lib/actions/members';
+import {
+  MEMBER_CATEGORIES,
+  MEMBER_CATEGORY_VALUES,
+  memberCategoryLabel,
+  type MemberCategoryValue,
+} from '@/lib/member-categories';
 import type { Member } from '@/lib/db/schema';
 
 const STATUSES: Member['status'][] = ['active', 'probe', 'paused', 'inactive'];
@@ -59,6 +65,7 @@ export default async function AdminMembersPage({
     q?: string;
     status?: string;
     dues?: string;
+    category?: string;
     page?: string;
     deleted?: string;
   }>;
@@ -73,14 +80,18 @@ export default async function AdminMembersPage({
   const duesParam = DUES.includes(sp.dues as Member['paymentStatus'])
     ? (sp.dues as Member['paymentStatus'])
     : undefined;
+  const categoryParam = (MEMBER_CATEGORY_VALUES as string[]).includes(sp.category ?? '')
+    ? (sp.category as MemberCategoryValue)
+    : undefined;
   const page = Math.max(1, Number(sp.page) || 1);
-  const hasFilter = Boolean(q || statusParam || duesParam);
+  const hasFilter = Boolean(q || statusParam || duesParam || categoryParam);
 
   const [result, stats] = await Promise.all([
     listMembersFiltered({
       search: q || undefined,
       status: statusParam,
       dues: duesParam,
+      category: categoryParam,
       page,
       pageSize: PAGE_SIZE,
     }),
@@ -95,6 +106,7 @@ export default async function AdminMembersPage({
     if (q) params.set('q', q);
     if (statusParam) params.set('status', statusParam);
     if (duesParam) params.set('dues', duesParam);
+    if (categoryParam) params.set('category', categoryParam);
     if (p > 1) params.set('page', String(p));
     const s = params.toString();
     return `/admin/mitglieder${s ? `?${s}` : ''}`;
@@ -206,6 +218,18 @@ export default async function AdminMembersPage({
           {DUES.map((d) => (
             <option key={d} value={d}>
               {DUES_LABEL[d]}
+            </option>
+          ))}
+        </select>
+        <select
+          name="category"
+          defaultValue={categoryParam ?? ''}
+          className="h-11 px-3 rounded-md bg-white border border-stone-200 text-[14px] text-stone-700 outline-none focus:border-lake-500"
+        >
+          <option value="">Kategorie: alle</option>
+          {MEMBER_CATEGORIES.map((c) => (
+            <option key={c.value} value={c.value}>
+              {c.label}
             </option>
           ))}
         </select>
