@@ -1,4 +1,3 @@
-import { notFound } from 'next/navigation';
 import { MobileHeader } from '@/components/nav/MobileHeader';
 import { RsvpSegmented } from '@/components/feedback/RsvpSegmented';
 import { Avatar, AvatarGroup, type AvatarTone } from '@/components/ui/Avatar';
@@ -7,7 +6,12 @@ import { Icon } from '@/components/ui/Icon';
 import { db } from '@/lib/db';
 import { members } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
-import { getTrainingById, getTrainingMeta, getTrainingRoster } from '@/lib/db/queries/trainings';
+import {
+  getNextTrainingForMember,
+  getTrainingById,
+  getTrainingMeta,
+  getTrainingRoster,
+} from '@/lib/db/queries/trainings';
 import { getCurrentMember } from '@/lib/db/queries/session';
 import { formatRelativeFromNow, formatTimeRange, shortDateLabel, MONTHS_DE, WEEKDAYS_DE_SHORT } from '@/lib/format';
 
@@ -25,13 +29,36 @@ export default async function AttendancePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const training = await getTrainingById(id);
-  if (!training) notFound();
+  const me = await getCurrentMember();
 
-  const [meta, roster, me] = await Promise.all([
+  // „heute" (oder jede Nicht-UUID) -> nächstes Training des Mitglieds,
+  // damit der Training-Reiter im Mitgliederbereich nicht crasht.
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const training = UUID_RE.test(id)
+    ? await getTrainingById(id)
+    : me
+      ? await getNextTrainingForMember(me.id)
+      : null;
+
+  if (!training) {
+    return (
+      <>
+        <MobileHeader backHref="/app/dashboard" title="Training" lead="Anwesenheit" />
+        <div className="px-5 pb-12">
+          <div className="bg-white rounded-lg border border-stone-200 px-5 py-10 text-center">
+            <p className="text-[15px] text-stone-600">Aktuell ist kein Training geplant.</p>
+            <p className="text-[13px] text-stone-500 mt-1.5">
+              Sobald ein neuer Termin eingetragen ist, erscheint er hier.
+            </p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  const [meta, roster] = await Promise.all([
     getTrainingMeta(training.id),
     getTrainingRoster(training.id),
-    getCurrentMember(),
   ]);
 
   const myRsvp = me ? roster.find((r) => r.member.id === me.id) ?? null : null;
