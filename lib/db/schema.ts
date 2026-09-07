@@ -475,6 +475,44 @@ export const siteSettings = pgTable('site_settings', {
 
 export type SiteSetting = typeof siteSettings.$inferSelect;
 
+// Umfragen — Admin stellt eine Frage mit Antwortoptionen, Mitglieder stimmen ab.
+export const surveys = pgTable('surveys', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  question: text('question').notNull(),
+  description: text('description'),
+  active: boolean('active').notNull().default(true),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const surveyOptions = pgTable('survey_options', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  surveyId: uuid('survey_id')
+    .notNull()
+    .references(() => surveys.id, { onDelete: 'cascade' }),
+  label: text('label').notNull(),
+  sortOrder: integer('sort_order').notNull().default(0),
+});
+
+export const surveyVotes = pgTable(
+  'survey_votes',
+  {
+    surveyId: uuid('survey_id')
+      .notNull()
+      .references(() => surveys.id, { onDelete: 'cascade' }),
+    memberId: uuid('member_id')
+      .notNull()
+      .references(() => members.id, { onDelete: 'cascade' }),
+    optionId: uuid('option_id')
+      .notNull()
+      .references(() => surveyOptions.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.surveyId, t.memberId] })],
+);
+
+export type Survey = typeof surveys.$inferSelect;
+export type SurveyOption = typeof surveyOptions.$inferSelect;
+
 // Foto-Galerie — vom Admin gepflegte Bilder, öffentlich unter /galerie.
 export const galleryImages = pgTable('gallery_images', {
   id: uuid('id').primaryKey().defaultRandom(),

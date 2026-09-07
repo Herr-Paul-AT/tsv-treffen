@@ -122,6 +122,7 @@ export default async function ProfilPage() {
             { href: '/app/dokumente', icon: <Icon.Document />, label: 'Dokumente', hint: 'Statuten · Beitragsordnung · Protokolle' },
             { href: '/app/kontakte', icon: <Icon.User />, label: 'Trainer & Kontakte', hint: 'Ansprechpartner im Verein' },
             { href: '/app/veranstaltungen', icon: <Icon.Calendar />, label: 'Veranstaltungen', hint: 'Zu- & Absagen zu Terminen' },
+            { href: '/app/umfragen', icon: <Icon.Check />, label: 'Umfragen', hint: 'Mitmachen & abstimmen' },
             { href: '/', icon: <Icon.Home />, label: 'Zur öffentlichen Website', hint: 'tsv-treffen.at' },
           ].map((it, i, arr) => (
             <Link

@@ -141,6 +141,13 @@
       "when": 1788816775550,
       "tag": "0019_living_jetstream",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1788816995885,
+      "tag": "0020_far_wind_dancer",
+      "breakpoints": true
     }
   ]
 }
