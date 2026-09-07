@@ -135,6 +135,56 @@ export async function sendMemberWelcome(opts: {
   return true;
 }
 
+/**
+ * Zahlungserinnerung (Mahnmail) an ein Mitglied mit offenem Beitrag (best effort).
+ * Gibt false zurück, wenn SMTP nicht konfiguriert ist.
+ */
+export async function sendDuesReminder(opts: {
+  to: string;
+  firstName: string;
+  amountCents?: number | null;
+  year?: number;
+}): Promise<boolean> {
+  if (!isMailConfigured()) return false;
+  const transport = getTransport();
+  const year = opts.year ?? new Date().getFullYear();
+  const amount =
+    opts.amountCents && opts.amountCents > 0
+      ? new Intl.NumberFormat('de-AT', { style: 'currency', currency: 'EUR' }).format(
+          opts.amountCents / 100,
+        )
+      : null;
+  const body = [
+    `Hallo ${opts.firstName},`,
+    ``,
+    `wir möchten dich freundlich an deinen offenen Mitgliedsbeitrag für ${year} beim`,
+    `TSV Schloss Treffen erinnern.`,
+    amount ? `\nOffener Betrag: ${amount}` : ``,
+    ``,
+    `Bankverbindung:`,
+    `Empfänger: Tennissportverein Schloß Treffen c/o Hr. Kalin Martin`,
+    `IBAN: AT43 3939 0000 0400 9684`,
+    `Verwendungszweck: Name des Mitglieds`,
+    ``,
+    `Falls du den Beitrag bereits überwiesen hast, betrachte diese Nachricht bitte`,
+    `als gegenstandslos. Bei Fragen erreichst du uns unter office@tsv-treffen.at.`,
+    ``,
+    `Sportliche Grüße`,
+    `TSV Schloss Treffen`,
+  ]
+    .filter((l) => l !== ``)
+    .join('\n');
+  await transport.sendMail({
+    from: MAIL_FROM,
+    to: opts.to,
+    bcc: MAIL_BCC || undefined,
+    subject: `Erinnerung: Mitgliedsbeitrag ${year}`,
+    text: body,
+    html: bodyToHtml(body),
+  });
+  return true;
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, '&amp;')

@@ -103,6 +103,53 @@ export async function listMembersFiltered(f: MemberFilter): Promise<FilteredMemb
   };
 }
 
+export type DuesMemberRow = {
+  id: string;
+  name: string;
+  email: string | null;
+  initials: string;
+  avatarTone: string;
+  category: Member['category'];
+  paymentStatus: Member['paymentStatus'];
+  paymentDueCents: number;
+  paymentRemindedAt: Date | null;
+};
+
+/**
+ * Mitglieder für die Beitrags-Übersicht (basierend auf dem am Mitglied
+ * gepflegten Beitragsstatus). `onlyOpen` beschränkt auf offene/anteilige Beiträge.
+ */
+export async function listDuesMembers(onlyOpen = false): Promise<DuesMemberRow[]> {
+  const where = onlyOpen ? inArray(members.paymentStatus, ['open', 'partial']) : undefined;
+  const rows = await db
+    .select({
+      id: members.id,
+      firstName: members.firstName,
+      lastName: members.lastName,
+      email: members.email,
+      initials: members.initials,
+      avatarTone: members.avatarTone,
+      category: members.category,
+      paymentStatus: members.paymentStatus,
+      paymentDueCents: members.paymentDueCents,
+      paymentRemindedAt: members.paymentRemindedAt,
+    })
+    .from(members)
+    .where(where)
+    .orderBy(asc(members.lastName), asc(members.firstName));
+  return rows.map((r) => ({
+    id: r.id,
+    name: `${r.firstName} ${r.lastName}`,
+    email: r.email,
+    initials: r.initials,
+    avatarTone: r.avatarTone,
+    category: r.category,
+    paymentStatus: r.paymentStatus,
+    paymentDueCents: r.paymentDueCents,
+    paymentRemindedAt: r.paymentRemindedAt,
+  }));
+}
+
 export async function getMember(id: string): Promise<Member | null> {
   const rows = await db.select().from(members).where(eq(members.id, id)).limit(1);
   return rows[0] ?? null;

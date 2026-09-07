@@ -113,6 +113,13 @@
       "when": 1788815504356,
       "tag": "0015_solid_doctor_doom",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1788815808847,
+      "tag": "0016_clammy_sunfire",
+      "breakpoints": true
     }
   ]
 }

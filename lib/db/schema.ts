@@ -64,6 +64,8 @@ export const members = pgTable('members', {
   lkRating: numeric('lk_rating', { precision: 4, scale: 1 }),
   paymentStatus: paymentStatus('payment_status').notNull().default('paid'),
   paymentDueCents: integer('payment_due_cents').notNull().default(0),
+  // Zeitpunkt der letzten versendeten Zahlungserinnerung (Mahnmail). null = noch keine.
+  paymentRemindedAt: timestamp('payment_reminded_at', { withTimezone: true }),
   birthdate: date('birthdate'),
   phone: text('phone'),
   street: text('street'),
