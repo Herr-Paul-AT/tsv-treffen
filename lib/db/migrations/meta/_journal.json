@@ -127,6 +127,13 @@
       "when": 1788816167368,
       "tag": "0017_puzzling_deadpool",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1788816418597,
+      "tag": "0018_tough_stick",
+      "breakpoints": true
     }
   ]
 }

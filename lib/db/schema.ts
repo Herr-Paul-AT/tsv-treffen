@@ -466,6 +466,15 @@ export const faqs = pgTable('faqs', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
+// Vom Verein selbst pflegbare Einstellungen (Schlüssel/Wert), z. B. Saison-Jahr.
+export const siteSettings = pgTable('site_settings', {
+  key: text('key').primaryKey(),
+  value: text('value').notNull().default(''),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export type SiteSetting = typeof siteSettings.$inferSelect;
+
 export type MembershipPlan = typeof membershipPlans.$inferSelect;
 export type MembershipRequest = typeof membershipRequests.$inferSelect;
 export type CourtProgramEntry = typeof courtProgram.$inferSelect;

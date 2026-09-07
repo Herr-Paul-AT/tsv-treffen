@@ -14,6 +14,7 @@ import { listActiveFaqs } from '@/lib/db/queries/faqs';
 import { listActivePartners } from '@/lib/db/queries/partners';
 import { listActiveContacts } from '@/lib/db/queries/contacts';
 import { getClubStats } from '@/lib/db/queries/stats';
+import { getSiteSettings } from '@/lib/db/queries/settings';
 import { LandingMobileMenu } from '@/components/LandingMobileMenu';
 import { ContactsGrid } from '@/components/ContactsGrid';
 import { formatDayMonth, formatDayMonthCaps, MONTHS_DE } from '@/lib/format';
@@ -47,7 +48,7 @@ function formatEventDate(start: Date, end: Date | null): string {
 }
 
 export default async function LandingPage() {
-  const [stats, news, events, teams, sponsors, plans, program, faqs, partners, contacts] = await Promise.all([
+  const [stats, news, events, teams, sponsors, plans, program, faqs, partners, contacts, settings] = await Promise.all([
     getClubStats(),
     listNews(3, { publicOnly: true }),
     listUpcomingEvents(8),
@@ -58,10 +59,13 @@ export default async function LandingPage() {
     listActiveFaqs(),
     listActivePartners(),
     listActiveContacts(),
+    getSiteSettings(),
   ]);
   const adultTeams = teams.filter((t) => !/^Jugend/.test(t.name));
   const youthTeams = teams.filter((t) => /^Jugend/.test(t.name));
   const seasons = new Date().getFullYear() - 1972;
+  const seasonYear = settings.seasonYear;
+  const seasonOpening = settings.seasonOpening;
   return (
     <main className="min-h-dvh bg-paper-100">
       {/* ─── HERO ─────────────────────────────────────────────── */}
@@ -90,7 +94,8 @@ export default async function LandingPage() {
           </div>
           <div>
             <span className="font-mono text-[10.5px] uppercase tracking-[0.22em] text-sand-300">
-              Saison 2026 · Eröffnung am 12. April
+              Saison {seasonYear}
+              {seasonOpening ? ` · ${seasonOpening}` : ''}
             </span>
             <h1 className="font-display text-[40px] sm:text-[64px] leading-[1.02] tracking-[-0.015em] mt-3 max-w-[820px]">
               Tennis beim Schloss
@@ -243,7 +248,7 @@ export default async function LandingPage() {
       {/* ─── MANNSCHAFTEN ──────────────────────────────────── */}
       <section id="mannschaften" className="max-w-[1080px] mx-auto px-5 mt-20">
         <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-stone-500 rule-eyebrow">
-          Mannschaften 2026
+          Mannschaften {seasonYear}
         </div>
         <h2 className="font-display text-[28px] sm:text-[36px] leading-[1.1] tracking-[-0.01em] text-stone-800 mt-4 max-w-2xl">
           {teams.length} Teams · {adultTeams.length} Erwachsene, {youthTeams.length} Jugend.
@@ -288,7 +293,7 @@ export default async function LandingPage() {
       {program.length > 0 && (
       <section id="training" className="max-w-[1080px] mx-auto px-5 mt-20">
         <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-stone-500 rule-eyebrow">
-          Trainingszeiten · Saison 2026
+          Trainingszeiten · Saison {seasonYear}
         </div>
         <h2 className="font-display text-[28px] sm:text-[36px] leading-[1.1] tracking-[-0.01em] text-stone-800 mt-4 max-w-2xl">
           Was passiert am Platz.
@@ -458,7 +463,7 @@ export default async function LandingPage() {
       {/* ─── EVENTS 2026 ───────────────────────────────────── */}
       <section id="events" className="max-w-[1080px] mx-auto px-5 mt-20">
         <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-stone-500 rule-eyebrow">
-          Saison-Kalender 2026
+          Saison-Kalender {seasonYear}
         </div>
         <h2 className="font-display text-[28px] sm:text-[36px] leading-[1.1] tracking-[-0.01em] text-stone-800 mt-4 max-w-2xl">
           Was ist los am Platz.
@@ -778,7 +783,7 @@ export default async function LandingPage() {
       {/* ─── SPONSOREN ────────────────────────────────────── */}
       <section className="max-w-[1080px] mx-auto px-5 mt-20 pb-16">
         <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-stone-500 rule-eyebrow">
-          Saison 2026
+          Saison {seasonYear}
         </div>
         <h2 className="font-display text-[24px] sm:text-[28px] leading-[1.1] tracking-[-0.01em] text-stone-800 mt-3">
           Danke an unsere Sponsoren.
@@ -826,7 +831,7 @@ export default async function LandingPage() {
         <div className="relative max-w-[1080px] mx-auto px-5 sm:px-10 py-16 text-center sm:text-left grid sm:grid-cols-[1.4fr_auto] items-center gap-8">
           <div>
             <div className="font-mono text-[10.5px] uppercase tracking-[0.22em] text-sand-300">
-              Bereit für die Saison 2026?
+              Bereit für die Saison {seasonYear}?
             </div>
             <h2 className="font-display text-[28px] sm:text-[40px] leading-[1.05] tracking-[-0.015em] mt-3 max-w-[600px]">
               Werde Teil des TSV.
@@ -892,7 +897,7 @@ export default async function LandingPage() {
         </div>
         <div className="border-t border-white/10">
           <div className="max-w-[1080px] mx-auto px-5 sm:px-8 py-4 flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.18em] text-paper-100/45 gap-4 flex-wrap">
-            <span>TSV Schloss Treffen · Saison 2026</span>
+            <span>TSV Schloss Treffen · Saison {seasonYear}</span>
             <span className="flex items-center gap-4">
               <Link href="/impressum" className="hover:text-paper-100">
                 Impressum

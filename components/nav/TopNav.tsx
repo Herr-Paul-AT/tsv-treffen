@@ -24,6 +24,7 @@ const ITEMS = [
   { href: '/admin/partner', label: 'Partner' },
   { href: '/admin/sponsoren', label: 'Sponsoren' },
   { href: '/admin/platzbuchung', label: 'Plätze' },
+  { href: '/admin/einstellungen', label: 'Einstellungen' },
 ];
 
 function isActive(pathname: string | null, href: string) {
