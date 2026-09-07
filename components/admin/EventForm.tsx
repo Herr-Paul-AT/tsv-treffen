@@ -162,19 +162,33 @@ export function EventForm({
         </p>
       </div>
 
-      {!event && (
+      <div className="rounded-lg border border-stone-200 bg-white p-4">
         <label className="flex items-center gap-3 cursor-pointer select-none">
           <input
             type="checkbox"
             name="notifyMembers"
-            defaultChecked
+            defaultChecked={!event}
             className="w-5 h-5 rounded border-stone-300 text-lake-700 focus:ring-lake-500/30"
           />
           <span className="text-[15px] text-stone-700">
-            Mitglieder per E-Mail über diesen Termin informieren (sofern Mailversand aktiv)
+            {event
+              ? 'Mitglieder erneut per E-Mail über diesen Termin informieren'
+              : 'Mitglieder per E-Mail über diesen Termin informieren'}{' '}
+            <span className="text-stone-500">(sofern Mailversand aktiv)</span>
           </span>
         </label>
-      )}
+        {event?.notifiedAt && (
+          <p className="mt-2 pl-8 font-mono text-[11px] uppercase tracking-[0.12em] text-forest-700">
+            Zuletzt versendet am{' '}
+            {event.notifiedAt.toLocaleDateString('de-AT', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+            })}{' '}
+            · {event.notifiedCount} Empfänger
+          </p>
+        )}
+      </div>
 
       <div className="flex items-center gap-3 pt-2">
         <Button type="submit" variant="primary" icon={<Icon.Check size={16} />}>

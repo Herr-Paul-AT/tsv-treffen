@@ -73,6 +73,40 @@ function parseEventForm(formData: FormData): EventValues {
   };
 }
 
+/**
+ * Verschickt eine Termin-Info per Rundmail an alle Mitglieder (best effort).
+ * Gibt den Sende-Zeitpunkt und die Anzahl erreichter Empfänger zurück
+ * (count = 0 / at = null, wenn nichts versendet wurde).
+ */
+async function notifyMembersOfEvent(values: EventValues): Promise<{ at: Date | null; count: number }> {
+  try {
+    const recipients = await resolveRecipients({
+      audience: 'all',
+      teamId: null,
+      category: null,
+      memberIds: [],
+    });
+    if (recipients.length === 0) return { at: null, count: 0 };
+    const body = [
+      `Neuer Termin beim TSV Schloss Treffen:`,
+      ``,
+      `${values.title}`,
+      `${formatGermanDate(values.startsAt)}`,
+      values.location ? `Ort: ${values.location}` : ``,
+      values.description ? `\n${values.description}` : ``,
+      ``,
+      `Details & Kalendereintrag auf www.tsv-treffen.at.`,
+    ]
+      .filter((l) => l !== ``)
+      .join('\n');
+    const res = await sendBulkMail({ recipients, subject: `Neuer Termin: ${values.title}`, body });
+    return { at: new Date(), count: res.sent };
+  } catch {
+    // Termin ist gespeichert, Mailversand egal.
+    return { at: null, count: 0 };
+  }
+}
+
 /** Alle Ansichten, die Veranstaltungen anzeigen, neu laden. */
 function revalidateEventViews() {
   revalidatePath('/admin/veranstaltungen');
@@ -84,73 +118,60 @@ function revalidateEventViews() {
 }
 
 export async function createEvent(formData: FormData) {
+  let notified: { at: Date | null; count: number } = { at: null, count: 0 };
+  const notify = formData.get('notifyMembers') === 'on';
   try {
     const values = parseEventForm(formData);
     const file = formData.get('attachment');
     const up = await uploadPublicFile(file instanceof File ? file : null, 'events');
+
+    // Mitglieder über den neuen Termin informieren (best effort, nur wenn angehakt).
+    if (notify) notified = await notifyMembersOfEvent(values);
+
     await db.insert(events).values({
       ...values,
       attachmentUrl: up?.url ?? null,
       attachmentName: up?.name ?? null,
+      notifiedAt: notified.at,
+      notifiedCount: notified.count,
     });
-
-    // Mitglieder über den neuen Termin informieren (best effort, nur wenn angehakt).
-    if (formData.get('notifyMembers') === 'on') {
-      try {
-        const recipients = await resolveRecipients({
-          audience: 'all',
-          teamId: null,
-          category: null,
-          memberIds: [],
-        });
-        if (recipients.length > 0) {
-          const body = [
-            `Neuer Termin beim TSV Schloss Treffen:`,
-            ``,
-            `${values.title}`,
-            `${formatGermanDate(values.startsAt)}`,
-            values.location ? `Ort: ${values.location}` : ``,
-            values.description ? `\n${values.description}` : ``,
-            ``,
-            `Details & Kalendereintrag auf www.tsv-treffen.at.`,
-          ]
-            .filter((l) => l !== ``)
-            .join('\n');
-          await sendBulkMail({ recipients, subject: `Neuer Termin: ${values.title}`, body });
-        }
-      } catch {
-        // Termin ist gespeichert, Mailversand egal.
-      }
-    }
   } catch (e) {
     redirect(`/admin/veranstaltungen/neu?error=${encodeURIComponent(errMsg(e))}`);
   }
   revalidateEventViews();
-  redirect('/admin/veranstaltungen');
+  redirect(notify ? `/admin/veranstaltungen?notified=${notified.count}` : '/admin/veranstaltungen');
 }
 
 export async function updateEvent(formData: FormData) {
   const id = String(formData.get('id') ?? '').trim();
   if (!id) throw new Error('Datensatz-ID fehlt.');
+  let notified: { at: Date | null; count: number } = { at: null, count: 0 };
+  const notify = formData.get('notifyMembers') === 'on';
   try {
     const values = parseEventForm(formData);
     const file = formData.get('attachment');
     const up = await uploadPublicFile(file instanceof File ? file : null, 'events');
     const currentUrl = String(formData.get('currentAttachmentUrl') ?? '').trim() || null;
     const currentName = String(formData.get('currentAttachmentName') ?? '').trim() || null;
+
+    // Erneut benachrichtigen (best effort, nur wenn angehakt) — z. B. nach Änderungen.
+    if (notify) notified = await notifyMembersOfEvent(values);
+
     await db
       .update(events)
       .set({
         ...values,
         attachmentUrl: up?.url ?? currentUrl,
         attachmentName: up?.name ?? currentName,
+        // Versand-Info nur überschreiben, wenn tatsächlich (erneut) versendet wurde.
+        ...(notified.at ? { notifiedAt: notified.at, notifiedCount: notified.count } : {}),
       })
       .where(eq(events.id, id));
   } catch (e) {
     redirect(`/admin/veranstaltungen/${id}?error=${encodeURIComponent(errMsg(e))}`);
   }
   revalidateEventViews();
-  redirect('/admin/veranstaltungen');
+  redirect(notify ? `/admin/veranstaltungen?notified=${notified.count}` : '/admin/veranstaltungen');
 }
 
 export async function deleteEvent(formData: FormData) {

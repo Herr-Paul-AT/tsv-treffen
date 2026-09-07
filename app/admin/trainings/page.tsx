@@ -4,12 +4,14 @@ import { Avatar, type AvatarTone } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
+import { ConfirmSubmit } from '@/components/admin/ConfirmSubmit';
 import { getTrainingsInRange, listTrainingsForManagement } from '@/lib/db/queries/trainings';
 import { listEventsInRange } from '@/lib/db/queries/events';
 import {
   getTrainingAdminStats,
   getMembersNeedingAttention,
 } from '@/lib/db/queries/admin-trainings';
+import { sendTrainingReminders } from '@/lib/actions/trainings';
 import { MONTHS_DE } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
@@ -28,7 +30,12 @@ function endOfWeek(d: Date) {
   return out;
 }
 
-export default async function AdminTrainingsPage() {
+export default async function AdminTrainingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ reminded?: string; mailoff?: string }>;
+}) {
+  const sp = await searchParams;
   const now = new Date();
   const wkStart = startOfWeek(now);
   const wkEnd = endOfWeek(now);
@@ -115,6 +122,23 @@ export default async function AdminTrainingsPage() {
         </div>
       </div>
 
+      {sp.reminded != null && (
+        <div className="mt-5 flex items-start gap-2.5 rounded-md bg-forest-50 border border-forest-200 px-4 py-3 text-[14px] text-forest-800">
+          <Icon.Check size={16} className="flex-none mt-0.5" />
+          <span>
+            {Number(sp.reminded) > 0
+              ? `${sp.reminded} Anwesenheits-Erinnerung(en) versendet.`
+              : 'Es waren keine offenen Rückmeldungen mit E-Mail zu erinnern.'}
+          </span>
+        </div>
+      )}
+      {sp.mailoff != null && (
+        <div className="mt-5 flex items-start gap-2.5 rounded-md bg-danger/5 border border-danger/20 px-4 py-3 text-[14px] text-danger">
+          <Icon.Info size={16} className="flex-none mt-0.5" />
+          <span>E-Mail-Versand ist nicht konfiguriert — es wurden keine Erinnerungen gesendet.</span>
+        </div>
+      )}
+
       <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-3">
         {STATS.map((t) => (
           <div key={t.l} className="bg-white rounded-lg border border-stone-200 p-5">
@@ -188,18 +212,21 @@ export default async function AdminTrainingsPage() {
           </div>
 
           <div className="bg-white rounded-lg border border-stone-200 p-5">
-            <h3 className="font-display text-[18px] text-stone-800">Schnellaktionen</h3>
-            <div className="mt-3 space-y-2">
-              <Badge tone="forest" icon={<Icon.Check size={11} />}>
-                Anwesenheit-Erinnerung senden
-              </Badge>
-              <div className="text-[12.5px] text-stone-500 mt-2">
-                {attention.length} {attention.length === 1 ? 'Person' : 'Personen'} ohne Rückmeldung
-              </div>
+            <h3 className="font-display text-[18px] text-stone-800">Anwesenheit-Erinnerung</h3>
+            <p className="text-[13px] text-stone-600 mt-1.5 leading-snug">
+              Sendet eine E-Mail an alle aktiven Mitglieder, die zu einem Training in den nächsten
+              7 Tagen noch nicht zu-/abgesagt haben.
+            </p>
+            <div className="text-[12.5px] text-stone-500 mt-3 mb-3">
+              {attention.length} {attention.length === 1 ? 'Person' : 'Personen'} aktuell ohne Rückmeldung
             </div>
-            <Button variant="secondary" size="sm" className="mt-4 w-full">
-              Reminder verschicken
-            </Button>
+            <ConfirmSubmit
+              action={sendTrainingReminders}
+              label="Reminder verschicken"
+              variant="secondary"
+              icon={<Icon.Mail size={16} />}
+              confirmText="Erinnerungs-Mail an alle Mitglieder ohne Rückmeldung (nächste 7 Tage) senden?"
+            />
           </div>
         </aside>
       </div>

@@ -115,3 +115,53 @@ export async function getMembersNeedingAttention(limit = 5): Promise<AttentionMe
     issue: `Keine Rückmeldung zu ${r.training_title}`,
   }));
 }
+
+export type TrainingReminderRecipient = {
+  memberId: string;
+  firstName: string;
+  email: string;
+  trainingTitle: string;
+  startsAt: Date;
+};
+
+/**
+ * Empfänger für eine Anwesenheits-Erinnerung: aktive Mitglieder, die einem Team
+ * mit einem Training in den nächsten 7 Tagen angehören und dafür noch nicht
+ * rückgemeldet haben. Nur Mitglieder mit hinterlegter E-Mail.
+ */
+export async function listTrainingReminderRecipients(): Promise<TrainingReminderRecipient[]> {
+  const rows = await rawRows<{
+    member_id: string;
+    first_name: string;
+    email: string;
+    training_title: string;
+    starts_at: string;
+  }>(sql`
+    WITH upcoming AS (
+      SELECT t.id AS training_id, t.team_id, t.title, t.starts_at
+      FROM trainings t
+      WHERE t.team_id IS NOT NULL
+        AND t.cancelled = false
+        AND t.starts_at >= NOW()
+        AND t.starts_at < NOW() + INTERVAL '7 days'
+    )
+    SELECT DISTINCT ON (m.id)
+      m.id AS member_id, m.first_name, m.email,
+      u.title AS training_title, u.starts_at AS starts_at
+    FROM upcoming u
+    JOIN team_members tm ON tm.team_id = u.team_id
+    JOIN members m ON m.id = tm.member_id
+    LEFT JOIN attendances a ON a.training_id = u.training_id AND a.member_id = m.id
+    WHERE a.member_id IS NULL
+      AND m.status = 'active'
+      AND m.email IS NOT NULL AND m.email <> ''
+    ORDER BY m.id, u.starts_at ASC
+  `);
+  return rows.map((r) => ({
+    memberId: r.member_id,
+    firstName: r.first_name,
+    email: r.email,
+    trainingTitle: r.training_title,
+    startsAt: new Date(r.starts_at),
+  }));
+}

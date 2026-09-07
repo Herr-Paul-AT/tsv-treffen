@@ -185,6 +185,39 @@ export async function sendDuesReminder(opts: {
   return true;
 }
 
+/**
+ * Anwesenheits-Erinnerung an ein Mitglied ohne Rückmeldung zu einem anstehenden
+ * Training (best effort). Gibt false zurück, wenn SMTP nicht konfiguriert ist.
+ */
+export async function sendTrainingReminder(opts: {
+  to: string;
+  firstName: string;
+  trainingTitle: string;
+  when: string;
+}): Promise<boolean> {
+  if (!isMailConfigured()) return false;
+  const transport = getTransport();
+  const body = [
+    `Hallo ${opts.firstName},`,
+    ``,
+    `für dein anstehendes Training „${opts.trainingTitle}" (${opts.when}) fehlt noch deine`,
+    `Rückmeldung. Bitte sag im Mitgliederbereich kurz zu oder ab:`,
+    `https://www.tsv-treffen.at/login`,
+    ``,
+    `Danke & sportliche Grüße`,
+    `TSV Schloss Treffen`,
+  ].join('\n');
+  await transport.sendMail({
+    from: MAIL_FROM,
+    to: opts.to,
+    bcc: MAIL_BCC || undefined,
+    subject: `Erinnerung: Rückmeldung zu „${opts.trainingTitle}"`,
+    text: body,
+    html: bodyToHtml(body),
+  });
+  return true;
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, '&amp;')

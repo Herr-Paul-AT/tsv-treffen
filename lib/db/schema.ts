@@ -216,6 +216,9 @@ export const events = pgTable('events', {
   // öffentliche Anmeldeformular; maxAttendees begrenzt die Plätze (null = ohne Limit).
   registrationOpen: boolean('registration_open').notNull().default(false),
   maxAttendees: integer('max_attendees'),
+  // Wann/an wie viele Mitglieder dieser Termin per E-Mail versendet wurde.
+  notifiedAt: timestamp('notified_at', { withTimezone: true }),
+  notifiedCount: integer('notified_count').notNull().default(0),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 

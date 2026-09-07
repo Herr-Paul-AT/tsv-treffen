@@ -34,7 +34,12 @@ function formatWhen(e: Event): string {
   return `${datePart} · ${timePart}`;
 }
 
-export default async function AdminEventsPage() {
+export default async function AdminEventsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ notified?: string }>;
+}) {
+  const sp = await searchParams;
   const all = await listAllEvents();
   const now = new Date();
   const upcoming = all.filter((e) => (e.endsAt ?? e.startsAt) >= now);
@@ -73,6 +78,17 @@ export default async function AdminEventsPage() {
           </Button>
         </Link>
       </div>
+
+      {sp.notified != null && (
+        <div className="mt-5 flex items-start gap-2.5 rounded-md bg-forest-50 border border-forest-200 px-4 py-3 text-[14px] text-forest-800">
+          <Icon.Check size={16} className="flex-none mt-0.5" />
+          <span>
+            {Number(sp.notified) > 0
+              ? `Termin gespeichert und an ${sp.notified} Mitglied(er) per E-Mail versendet.`
+              : 'Termin gespeichert. Es wurde keine E-Mail versendet (kein Empfänger oder Mailversand inaktiv).'}
+          </span>
+        </div>
+      )}
 
       <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-3">
         {STATS.map((t) => (
@@ -127,7 +143,14 @@ function EventTable({
             ].join(' ')}
           >
             <span className="font-mono text-[12px] text-stone-600">{formatWhen(e)}</span>
-            <span className="text-[14.5px] font-medium text-stone-800 truncate">{e.title}</span>
+            <span className="min-w-0">
+              <span className="block text-[14.5px] font-medium text-stone-800 truncate">{e.title}</span>
+              {e.notifiedAt && (
+                <span className="mt-0.5 inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.12em] text-forest-700">
+                  <Icon.Check size={10} /> versendet · {e.notifiedCount}
+                </span>
+              )}
+            </span>
             <span>
               <Badge tone={KIND_TONE[e.kind]}>{KIND_LABEL[e.kind]}</Badge>
             </span>

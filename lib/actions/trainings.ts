@@ -5,6 +5,9 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import { trainings } from '@/lib/db/schema';
+import { listTrainingReminderRecipients } from '@/lib/db/queries/admin-trainings';
+import { isMailConfigured, sendTrainingReminder } from '@/lib/mailer';
+import { formatGermanDate } from '@/lib/format';
 
 function parseTrainingForm(formData: FormData) {
   const title = String(formData.get('title') ?? '').trim();
@@ -66,4 +69,31 @@ export async function deleteTraining(formData: FormData) {
   await db.delete(trainings).where(eq(trainings.id, id));
   revalidateTrainingViews(id);
   redirect('/admin/trainings');
+}
+
+/**
+ * Verschickt Anwesenheits-Erinnerungen an alle aktiven Mitglieder, die zu einem
+ * Training in den nächsten 7 Tagen noch nicht rückgemeldet haben (best effort).
+ */
+export async function sendTrainingReminders() {
+  if (!isMailConfigured()) {
+    redirect('/admin/trainings?mailoff=1');
+  }
+  const recipients = await listTrainingReminderRecipients();
+  let sent = 0;
+  for (const r of recipients) {
+    try {
+      await sendTrainingReminder({
+        to: r.email,
+        firstName: r.firstName,
+        trainingTitle: r.trainingTitle,
+        when: formatGermanDate(r.startsAt),
+      });
+      sent++;
+    } catch {
+      // Einzelversand fehlgeschlagen — Rest trotzdem versuchen.
+    }
+  }
+  revalidatePath('/admin/trainings');
+  redirect(`/admin/trainings?reminded=${sent}`);
 }
