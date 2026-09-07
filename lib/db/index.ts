@@ -13,9 +13,22 @@ function makeDb(): DrizzleDb {
   if (url) {
     const { drizzle } = require('drizzle-orm/postgres-js');
     const postgres = require('postgres');
-    const client = postgres(url, { prepare: false, max: 10 });
+    // Serverless (Vercel) + Supabase-Pooler: pro Function-Instanz nur EINE
+    // Verbindung, sonst summieren sich bei parallelen Queries (z. B. Startseite)
+    // und gleichzeitigen Instanzen die Verbindungen und der Pooler blockt/hängt.
+    // Parallele Queries werden über die eine Verbindung serialisiert.
+    const client = postgres(url, {
+      prepare: false,
+      max: 1,
+      idle_timeout: 20, // Sekunden — Verbindung freigeben, wenn ungenutzt
+      connect_timeout: 15, // Sekunden — nicht ewig auf den Pooler warten
+    });
     globalForDb.__dbDriver = 'postgres';
-    return drizzle(client, { schema });
+    // Auch in Produktion je Instanz cachen, damit nicht pro Modul-Eval ein
+    // neuer Pool entsteht.
+    const pgDb: DrizzleDb = drizzle(client, { schema });
+    globalForDb.__db = pgDb;
+    return pgDb;
   }
   // Dev only: embedded PGlite. Not bundled in production (env-gated above).
   const path = require('node:path');
