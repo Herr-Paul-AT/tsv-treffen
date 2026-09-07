@@ -32,8 +32,12 @@ function parseMemberForm(formData: FormData) {
   const firstName = String(formData.get('firstName') ?? '').trim();
   const lastName = String(formData.get('lastName') ?? '').trim();
   const email = String(formData.get('email') ?? '').trim().toLowerCase();
+  const phone = String(formData.get('phone') ?? '').trim();
+  const birthRaw = String(formData.get('birthdate') ?? '').trim();
   if (!firstName) throw new Error('Vorname ist erforderlich.');
   if (!lastName) throw new Error('Nachname ist erforderlich.');
+  if (!phone) throw new Error('Telefonnummer ist erforderlich.');
+  if (!birthRaw) throw new Error('Geburtsdatum ist erforderlich.');
 
   const role = pick(ROLES, String(formData.get('role') ?? ''), 'member') as Role;
   const status = pick(STATUSES, String(formData.get('status') ?? ''), 'active') as Status;
@@ -49,8 +53,10 @@ function parseMemberForm(formData: FormData) {
   const lkRaw = String(formData.get('lkRating') ?? '').trim();
   const lkRating = lkRaw && /^\d+(\.\d+)?$/.test(lkRaw) ? lkRaw : null;
 
-  const birthRaw = String(formData.get('birthdate') ?? '').trim();
   const memberSinceRaw = String(formData.get('memberSince') ?? '').trim();
+
+  const photoConsent = formData.get('photoConsent') === 'on';
+  const photoConsentHomepage = photoConsent && formData.get('photoConsentHomepage') === 'on';
 
   return {
     firstName,
@@ -68,10 +74,15 @@ function parseMemberForm(formData: FormData) {
     lkRating,
     birthdate: birthRaw || null,
     memberSince: memberSinceRaw || undefined,
-    phone: String(formData.get('phone') ?? '').trim() || null,
+    phone: phone || null,
     street: String(formData.get('street') ?? '').trim() || null,
     postalCode: String(formData.get('postalCode') ?? '').trim() || null,
     city: String(formData.get('city') ?? '').trim() || null,
+    clothingSize: String(formData.get('clothingSize') ?? '').trim() || null,
+    photoConsent,
+    photoConsentHomepage,
+    // Datenschutz-Zustimmung als Roh-Flag; der Zeitstempel wird in create/update gesetzt.
+    privacyConsent: formData.get('privacyConsent') === 'on',
     notes: String(formData.get('notes') ?? '').trim() || null,
   };
 }
@@ -83,10 +94,14 @@ function revalidateMemberViews() {
 }
 
 export async function createMember(formData: FormData) {
-  const values = parseMemberForm(formData);
+  const { privacyConsent, ...values } = parseMemberForm(formData);
   // Dublette bewusst KEINE Sperre mehr: Familienmitglieder dürfen dieselbe
   // E-Mail teilen. (Dubletten werden anderswo nur als Hinweis angezeigt.)
-  await db.insert(members).values({ ...values, updatedAt: new Date() });
+  await db.insert(members).values({
+    ...values,
+    privacyConsentAt: privacyConsent ? new Date() : null,
+    updatedAt: new Date(),
+  });
 
   // Willkommens-Mail ans neue Mitglied (best effort; nur wenn angehakt + E-Mail vorhanden).
   if (values.email && formData.get('sendWelcome') === 'on') {
@@ -108,10 +123,17 @@ export async function createMember(formData: FormData) {
 export async function updateMember(formData: FormData) {
   const id = String(formData.get('id') ?? '').trim();
   if (!id) throw new Error('Mitglieds-ID fehlt.');
-  const values = parseMemberForm(formData);
+  const { privacyConsent, ...values } = parseMemberForm(formData);
+  // Bestehenden Zustimmungs-Zeitstempel bewahren, wenn weiterhin zugestimmt.
+  const existing = await db
+    .select({ at: members.privacyConsentAt })
+    .from(members)
+    .where(eq(members.id, id))
+    .limit(1);
+  const privacyConsentAt = privacyConsent ? existing[0]?.at ?? new Date() : null;
   await db
     .update(members)
-    .set({ ...values, updatedAt: new Date() })
+    .set({ ...values, privacyConsentAt, updatedAt: new Date() })
     .where(eq(members.id, id));
   revalidateMemberViews();
   redirect('/admin/mitglieder');

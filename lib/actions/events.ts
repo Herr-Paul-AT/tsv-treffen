@@ -177,12 +177,17 @@ export async function submitEventRegistration(formData: FormData) {
   const name = String(formData.get('name') ?? '').trim();
   const email = String(formData.get('email') ?? '').trim().toLowerCase();
   const phone = String(formData.get('phone') ?? '').trim() || null;
+  const street = String(formData.get('street') ?? '').trim();
+  const postalCode = String(formData.get('postalCode') ?? '').trim();
+  const city = String(formData.get('city') ?? '').trim();
   const message = String(formData.get('message') ?? '').trim() || null;
   const partRaw = Number.parseInt(String(formData.get('participants') ?? '1'), 10);
   const participants = Number.isNaN(partRaw) || partRaw < 1 ? 1 : partRaw;
 
   if (!name) back('Bitte einen Namen angeben.');
   if (!EMAIL_RE.test(email)) back('Bitte eine gültige E-Mail-Adresse angeben.');
+  if (!phone) back('Bitte eine Telefonnummer angeben.');
+  if (!street || !postalCode || !city) back('Bitte die vollständige Adresse angeben.');
   if (formData.get('privacyConsent') !== 'on') back('Bitte der Datenschutzerklärung zustimmen.');
 
   const ev = event!;
@@ -193,7 +198,9 @@ export async function submitEventRegistration(formData: FormData) {
     }
   }
 
-  await db.insert(eventRegistrations).values({ eventId, name, email, phone, participants, message });
+  await db
+    .insert(eventRegistrations)
+    .values({ eventId, name, email, phone, street, postalCode, city, participants, message });
   revalidateEventViews();
   revalidatePath(`/veranstaltung/${eventId}`);
 
@@ -204,6 +211,7 @@ export async function submitEventRegistration(formData: FormData) {
       `Name: ${name}`,
       `E-Mail: ${email}`,
       phone ? `Telefon: ${phone}` : ``,
+      `Adresse: ${street}, ${postalCode} ${city}`,
       `Teilnehmer: ${participants}`,
       message ? `\nNachricht:\n${message}` : ``,
       ``,

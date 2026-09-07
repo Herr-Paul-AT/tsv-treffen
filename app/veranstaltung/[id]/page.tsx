@@ -138,7 +138,12 @@ export default async function PublicEventPage({
                   <TextField label="Name" name="name" required placeholder="Vor- und Nachname" />
                   <div className="grid sm:grid-cols-2 gap-4">
                     <TextField label="E-Mail" name="email" type="email" required placeholder="name@example.at" />
-                    <TextField label="Telefon (optional)" name="phone" type="tel" placeholder="+43 …" />
+                    <TextField label="Telefon" name="phone" type="tel" required placeholder="+43 …" />
+                  </div>
+                  <TextField label="Adresse" name="street" required placeholder="Straße und Hausnummer" />
+                  <div className="grid sm:grid-cols-[160px_1fr] gap-4">
+                    <TextField label="PLZ" name="postalCode" required placeholder="9521" />
+                    <TextField label="Ort" name="city" required placeholder="Treffen" />
                   </div>
                   <TextField
                     label="Anzahl Teilnehmer"

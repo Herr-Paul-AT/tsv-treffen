@@ -116,14 +116,22 @@ export function MemberForm({
       </div>
 
       <div className="grid sm:grid-cols-2 gap-4">
-        <TextField label="Telefon (optional)" name="phone" defaultValue={member?.phone ?? ''} />
+        <TextField label="Telefon" name="phone" required defaultValue={member?.phone ?? ''} />
         <TextField
-          label="Geburtsdatum (optional)"
+          label="Geburtsdatum"
           name="birthdate"
           type="date"
+          required
           defaultValue={isoDate(member?.birthdate)}
         />
       </div>
+
+      <TextField
+        label="Konfektionsgröße (optional)"
+        name="clothingSize"
+        defaultValue={member?.clothingSize ?? ''}
+        placeholder="z. B. M, L, 128, 42 …"
+      />
 
       <div className="grid sm:grid-cols-2 gap-4">
         <TextField
@@ -187,6 +195,48 @@ export function MemberForm({
             placeholder="z. B. Bandenwerbung, Trikots …"
             className="mt-2 w-full h-12 px-4 bg-white rounded-md border border-stone-200 text-[16px] text-stone-800 placeholder-stone-400 outline-none focus:border-lake-500 focus:ring-2 focus:ring-lake-500/15"
           />
+        </label>
+      </div>
+
+      <div className="rounded-lg border border-stone-200 bg-white p-4 space-y-3">
+        <div className={fieldLabel}>Einwilligungen</div>
+        <label className="flex items-start gap-3 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            name="privacyConsent"
+            defaultChecked={Boolean(member?.privacyConsentAt)}
+            className="mt-0.5 w-5 h-5 flex-none rounded border-stone-300 text-lake-700 focus:ring-lake-500/30"
+          />
+          <span className="text-[15px] text-stone-700 leading-snug">
+            Datenschutz-Zustimmung liegt vor (Mitglied hat der Verarbeitung seiner Daten zugestimmt)
+            {member?.privacyConsentAt && (
+              <span className="block font-mono text-[11px] text-stone-500 mt-0.5">
+                erfasst am {isoDate(member.privacyConsentAt)}
+              </span>
+            )}
+          </span>
+        </label>
+        <label className="flex items-start gap-3 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            name="photoConsent"
+            defaultChecked={member?.photoConsent ?? false}
+            className="mt-0.5 w-5 h-5 flex-none rounded border-stone-300 text-lake-700 focus:ring-lake-500/30"
+          />
+          <span className="text-[15px] text-stone-700 leading-snug">
+            Einverstanden mit der Veröffentlichung von Fotos (Verein / Aushang)
+          </span>
+        </label>
+        <label className="flex items-start gap-3 cursor-pointer select-none pl-8">
+          <input
+            type="checkbox"
+            name="photoConsentHomepage"
+            defaultChecked={member?.photoConsentHomepage ?? false}
+            className="mt-0.5 w-5 h-5 flex-none rounded border-stone-300 text-lake-700 focus:ring-lake-500/30"
+          />
+          <span className="text-[14px] text-stone-600 leading-snug">
+            … zusätzlich auch auf der öffentlichen Homepage
+          </span>
         </label>
       </div>
 

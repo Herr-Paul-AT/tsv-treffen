@@ -92,6 +92,13 @@ export default async function EditEventPage({
                     {r.email}
                     {r.phone ? ` · ${r.phone}` : ''}
                   </div>
+                  {(r.street || r.city) && (
+                    <div className="text-[12.5px] text-stone-500 truncate">
+                      {[r.street, [r.postalCode, r.city].filter(Boolean).join(' ')]
+                        .filter(Boolean)
+                        .join(', ')}
+                    </div>
+                  )}
                   {r.message && <div className="text-[13px] text-stone-600 mt-1">{r.message}</div>}
                 </div>
                 <a href={`mailto:${r.email}`} className="text-lake-700 flex-none" aria-label="Antworten">

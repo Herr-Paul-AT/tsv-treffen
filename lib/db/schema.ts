@@ -69,6 +69,15 @@ export const members = pgTable('members', {
   street: text('street'),
   postalCode: text('postal_code'),
   city: text('city'),
+  // Konfektions-/Bekleidungsgröße (z. B. für Vereinsbekleidung), frei wählbar.
+  clothingSize: text('clothing_size'),
+  // Datenschutz-Zustimmung: Zeitpunkt, zu dem die Einwilligung erfasst wurde
+  // (beim Anlegen im Admin oder bei der Selbst-Anmeldung). null = keine erfasst.
+  privacyConsentAt: timestamp('privacy_consent_at', { withTimezone: true }),
+  // Einwilligung zur Veröffentlichung von Fotos (Vereinsintern / Aushang).
+  photoConsent: boolean('photo_consent').notNull().default(false),
+  // Zusätzliche Einwilligung: Fotos dürfen auch auf der öffentlichen Homepage erscheinen.
+  photoConsentHomepage: boolean('photo_consent_homepage').notNull().default(false),
   notes: text('notes'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
@@ -233,6 +242,10 @@ export const eventRegistrations = pgTable('event_registrations', {
   name: text('name').notNull(),
   email: text('email').notNull(),
   phone: text('phone'),
+  // Adresse — bei Camp/Trainingslager-Anmeldungen Pflicht (im Formular erzwungen).
+  street: text('street'),
+  postalCode: text('postal_code'),
+  city: text('city'),
   participants: integer('participants').notNull().default(1),
   message: text('message'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

@@ -126,6 +126,8 @@ export async function createMemberFromRequest(formData: FormData) {
         street: request.street,
         postalCode: request.postalCode,
         city: request.city,
+        // Bei der Selbst-Anmeldung wurde der Datenschutzerklärung zugestimmt.
+        privacyConsentAt: request.createdAt,
         updatedAt: new Date(),
       })
       .returning();

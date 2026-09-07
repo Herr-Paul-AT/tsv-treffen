@@ -14,7 +14,17 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 
   const rows = await listEventRegistrations(id);
 
-  const header = ['Name', 'E-Mail', 'Telefon', 'Teilnehmer', 'Nachricht', 'Angemeldet am'];
+  const header = [
+    'Name',
+    'E-Mail',
+    'Telefon',
+    'Straße',
+    'PLZ',
+    'Ort',
+    'Teilnehmer',
+    'Nachricht',
+    'Angemeldet am',
+  ];
   const lines = [header.join(',')];
   for (const r of rows) {
     lines.push(
@@ -22,6 +32,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
         csvCell(r.name),
         csvCell(r.email),
         csvCell(r.phone),
+        csvCell(r.street),
+        csvCell(r.postalCode),
+        csvCell(r.city),
         csvCell(r.participants),
         csvCell(r.message),
         csvCell(r.createdAt.toISOString().slice(0, 16).replace('T', ' ')),
