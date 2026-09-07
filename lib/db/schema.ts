@@ -475,6 +475,18 @@ export const siteSettings = pgTable('site_settings', {
 
 export type SiteSetting = typeof siteSettings.$inferSelect;
 
+// Foto-Galerie — vom Admin gepflegte Bilder, öffentlich unter /galerie.
+export const galleryImages = pgTable('gallery_images', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  url: text('url').notNull(),
+  caption: text('caption'),
+  sortOrder: integer('sort_order').notNull().default(0),
+  active: boolean('active').notNull().default(true),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export type GalleryImage = typeof galleryImages.$inferSelect;
+
 export type MembershipPlan = typeof membershipPlans.$inferSelect;
 export type MembershipRequest = typeof membershipRequests.$inferSelect;
 export type CourtProgramEntry = typeof courtProgram.$inferSelect;

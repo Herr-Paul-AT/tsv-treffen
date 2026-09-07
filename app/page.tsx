@@ -82,6 +82,7 @@ export default async function LandingPage() {
               <a href="#anlage" className="hover:text-paper-50">Anlage</a>
               <a href="#mannschaften" className="hover:text-paper-50">Mannschaften</a>
               <a href="#training" className="hover:text-paper-50">Training</a>
+              <Link href="/galerie" className="hover:text-paper-50">Galerie</Link>
               <a href="#mitgliedschaft" className="hover:text-paper-50">Mitglied werden</a>
               <Link
                 href="/login"
