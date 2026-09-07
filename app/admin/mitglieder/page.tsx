@@ -68,6 +68,7 @@ export default async function AdminMembersPage({
     category?: string;
     page?: string;
     deleted?: string;
+    family?: string;
   }>;
 }) {
   const sp = await searchParams;
@@ -141,6 +142,11 @@ export default async function AdminMembersPage({
               Importieren
             </Button>
           </Link>
+          <Link href="/admin/mitglieder/familie">
+            <Button variant="secondary" icon={<Icon.Users size={16} />}>
+              Familie anlegen
+            </Button>
+          </Link>
           <Link href="/admin/mitglieder/neu">
             <Button variant="primary" icon={<Icon.Plus size={16} />}>
               Mitglied anlegen
@@ -166,6 +172,14 @@ export default async function AdminMembersPage({
           <Icon.Check size={18} className="text-forest-700" />
           <span className="text-[14px] text-forest-800">
             <strong>{sp.deleted}</strong> Mitglied(er) gelöscht.
+          </span>
+        </div>
+      )}
+      {sp.family && Number(sp.family) > 0 && (
+        <div className="mt-5 flex items-center gap-3 bg-forest-50 border border-forest-200 rounded-lg px-5 py-3.5">
+          <Icon.Check size={18} className="text-forest-700" />
+          <span className="text-[14px] text-forest-800">
+            Familie mit <strong>{sp.family}</strong> Person(en) angelegt.
           </span>
         </div>
       )}
