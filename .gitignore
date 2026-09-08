@@ -45,3 +45,6 @@ next-env.d.ts
 
 # Claude local settings (per-user)
 .claude/settings.local.json
+
+# Original-Fotos (nicht ins Repo — kommen in Supabase-Galerie / werden optimiert eingebaut)
+/public/fotos/
