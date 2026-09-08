@@ -9,37 +9,18 @@ const globalForDb = globalThis as unknown as {
 };
 
 function makeDb(): DrizzleDb {
-  const rawUrl = process.env.DATABASE_URL;
-  if (rawUrl) {
+  const url = process.env.DATABASE_URL;
+  if (url) {
     const { drizzle } = require('drizzle-orm/postgres-js');
     const postgres = require('postgres');
-    // Serverless (Vercel) + Supabase: den TRANSACTION-Pooler (Port 6543) nutzen,
-    // nicht den Session-Pooler (5432). Der Session-Pooler hält je Client-Verbindung
-    // eine Server-Verbindung und läuft bei vielen Function-Instanzen voll → Seiten
-    // mit DB-Zugriff hängen. Der Transaction-Pooler multiplext und ist dafür gebaut.
-    // Migrationen (lib/db/migrate.ts) nutzen weiterhin die Original-URL.
-    let url = rawUrl;
-    try {
-      const u = new URL(rawUrl);
-      if (u.hostname.includes('pooler.supabase.com') && u.port === '5432') {
-        u.port = '6543';
-        url = u.toString();
-      }
-    } catch {
-      // URL nicht parsebar → Original verwenden.
-    }
-    const client = postgres(url, {
-      prepare: false, // Pflicht für den Transaction-Pooler (pgbouncer)
-      max: 3,
-      idle_timeout: 20, // Sekunden — Verbindung freigeben, wenn ungenutzt
-      connect_timeout: 15, // Sekunden — nicht ewig auf den Pooler warten
-    });
+    // Supabase Session-Pooler (Port 5432) + postgres-js. WICHTIG: NICHT auf den
+    // Transaction-Pooler (6543) umstellen — postgres-js hängt dort bei parallelen
+    // Queries (z. B. die 11 der Startseite). Der Session-Pooler verträgt die
+    // Parallelität problemlos. idle_timeout gibt ungenutzte Verbindungen frei,
+    // damit sie sich über warme Serverless-Instanzen nicht ansammeln.
+    const client = postgres(url, { prepare: false, max: 10, idle_timeout: 20 });
     globalForDb.__dbDriver = 'postgres';
-    // Auch in Produktion je Instanz cachen, damit nicht pro Modul-Eval ein
-    // neuer Pool entsteht.
-    const pgDb: DrizzleDb = drizzle(client, { schema });
-    globalForDb.__db = pgDb;
-    return pgDb;
+    return drizzle(client, { schema });
   }
   // Dev only: embedded PGlite. Not bundled in production (env-gated above).
   const path = require('node:path');
