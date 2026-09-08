@@ -18,7 +18,7 @@ function makeDb(): DrizzleDb {
     // Queries (z. B. die 11 der Startseite). Der Session-Pooler verträgt die
     // Parallelität problemlos. idle_timeout gibt ungenutzte Verbindungen frei,
     // damit sie sich über warme Serverless-Instanzen nicht ansammeln.
-    const client = postgres(url, { prepare: false, max: 10, idle_timeout: 20 });
+    const client = postgres(url, { prepare: false, max: 5, idle_timeout: 20 });
     globalForDb.__dbDriver = 'postgres';
     return drizzle(client, { schema });
   }

@@ -19,7 +19,11 @@ import { LandingMobileMenu } from '@/components/LandingMobileMenu';
 import { ContactsGrid } from '@/components/ContactsGrid';
 import { formatDayMonth, formatDayMonthCaps, MONTHS_DE } from '@/lib/format';
 
-export const dynamic = 'force-dynamic';
+// Öffentliche Startseite als ISR: alle 60 s im Hintergrund neu erzeugt und aus
+// dem Cache ausgeliefert — so trifft nicht jeder Aufruf gleichzeitig 11 DB-Queries
+// (Cold-Start-Hänger auf Serverless). Admin-Änderungen lösen zusätzlich sofort
+// via revalidatePath('/') eine Neuerzeugung aus.
+export const revalidate = 60;
 
 const RESERVATION_URL = 'https://treffen.tennisplatz.info/reservierung';
 
