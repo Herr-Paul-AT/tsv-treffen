@@ -76,8 +76,12 @@ export default async function LandingPage() {
     <main className="min-h-dvh bg-paper-100">
       {/* ─── HERO ─────────────────────────────────────────────── */}
       <section className="relative h-[520px] sm:h-[620px] bg-stone-800 overflow-hidden">
-        <div className="absolute inset-0 ph-stripe-dark" />
-        <div className="absolute inset-0 bg-gradient-to-b from-stone-900/40 via-stone-900/10 to-stone-900/85" />
+        <img
+          src="/img/hero.jpg"
+          alt="Die Tennisanlage des TSV Schloss Treffen mit Blick auf die Berge"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-stone-900/55 via-stone-900/20 to-stone-900/90" />
         <div className="absolute -right-6 top-12 opacity-15 pointer-events-none">
           <TSVMark size={320} variant="negative" />
         </div>
@@ -170,6 +174,11 @@ export default async function LandingPage() {
               <br />
               vor der Gerlitzen.
             </h2>
+            <img
+              src="/img/verein.jpg"
+              alt="Luftaufnahme der Sandplätze des TSV Schloss Treffen"
+              className="mt-8 w-full rounded-xl border border-stone-200 object-cover aspect-[4/3]"
+            />
           </div>
           <div className="space-y-5 text-[16px] sm:text-[17px] text-stone-700 leading-[1.6]">
             <p>
@@ -217,7 +226,13 @@ export default async function LandingPage() {
           Drei Plätze, ein Vereinsheim, eine Aussicht.
         </h2>
 
-        <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <img
+          src="/img/anlage.jpg"
+          alt="Die drei Sandplätze des TSV Schloss Treffen von oben"
+          className="mt-8 w-full rounded-xl border border-stone-200 object-cover h-[240px] sm:h-[380px]"
+        />
+
+        <div className="mt-3 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {[
             { name: '3 Sandplätze', sub: 'Gepflegter Sandplatz-Belag', icon: <Icon.Court /> },
             { name: 'Vereinsheim', sub: 'Umkleide, Dusche, kleine Küche', icon: <Icon.Home /> },
