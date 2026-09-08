@@ -52,19 +52,21 @@ function formatEventDate(start: Date, end: Date | null): string {
 }
 
 export default async function LandingPage() {
-  const [stats, news, events, teams, sponsors, plans, program, faqs, partners, contacts, settings] = await Promise.all([
-    getClubStats(),
-    listNews(3, { publicOnly: true }),
-    listUpcomingEvents(8),
-    listTeamsWithRoster(),
-    listActiveSponsors(),
-    listActiveMembershipPlans(),
-    listActiveCourtProgram(),
-    listActiveFaqs(),
-    listActivePartners(),
-    listActiveContacts(),
-    getSiteSettings(),
-  ]);
+  // Bewusst SEQUENZIELL (nicht Promise.all): so wird immer nur EINE DB-Verbindung
+  // gleichzeitig gebraucht. Auf Vercel-Serverless schlug das gleichzeitige Öffnen
+  // mehrerer Pooler-Verbindungen (11 parallele Queries) fehl → Startseite hing.
+  // Dank ISR (revalidate) läuft das nur bei der Neu-Generierung, nicht pro Aufruf.
+  const stats = await getClubStats();
+  const news = await listNews(3, { publicOnly: true });
+  const events = await listUpcomingEvents(8);
+  const teams = await listTeamsWithRoster();
+  const sponsors = await listActiveSponsors();
+  const plans = await listActiveMembershipPlans();
+  const program = await listActiveCourtProgram();
+  const faqs = await listActiveFaqs();
+  const partners = await listActivePartners();
+  const contacts = await listActiveContacts();
+  const settings = await getSiteSettings();
   const adultTeams = teams.filter((t) => !/^Jugend/.test(t.name));
   const youthTeams = teams.filter((t) => /^Jugend/.test(t.name));
   const seasons = new Date().getFullYear() - 1972;
