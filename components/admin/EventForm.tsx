@@ -126,16 +126,25 @@ export function EventForm({
             Online-Anmeldung aktivieren (z. B. Sommercamp)
           </span>
         </label>
-        <TextField
-          label="Max. Plätze (leer = ohne Limit)"
-          name="maxAttendees"
-          type="number"
-          defaultValue={event?.maxAttendees != null ? String(event.maxAttendees) : ''}
-          placeholder="z. B. 10"
-        />
+        <div className="grid sm:grid-cols-2 gap-4">
+          <TextField
+            label="Max. Plätze (leer = ohne Limit)"
+            name="maxAttendees"
+            type="number"
+            defaultValue={event?.maxAttendees != null ? String(event.maxAttendees) : ''}
+            placeholder="z. B. 10"
+          />
+          <TextField
+            label="Preis in € (optional)"
+            name="priceEuros"
+            defaultValue={event?.priceCents != null ? String(event.priceCents / 100).replace('.', ',') : ''}
+            placeholder="z. B. 160"
+          />
+        </div>
         <p className="text-[12.5px] text-stone-500">
           Bei aktivierter Anmeldung erscheint auf der Startseite ein Anmeldeformular. Ist das Limit
-          erreicht, wird „ausgebucht" angezeigt und die Anmeldung gesperrt.
+          erreicht, wird „ausgebucht" angezeigt und die Anmeldung gesperrt. Trainings und Camps mit
+          aktiver Anmeldung erscheinen zusätzlich als buchbare Pakete unter „Angebote".
         </p>
       </div>
 

@@ -67,6 +67,21 @@ export default async function PublicEventPage({
                 {event.location}
               </div>
             )}
+            {event.priceCents != null && (
+              <div className="flex items-center gap-2">
+                <Icon.Star size={16} className="text-stone-400" />
+                <span>
+                  <span className="font-display text-[17px] text-stone-800">
+                    €{' '}
+                    {new Intl.NumberFormat('de-AT', {
+                      minimumFractionDigits: event.priceCents % 100 === 0 ? 0 : 2,
+                      maximumFractionDigits: 2,
+                    }).format(event.priceCents / 100)}
+                  </span>{' '}
+                  <span className="text-stone-500 text-[13.5px]">pro Teilnehmer</span>
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -145,13 +160,20 @@ export default async function PublicEventPage({
                     <TextField label="PLZ" name="postalCode" required placeholder="9521" />
                     <TextField label="Ort" name="city" required placeholder="Treffen" />
                   </div>
-                  <TextField
-                    label="Anzahl Teilnehmer"
-                    name="participants"
-                    type="number"
-                    defaultValue="1"
-                    placeholder="1"
-                  />
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <TextField
+                      label="Geburtsdatum (optional, bei Kindern bitte angeben)"
+                      name="birthdate"
+                      type="date"
+                    />
+                    <TextField
+                      label="Anzahl Teilnehmer"
+                      name="participants"
+                      type="number"
+                      defaultValue="1"
+                      placeholder="1"
+                    />
+                  </div>
                   <div>
                     <label htmlFor="ev-msg" className="block">
                       <span className={fieldLabel}>Nachricht (optional)</span>

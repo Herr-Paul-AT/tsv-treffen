@@ -93,6 +93,8 @@ export function MembershipRequestForm({
         <TextField label="Telefonnummer" name="phone" type="tel" required placeholder="+43 …" autoComplete="tel" />
       </div>
 
+      <TextField label="Geburtsdatum" name="birthdate" type="date" required autoComplete="bday" />
+
       <TextField label="Adresse (Straße & Nr.)" name="street" required placeholder="Musterstraße 1" autoComplete="street-address" />
 
       <div className="grid sm:grid-cols-[160px_1fr] gap-4">

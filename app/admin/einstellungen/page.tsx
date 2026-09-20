@@ -53,6 +53,17 @@ export default async function AdminSettingsPage({
           Das Saison-Jahr steht z. B. im Header („Saison 2026"), bei „Mannschaften", im
           Trainings- und Saison-Kalender und im Footer.
         </p>
+        <div className="grid sm:grid-cols-[200px_1fr] gap-4 pt-2">
+          <TextField
+            label="Gründungsjahr"
+            name="foundingYear"
+            defaultValue={String(settings.foundingYear)}
+            placeholder="z. B. 1978"
+          />
+          <p className="text-[13px] text-stone-500 leading-snug self-end pb-3">
+            Erscheint auf der Startseite („seit …", „… gegründet") und in der Saisons-Zählung.
+          </p>
+        </div>
         <Button type="submit" variant="primary" icon={<Icon.Check size={16} />}>
           Speichern
         </Button>

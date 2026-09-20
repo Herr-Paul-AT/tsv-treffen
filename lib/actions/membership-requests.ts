@@ -28,6 +28,7 @@ export async function submitMembershipRequest(formData: FormData) {
   const street = req(formData, 'street', 'Adresse');
   const postalCode = req(formData, 'postalCode', 'PLZ');
   const city = req(formData, 'city', 'Ort');
+  const birthdate = req(formData, 'birthdate', 'Geburtsdatum');
 
   if (!EMAIL_RE.test(email)) throw new Error('Bitte eine gültige E-Mail-Adresse angeben.');
   if (formData.get('privacyConsent') !== 'on') {
@@ -53,6 +54,7 @@ export async function submitMembershipRequest(formData: FormData) {
     street,
     postalCode,
     city,
+    birthdate,
     category,
     planSlug,
     planName,
@@ -73,6 +75,7 @@ export async function submitMembershipRequest(formData: FormData) {
       `E-Mail: ${email}`,
       `Telefon: ${phone}`,
       `Adresse: ${street}, ${postalCode} ${city}`,
+      `Geburtsdatum: ${birthdate}`,
       `Kategorie: ${memberCategoryLabel(category)}`,
       planName ? `Gewähltes Paket: ${planName}` : ``,
       isSponsor ? `Sponsor: ja${sponsorNote ? ` — ${sponsorNote}` : ''}` : `Sponsor: nein`,
@@ -126,6 +129,7 @@ export async function createMemberFromRequest(formData: FormData) {
         street: request.street,
         postalCode: request.postalCode,
         city: request.city,
+        birthdate: request.birthdate,
         // Bei der Selbst-Anmeldung wurde der Datenschutzerklärung zugestimmt.
         privacyConsentAt: request.createdAt,
         updatedAt: new Date(),

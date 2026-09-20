@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, lte } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, inArray, lte } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import {
   events,
@@ -68,6 +68,29 @@ export async function listUpcomingEvents(limit = 12): Promise<Event[]> {
     .where(gte(events.startsAt, new Date()))
     .orderBy(asc(events.startsAt))
     .limit(limit);
+}
+
+export type TrainingOffer = Event & { taken: number };
+
+/**
+ * Buchbare Angebote für die Startseite: Trainings/Camps mit aktiver Online-Anmeldung,
+ * die noch nicht vorbei sind — inkl. bereits belegter Plätze.
+ */
+export async function listTrainingOffers(): Promise<TrainingOffer[]> {
+  const now = new Date();
+  const rows = await db
+    .select()
+    .from(events)
+    .where(and(eq(events.registrationOpen, true), inArray(events.kind, ['training', 'camp'])))
+    .orderBy(asc(events.startsAt));
+  const upcoming = rows.filter((e) => (e.endsAt ?? e.startsAt) >= now);
+  const out: TrainingOffer[] = [];
+  for (const e of upcoming) {
+    // Sequenziell (nicht parallel) — siehe Serverless-Hinweis in app/page.tsx.
+    const taken = await countEventParticipants(e.id);
+    out.push({ ...e, taken });
+  }
+  return out;
 }
 
 export async function listEventsInRange(from: Date, to: Date): Promise<Event[]> {

@@ -8,6 +8,7 @@ const LINKS = [
   { href: '#anlage', label: 'Anlage' },
   { href: '#mannschaften', label: 'Mannschaften' },
   { href: '#training', label: 'Training' },
+  { href: '#angebote', label: 'Angebote' },
   { href: '/galerie', label: 'Galerie' },
   { href: '#mitgliedschaft', label: 'Mitglied werden' },
   { href: '#anfahrt', label: 'Anfahrt' },

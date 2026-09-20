@@ -60,7 +60,8 @@ export function ContactForm({
           className="mt-2 block w-full text-[14px] text-stone-700 file:mr-4 file:h-11 file:px-4 file:rounded-md file:border-0 file:bg-stone-800 file:text-paper-50 file:text-[14px] file:font-medium hover:file:bg-stone-700 file:cursor-pointer"
         />
         <p className="mt-1.5 text-[12.5px] text-stone-500">
-          PNG, JPG oder WEBP, max. 5 MB.{contact ? ' Leer lassen, um das aktuelle Foto zu behalten.' : ''}
+          PNG, JPG oder WEBP — Handyfotos sind ok (bis 20 MB, werden automatisch verkleinert).
+          {contact ? ' Leer lassen, um das aktuelle Foto zu behalten.' : ''}
         </p>
       </div>
 

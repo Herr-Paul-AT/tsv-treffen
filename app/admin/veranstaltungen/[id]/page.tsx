@@ -91,6 +91,9 @@ export default async function EditEventPage({
                   <div className="font-mono text-[11.5px] text-stone-500 truncate">
                     {r.email}
                     {r.phone ? ` · ${r.phone}` : ''}
+                    {r.birthdate
+                      ? ` · geb. ${new Date(r.birthdate).toLocaleDateString('de-AT', { day: '2-digit', month: '2-digit', year: 'numeric' })}`
+                      : ''}
                   </div>
                   {(r.street || r.city) && (
                     <div className="text-[12.5px] text-stone-500 truncate">

@@ -26,9 +26,12 @@ export async function updateSettings(formData: FormData) {
   const yearRaw = String(formData.get('seasonYear') ?? '').trim();
   const seasonYear = /^\d{4}$/.test(yearRaw) ? yearRaw : String(new Date().getFullYear());
   const seasonOpening = String(formData.get('seasonOpening') ?? '').trim();
+  const foundRaw = String(formData.get('foundingYear') ?? '').trim();
+  const foundingYear = /^\d{4}$/.test(foundRaw) ? foundRaw : '1978';
 
   await setSetting('season_year', seasonYear);
   await setSetting('season_opening', seasonOpening);
+  await setSetting('founding_year', foundingYear);
 
   // Startseite und überall, wo das Saison-Jahr erscheint, neu aufbauen.
   revalidatePath('/');

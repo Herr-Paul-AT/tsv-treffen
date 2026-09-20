@@ -5,7 +5,8 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ['@electric-sql/pglite'],
   experimental: {
     // Logos/Flyer per Server-Action hochladen (Standard wäre 1 MB).
-    serverActions: { bodySizeLimit: '6mb' },
+    // Handyfotos sind oft 5–12 MB; sie werden serverseitig verkleinert (lib/supabase/storage.ts).
+    serverActions: { bodySizeLimit: '20mb' },
   },
 };
 

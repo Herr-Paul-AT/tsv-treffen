@@ -132,6 +132,14 @@ export default async function AdminMembershipRequestsPage({
                 <Detail label="E-Mail" value={r.email} />
                 <Detail label="Telefon" value={r.phone} />
                 <Detail label="Adresse" value={`${r.street}, ${r.postalCode} ${r.city}`} />
+                <Detail
+                  label="Geburtsdatum"
+                  value={
+                    r.birthdate
+                      ? new Date(r.birthdate).toLocaleDateString('de-AT', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                      : '—'
+                  }
+                />
                 <Detail label="Kategorie" value={memberCategoryLabel(r.category)} />
                 {r.planName && <Detail label="Gewähltes Paket" value={r.planName} />}
                 {r.isSponsor && <Detail label="Sponsoring" value={r.sponsorNote || 'ohne nähere Angabe'} />}

@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { listNews } from '@/lib/db/queries/news';
-import { listUpcomingEvents } from '@/lib/db/queries/events';
+import { listUpcomingEvents, listTrainingOffers } from '@/lib/db/queries/events';
 import { listTeamsWithRoster } from '@/lib/db/queries/teams';
 import { listActiveSponsors } from '@/lib/db/queries/sponsors';
 import { listActiveMembershipPlans } from '@/lib/db/queries/membership-plans';
@@ -67,9 +67,11 @@ export default async function LandingPage() {
   const partners = await listActivePartners();
   const contacts = await listActiveContacts();
   const settings = await getSiteSettings();
+  const offers = await listTrainingOffers();
   const adultTeams = teams.filter((t) => !/^Jugend/.test(t.name));
   const youthTeams = teams.filter((t) => /^Jugend/.test(t.name));
-  const seasons = new Date().getFullYear() - 1972;
+  const foundingYear = settings.foundingYear;
+  const seasons = new Date().getFullYear() - foundingYear;
   const seasonYear = settings.seasonYear;
   const seasonOpening = settings.seasonOpening;
   return (
@@ -92,6 +94,9 @@ export default async function LandingPage() {
               <a href="#anlage" className="hover:text-paper-50">Anlage</a>
               <a href="#mannschaften" className="hover:text-paper-50">Mannschaften</a>
               <a href="#training" className="hover:text-paper-50">Training</a>
+              {offers.length > 0 && (
+                <a href="#angebote" className="hover:text-paper-50">Angebote</a>
+              )}
               <Link href="/galerie" className="hover:text-paper-50">Galerie</Link>
               <a href="#mitgliedschaft" className="hover:text-paper-50">Mitglied werden</a>
               <Link
@@ -115,7 +120,7 @@ export default async function LandingPage() {
             </h1>
             <p className="text-[16px] sm:text-[19px] text-paper-100/85 mt-4 leading-[1.55] max-w-[540px]">
               Drei Sandplätze beim Schloss, direkt am Treffnerbach, mit Blick auf die Gerlitzen.
-              Spielen, trainieren, dazugehören — seit 1972.
+              Spielen, trainieren, dazugehören — seit {foundingYear}.
             </p>
             <div className="flex gap-2 mt-6 flex-wrap">
               <a href="#mitgliedschaft">
@@ -165,7 +170,7 @@ export default async function LandingPage() {
         <div className="grid lg:grid-cols-[1fr_1.2fr] gap-10 items-start">
           <div>
             <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-stone-500 rule-eyebrow">
-              Seit 1972 · der Verein
+              Seit {foundingYear} · der Verein
             </div>
             <h2 className="font-display text-[32px] sm:text-[44px] leading-[1.05] tracking-[-0.01em] text-stone-800 mt-5">
               Tennis beim Schloss,
@@ -182,7 +187,7 @@ export default async function LandingPage() {
           </div>
           <div className="space-y-5 text-[16px] sm:text-[17px] text-stone-700 leading-[1.6]">
             <p>
-              Der TSV Schloss Treffen wurde 1972 gegründet — beim Schloss Treffen, direkt am
+              Der TSV Schloss Treffen wurde {foundingYear} gegründet — beim Schloss Treffen, direkt am
               Treffnerbach, mit Blick auf die Gerlitzen. Die Bildmarke ist kein Zufall: Tennisball
               als Sonne über dem Berg, das Schloss im Tal, drei Wasserlinien davor.
             </p>
@@ -361,6 +366,84 @@ export default async function LandingPage() {
           ))}
         </div>
       </section>
+      )}
+
+      {/* ─── ANGEBOTE (buchbare Trainings/Camps) ───────────── */}
+      {offers.length > 0 && (
+        <section id="angebote" className="max-w-[1080px] mx-auto px-5 mt-20">
+          <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-stone-500 rule-eyebrow">
+            Angebote & Anmeldung
+          </div>
+          <h2 className="font-display text-[28px] sm:text-[36px] leading-[1.1] tracking-[-0.01em] text-stone-800 mt-4 max-w-2xl">
+            Trainingspakete zum Mitmachen — ohne Mitgliedschaft buchbar.
+          </h2>
+          <p className="text-[15px] text-stone-600 mt-3 max-w-xl leading-[1.6]">
+            Kinder- und Jugendtrainings, Camps und Trainingslager: einfach online anmelden. Eine
+            Mitgliedschaft ist dafür nicht nötig.
+          </p>
+
+          <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {offers.map((o) => {
+              const spotsLeft = o.maxAttendees != null ? Math.max(0, o.maxAttendees - o.taken) : null;
+              const full = o.maxAttendees != null && spotsLeft === 0;
+              return (
+                <article
+                  key={o.id}
+                  className="bg-white rounded-xl border border-stone-200 p-6 flex flex-col transition-all hover:border-stone-300 hover:shadow-card"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <Badge tone={o.kind === 'camp' ? 'sand' : 'lake'}>
+                      {o.kind === 'camp' ? 'Camp' : 'Training'}
+                    </Badge>
+                    <span className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-stone-500">
+                      {formatEventDate(o.startsAt, o.endsAt)}
+                    </span>
+                  </div>
+                  <h3 className="font-display text-[22px] leading-[1.15] text-stone-800 mt-4">{o.title}</h3>
+                  {o.description && (
+                    <p className="text-[14px] text-stone-600 mt-2 leading-[1.55] line-clamp-3">{o.description}</p>
+                  )}
+                  <div className="mt-5 flex items-baseline gap-1.5">
+                    {o.priceCents != null ? (
+                      <>
+                        <span className="font-display text-[30px] leading-none text-stone-800">
+                          € {formatPlanPrice(o.priceCents)}
+                        </span>
+                        <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-stone-500">
+                          pro Teilnehmer
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-[14px] text-stone-600">Preis auf Anfrage</span>
+                    )}
+                  </div>
+                  <div className="mt-1.5 font-mono text-[10.5px] uppercase tracking-[0.14em]">
+                    {full ? (
+                      <span className="text-sand-700">Ausgebucht</span>
+                    ) : spotsLeft != null ? (
+                      <span className="text-forest-700">
+                        Noch {spotsLeft} {spotsLeft === 1 ? 'Platz' : 'Plätze'} frei
+                      </span>
+                    ) : (
+                      <span className="text-forest-700">Anmeldung offen</span>
+                    )}
+                  </div>
+                  <div className="mt-auto pt-6">
+                    <Link href={`/veranstaltung/${o.id}`} className="block">
+                      <Button
+                        variant={full ? 'secondary' : 'primary'}
+                        className="w-full"
+                        iconAfter={<Icon.ArrowRight size={14} />}
+                      >
+                        {full ? 'Details & Warteliste' : 'Jetzt anmelden'}
+                      </Button>
+                    </Link>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
       )}
 
       {/* ─── MITGLIEDSCHAFT ────────────────────────────────── */}

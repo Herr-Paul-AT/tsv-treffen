@@ -30,6 +30,7 @@ type EventValues = {
   description: string | null;
   registrationOpen: boolean;
   maxAttendees: number | null;
+  priceCents: number | null;
 };
 
 function parseEventForm(formData: FormData): EventValues {
@@ -60,6 +61,11 @@ function parseEventForm(formData: FormData): EventValues {
   const maxParsed = Number.parseInt(maxRaw, 10);
   const maxAttendees = maxRaw && !Number.isNaN(maxParsed) && maxParsed > 0 ? maxParsed : null;
 
+  // Preis (optional), Eingabe in Euro mit Komma oder Punkt.
+  const priceRaw = String(formData.get('priceEuros') ?? '').trim().replace(',', '.');
+  const priceParsed = Number.parseFloat(priceRaw);
+  const priceCents = priceRaw && !Number.isNaN(priceParsed) && priceParsed >= 0 ? Math.round(priceParsed * 100) : null;
+
   return {
     title,
     kind,
@@ -70,6 +76,7 @@ function parseEventForm(formData: FormData): EventValues {
     description: description || null,
     registrationOpen,
     maxAttendees,
+    priceCents,
   };
 }
 
@@ -201,6 +208,7 @@ export async function submitEventRegistration(formData: FormData) {
   const street = String(formData.get('street') ?? '').trim();
   const postalCode = String(formData.get('postalCode') ?? '').trim();
   const city = String(formData.get('city') ?? '').trim();
+  const birthdate = String(formData.get('birthdate') ?? '').trim() || null;
   const message = String(formData.get('message') ?? '').trim() || null;
   const partRaw = Number.parseInt(String(formData.get('participants') ?? '1'), 10);
   const participants = Number.isNaN(partRaw) || partRaw < 1 ? 1 : partRaw;
@@ -221,7 +229,7 @@ export async function submitEventRegistration(formData: FormData) {
 
   await db
     .insert(eventRegistrations)
-    .values({ eventId, name, email, phone, street, postalCode, city, participants, message });
+    .values({ eventId, name, email, phone, street, postalCode, city, birthdate, participants, message });
   revalidateEventViews();
   revalidatePath(`/veranstaltung/${eventId}`);
 
@@ -233,6 +241,7 @@ export async function submitEventRegistration(formData: FormData) {
       `E-Mail: ${email}`,
       phone ? `Telefon: ${phone}` : ``,
       `Adresse: ${street}, ${postalCode} ${city}`,
+      birthdate ? `Geburtsdatum: ${birthdate}` : ``,
       `Teilnehmer: ${participants}`,
       message ? `\nNachricht:\n${message}` : ``,
       ``,

@@ -1,11 +1,44 @@
 import 'server-only';
+import sharp from 'sharp';
 import { createClient } from '@supabase/supabase-js';
 import { SUPABASE_URL } from './config';
 
 const BUCKET = 'public-assets';
-const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
+// Handyfotos dürfen groß sein — Rasterbilder werden vor dem Upload verkleinert.
+const MAX_BYTES = 20 * 1024 * 1024; // 20 MB
+const MAX_PDF_BYTES = 10 * 1024 * 1024; // 10 MB
 const ALLOWED = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml', 'image/gif'];
 const ALLOWED_FILE = [...ALLOWED, 'application/pdf'];
+// Diese Formate werden serverseitig auf Web-Größe gebracht (JPEG, max. 1600 px).
+const RASTER = ['image/png', 'image/jpeg', 'image/webp'];
+
+/**
+ * Rasterbilder (JPG/PNG/WEBP) verkleinern + als JPEG ausgeben; alles andere
+ * (SVG, GIF, PDF) unverändert durchreichen. Berücksichtigt EXIF-Drehung (Handy).
+ */
+async function prepareUpload(
+  file: File,
+): Promise<{ bytes: Uint8Array; contentType: string; ext: string | null }> {
+  const raw = new Uint8Array(await file.arrayBuffer());
+  const type = file.type || 'application/octet-stream';
+  if (!RASTER.includes(type)) return { bytes: raw, contentType: type, ext: null };
+  try {
+    const out = await sharp(raw)
+      .rotate()
+      .resize(1600, 1600, { fit: 'inside', withoutEnlargement: true })
+      .jpeg({ quality: 82, mozjpeg: true })
+      .toBuffer();
+    return { bytes: new Uint8Array(out), contentType: 'image/jpeg', ext: 'jpg' };
+  } catch {
+    // Bild nicht dekodierbar (z. B. HEIC) → Original hochladen.
+    return { bytes: raw, contentType: type, ext: null };
+  }
+}
+
+function withExt(path: string, ext: string | null): string {
+  if (!ext) return path;
+  return path.replace(/\.[a-z0-9]+$/i, '') + '.' + ext;
+}
 
 function serviceClient() {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -32,19 +65,19 @@ function slugifyName(name: string): string {
  */
 export async function uploadPublicImage(file: File | null, folder: string): Promise<string | null> {
   if (!file || file.size === 0) return null;
-  if (file.size > MAX_BYTES) throw new Error('Das Bild ist zu groß (max. 5 MB).');
+  if (file.size > MAX_BYTES) throw new Error('Das Bild ist zu groß (max. 20 MB).');
   if (file.type && !ALLOWED.includes(file.type)) {
     throw new Error('Nur Bilddateien (PNG, JPG, WEBP, SVG, GIF) sind erlaubt.');
   }
 
   const supabase = serviceClient();
   const stamp = Date.now().toString(36);
-  const path = `${folder}/${stamp}-${slugifyName(file.name || 'logo.png')}`;
+  const prepared = await prepareUpload(file);
+  const path = withExt(`${folder}/${stamp}-${slugifyName(file.name || 'logo.png')}`, prepared.ext);
 
-  const bytes = new Uint8Array(await file.arrayBuffer());
   const { error } = await supabase.storage
     .from(BUCKET)
-    .upload(path, bytes, { contentType: file.type || 'image/png', upsert: false });
+    .upload(path, prepared.bytes, { contentType: prepared.contentType, upsert: false });
   if (error) throw new Error(`Upload fehlgeschlagen: ${error.message}`);
 
   const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
@@ -59,7 +92,9 @@ export type UploadedFile = { url: string; name: string };
  */
 export async function uploadPublicFile(file: File | null, folder: string): Promise<UploadedFile | null> {
   if (!file || file.size === 0) return null;
-  if (file.size > MAX_BYTES) throw new Error('Die Datei ist zu groß (max. 5 MB).');
+  const isPdf = file.type === 'application/pdf';
+  if (isPdf && file.size > MAX_PDF_BYTES) throw new Error('Das PDF ist zu groß (max. 10 MB).');
+  if (!isPdf && file.size > MAX_BYTES) throw new Error('Die Datei ist zu groß (max. 20 MB).');
   if (file.type && !ALLOWED_FILE.includes(file.type)) {
     throw new Error('Nur Bilder (PNG, JPG, WEBP, SVG, GIF) oder PDF sind erlaubt.');
   }
@@ -67,12 +102,12 @@ export async function uploadPublicFile(file: File | null, folder: string): Promi
   const supabase = serviceClient();
   const stamp = Date.now().toString(36);
   const original = file.name || 'anhang';
-  const path = `${folder}/${stamp}-${slugifyName(original)}`;
+  const prepared = await prepareUpload(file);
+  const path = withExt(`${folder}/${stamp}-${slugifyName(original)}`, prepared.ext);
 
-  const bytes = new Uint8Array(await file.arrayBuffer());
   const { error } = await supabase.storage
     .from(BUCKET)
-    .upload(path, bytes, { contentType: file.type || 'application/octet-stream', upsert: false });
+    .upload(path, prepared.bytes, { contentType: prepared.contentType, upsert: false });
   if (error) throw new Error(`Upload fehlgeschlagen: ${error.message}`);
 
   const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);

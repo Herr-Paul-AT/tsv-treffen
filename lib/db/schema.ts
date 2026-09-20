@@ -216,6 +216,8 @@ export const events = pgTable('events', {
   // öffentliche Anmeldeformular; maxAttendees begrenzt die Plätze (null = ohne Limit).
   registrationOpen: boolean('registration_open').notNull().default(false),
   maxAttendees: integer('max_attendees'),
+  // Preis in Cent für buchbare Angebote (Trainingspakete/Camps); null = ohne Preisangabe.
+  priceCents: integer('price_cents'),
   // Wann/an wie viele Mitglieder dieser Termin per E-Mail versendet wurde.
   notifiedAt: timestamp('notified_at', { withTimezone: true }),
   notifiedCount: integer('notified_count').notNull().default(0),
@@ -251,6 +253,8 @@ export const eventRegistrations = pgTable('event_registrations', {
   street: text('street'),
   postalCode: text('postal_code'),
   city: text('city'),
+  // Geburtsdatum des Teilnehmers (optional; relevant bei Kinder-/Jugendtrainings).
+  birthdate: date('birthdate'),
   participants: integer('participants').notNull().default(1),
   message: text('message'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
@@ -312,6 +316,8 @@ export const membershipRequests = pgTable('membership_requests', {
   street: text('street').notNull(),
   postalCode: text('postal_code').notNull(),
   city: text('city').notNull(),
+  // Geburtsdatum (Pflicht im Formular; Spalte nullable wegen Altbestand).
+  birthdate: date('birthdate'),
   category: memberCategory('category'),
   planSlug: text('plan_slug'),
   planName: text('plan_name'),
