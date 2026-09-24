@@ -11,10 +11,13 @@ export const dynamic = 'force-dynamic';
 
 export default async function EditMemberPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   const { id } = await params;
+  const sp = await searchParams;
   const member = await getMember(id);
   if (!member) notFound();
 
@@ -27,7 +30,7 @@ export default async function EditMemberPage({
         <Icon.ArrowLeft size={14} /> Zurück zur Mitgliederliste
       </Link>
       <div className="mt-3 flex items-center gap-4">
-        <Avatar initials={member.initials} size={48} tone={member.avatarTone as AvatarTone} />
+        <Avatar initials={member.initials} src={member.avatarUrl ?? undefined} size={48} tone={member.avatarTone as AvatarTone} />
         <div>
           <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-stone-500">
             Adminbereich · Mitglied bearbeiten
@@ -38,6 +41,12 @@ export default async function EditMemberPage({
         </div>
       </div>
 
+      {sp.error && (
+        <div className="mt-5 max-w-3xl flex items-start gap-2.5 rounded-md bg-danger/5 border border-danger/20 px-4 py-3 text-[14px] text-danger">
+          <Icon.Info size={16} className="flex-none mt-0.5" />
+          <span>{sp.error}</span>
+        </div>
+      )}
       <MemberForm action={updateMember} member={member} submitLabel="Änderungen speichern" />
 
       <div className="mt-12 max-w-3xl border-t border-stone-200 pt-6">

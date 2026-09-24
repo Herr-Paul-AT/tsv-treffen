@@ -56,7 +56,7 @@ export default async function ProfilPage() {
         {/* Hero */}
         <div className="bg-white rounded-xl border border-stone-200 p-5">
           <div className="flex items-center gap-4">
-            <Avatar initials={me.initials} size={72} tone={me.avatarTone as AvatarTone} />
+            <Avatar initials={me.initials} src={me.avatarUrl ?? undefined} size={72} tone={me.avatarTone as AvatarTone} />
             <div className="flex-1 min-w-0">
               <div className="font-display text-[24px] text-stone-800 leading-[1.05]">
                 {me.firstName} {me.lastName}

@@ -5,7 +5,12 @@ import { createMember } from '@/lib/actions/members';
 
 export const dynamic = 'force-dynamic';
 
-export default function NewMemberPage() {
+export default async function NewMemberPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const sp = await searchParams;
   return (
     <main className="px-8 py-6 max-w-[1280px] mx-auto">
       <Link
@@ -22,6 +27,12 @@ export default function NewMemberPage() {
           Neues Mitglied
         </h1>
       </div>
+      {sp.error && (
+        <div className="mt-5 max-w-3xl flex items-start gap-2.5 rounded-md bg-danger/5 border border-danger/20 px-4 py-3 text-[14px] text-danger">
+          <Icon.Info size={16} className="flex-none mt-0.5" />
+          <span>{sp.error}</span>
+        </div>
+      )}
       <MemberForm action={createMember} submitLabel="Mitglied anlegen" />
     </main>
   );

@@ -66,11 +66,13 @@ export default async function AttendancePage({
   // Trainer info
   let trainerInitials = 'MP';
   let trainerTone: AvatarTone = 'lake';
+  let trainerSrc: string | undefined;
   if (training.trainerId) {
     const t = await db.select().from(members).where(eq(members.id, training.trainerId)).limit(1);
     if (t[0]) {
       trainerInitials = t[0].initials;
       trainerTone = t[0].avatarTone as AvatarTone;
+      trainerSrc = t[0].avatarUrl ?? undefined;
     }
   }
 
@@ -116,7 +118,7 @@ export default async function AttendancePage({
             </div>
             <hr className="my-4 border-stone-100" />
             <div className="flex items-center gap-3">
-              <Avatar initials={trainerInitials} size={40} tone={trainerTone} />
+              <Avatar initials={trainerInitials} src={trainerSrc} size={40} tone={trainerTone} />
               <div className="flex-1">
                 <div className="text-[14px] font-medium text-stone-800">
                   {training.trainerName ?? 'Kein Trainer hinterlegt'}
@@ -159,7 +161,7 @@ export default async function AttendancePage({
               </div>
               {yes.length > 0 ? (
                 <AvatarGroup
-                  items={yes.map((y) => ({ initials: y.member.initials, tone: y.member.avatarTone as AvatarTone }))}
+                  items={yes.map((y) => ({ initials: y.member.initials, src: y.member.avatarUrl ?? undefined, tone: y.member.avatarTone as AvatarTone }))}
                   max={6}
                   size={32}
                 />
@@ -173,7 +175,7 @@ export default async function AttendancePage({
               </div>
               {maybe.length > 0 ? (
                 <AvatarGroup
-                  items={maybe.map((y) => ({ initials: y.member.initials, tone: y.member.avatarTone as AvatarTone }))}
+                  items={maybe.map((y) => ({ initials: y.member.initials, src: y.member.avatarUrl ?? undefined, tone: y.member.avatarTone as AvatarTone }))}
                   size={32}
                 />
               ) : (
@@ -186,7 +188,7 @@ export default async function AttendancePage({
               </div>
               {no.length > 0 ? (
                 <AvatarGroup
-                  items={no.map((y) => ({ initials: y.member.initials, tone: y.member.avatarTone as AvatarTone }))}
+                  items={no.map((y) => ({ initials: y.member.initials, src: y.member.avatarUrl ?? undefined, tone: y.member.avatarTone as AvatarTone }))}
                   size={32}
                 />
               ) : (

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { TextField } from '@/components/ui/TextField';
 import { Icon } from '@/components/ui/Icon';
+import { Avatar, type AvatarTone } from '@/components/ui/Avatar';
 import type { Member } from '@/lib/db/schema';
 import { MEMBER_CATEGORIES } from '@/lib/member-categories';
 
@@ -76,12 +77,37 @@ export function MemberForm({
     member && member.paymentDueCents > 0 ? String(member.paymentDueCents / 100) : '';
 
   return (
-    <form action={action} className="mt-8 max-w-3xl space-y-5">
+    <form action={action} className="mt-8 max-w-3xl space-y-5" encType="multipart/form-data">
       {member && <input type="hidden" name="id" value={member.id} />}
+      {member?.avatarUrl && <input type="hidden" name="currentAvatarUrl" value={member.avatarUrl} />}
 
       <div className="grid sm:grid-cols-2 gap-4">
         <TextField label="Vorname" name="firstName" required defaultValue={member?.firstName ?? ''} />
         <TextField label="Nachname" name="lastName" required defaultValue={member?.lastName ?? ''} />
+      </div>
+
+      <div className="rounded-lg border border-stone-200 bg-white p-4">
+        <span className={fieldLabel}>Profilbild (optional)</span>
+        <div className="mt-3 flex items-center gap-4">
+          <Avatar
+            initials={member?.initials ?? '–'}
+            src={member?.avatarUrl ?? undefined}
+            size={56}
+            tone={(member?.avatarTone as AvatarTone) ?? 'lake'}
+          />
+          <div className="flex-1 min-w-0">
+            <input
+              type="file"
+              name="avatar"
+              accept="image/png,image/jpeg,image/webp"
+              className="block w-full text-[14px] text-stone-700 file:mr-4 file:h-11 file:px-4 file:rounded-md file:border-0 file:bg-stone-800 file:text-paper-50 file:text-[14px] file:font-medium hover:file:bg-stone-700 file:cursor-pointer"
+            />
+            <p className="mt-1.5 text-[12.5px] text-stone-500">
+              JPG, PNG oder WEBP — Handyfotos sind ok, werden automatisch verkleinert.
+              {member?.avatarUrl ? ' Leer lassen, um das aktuelle Bild zu behalten.' : ''}
+            </p>
+          </div>
+        </div>
       </div>
 
       <TextField

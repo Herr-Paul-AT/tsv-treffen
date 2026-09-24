@@ -9,6 +9,17 @@ import { getExistingEmails } from '@/lib/db/queries/members';
 import { initialsFor, parseMembersCsv, toneFor } from '@/lib/members-csv';
 import { MEMBER_CATEGORY_VALUES, memberCategoryLabel } from '@/lib/member-categories';
 import { sendMemberWelcome } from '@/lib/mailer';
+import { uploadPublicImage } from '@/lib/supabase/storage';
+
+function errMsg(e: unknown): string {
+  return e instanceof Error ? e.message : 'Unbekannter Fehler beim Speichern.';
+}
+
+/** Profilbild aus dem Formular hochladen (null, wenn keines gewählt). */
+async function uploadAvatar(formData: FormData): Promise<string | null> {
+  const file = formData.get('avatar');
+  return uploadPublicImage(file instanceof File ? file : null, 'avatare');
+}
 
 const ROLES = ['member', 'trainer', 'jugendleiter', 'obmann', 'admin'] as const;
 const STATUSES = ['active', 'probe', 'paused', 'inactive'] as const;
@@ -94,14 +105,23 @@ function revalidateMemberViews() {
 }
 
 export async function createMember(formData: FormData) {
-  const { privacyConsent, ...values } = parseMemberForm(formData);
-  // Dublette bewusst KEINE Sperre mehr: Familienmitglieder dürfen dieselbe
-  // E-Mail teilen. (Dubletten werden anderswo nur als Hinweis angezeigt.)
-  await db.insert(members).values({
-    ...values,
-    privacyConsentAt: privacyConsent ? new Date() : null,
-    updatedAt: new Date(),
-  });
+  let values: Omit<ReturnType<typeof parseMemberForm>, 'privacyConsent'>;
+  try {
+    const { privacyConsent, ...rest } = parseMemberForm(formData);
+    values = rest;
+    const avatarUrl = await uploadAvatar(formData);
+    // Dublette bewusst KEINE Sperre mehr: Familienmitglieder dürfen dieselbe
+    // E-Mail teilen. (Dubletten werden anderswo nur als Hinweis angezeigt.)
+    await db.insert(members).values({
+      ...values,
+      avatarUrl,
+      privacyConsentAt: privacyConsent ? new Date() : null,
+      updatedAt: new Date(),
+    });
+  } catch (e) {
+    // Lesbare Meldung statt Server-Fehlerseite (z. B. Pflichtfeld fehlt, Upload zu groß).
+    redirect(`/admin/mitglieder/neu?error=${encodeURIComponent(errMsg(e))}`);
+  }
 
   // Willkommens-Mail ans neue Mitglied (best effort; nur wenn angehakt + E-Mail vorhanden).
   if (values.email && formData.get('sendWelcome') === 'on') {
@@ -191,18 +211,24 @@ export async function createFamily(formData: FormData) {
 export async function updateMember(formData: FormData) {
   const id = String(formData.get('id') ?? '').trim();
   if (!id) throw new Error('Mitglieds-ID fehlt.');
-  const { privacyConsent, ...values } = parseMemberForm(formData);
-  // Bestehenden Zustimmungs-Zeitstempel bewahren, wenn weiterhin zugestimmt.
-  const existing = await db
-    .select({ at: members.privacyConsentAt })
-    .from(members)
-    .where(eq(members.id, id))
-    .limit(1);
-  const privacyConsentAt = privacyConsent ? existing[0]?.at ?? new Date() : null;
-  await db
-    .update(members)
-    .set({ ...values, privacyConsentAt, updatedAt: new Date() })
-    .where(eq(members.id, id));
+  try {
+    const { privacyConsent, ...values } = parseMemberForm(formData);
+    const uploaded = await uploadAvatar(formData);
+    const currentAvatar = String(formData.get('currentAvatarUrl') ?? '').trim() || null;
+    // Bestehenden Zustimmungs-Zeitstempel bewahren, wenn weiterhin zugestimmt.
+    const existing = await db
+      .select({ at: members.privacyConsentAt })
+      .from(members)
+      .where(eq(members.id, id))
+      .limit(1);
+    const privacyConsentAt = privacyConsent ? existing[0]?.at ?? new Date() : null;
+    await db
+      .update(members)
+      .set({ ...values, avatarUrl: uploaded ?? currentAvatar, privacyConsentAt, updatedAt: new Date() })
+      .where(eq(members.id, id));
+  } catch (e) {
+    redirect(`/admin/mitglieder/${id}?error=${encodeURIComponent(errMsg(e))}`);
+  }
   revalidateMemberViews();
   redirect('/admin/mitglieder');
 }

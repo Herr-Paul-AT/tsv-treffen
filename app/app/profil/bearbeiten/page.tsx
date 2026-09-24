@@ -15,7 +15,12 @@ function isoDate(d: string | Date | null | undefined): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
-export default async function ProfilBearbeitenPage() {
+export default async function ProfilBearbeitenPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const sp = await searchParams;
   const me = await getCurrentMember();
   if (!me) {
     return (
@@ -38,7 +43,7 @@ export default async function ProfilBearbeitenPage() {
       </Link>
 
       <div className="mt-4 flex items-center gap-3">
-        <Avatar initials={me.initials} size={56} tone={me.avatarTone as AvatarTone} />
+        <Avatar initials={me.initials} src={me.avatarUrl ?? undefined} size={56} tone={me.avatarTone as AvatarTone} />
         <div>
           <span className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-stone-500">
             Profil bearbeiten
@@ -49,7 +54,29 @@ export default async function ProfilBearbeitenPage() {
         </div>
       </div>
 
-      <form action={updateOwnProfile} className="mt-6 space-y-4">
+      {sp.error && (
+        <div className="mt-5 flex items-start gap-2.5 rounded-md bg-danger/5 border border-danger/20 px-4 py-3 text-[14px] text-danger">
+          <Icon.Info size={16} className="flex-none mt-0.5" />
+          <span>{sp.error}</span>
+        </div>
+      )}
+
+      <form action={updateOwnProfile} className="mt-6 space-y-4" encType="multipart/form-data">
+        {me.avatarUrl && <input type="hidden" name="currentAvatarUrl" value={me.avatarUrl} />}
+        <div>
+          <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-stone-500">
+            Profilbild (optional)
+          </span>
+          <input
+            type="file"
+            name="avatar"
+            accept="image/png,image/jpeg,image/webp"
+            className="mt-2 block w-full text-[14px] text-stone-700 file:mr-4 file:h-11 file:px-4 file:rounded-md file:border-0 file:bg-stone-800 file:text-paper-50 file:text-[14px] file:font-medium hover:file:bg-stone-700 file:cursor-pointer"
+          />
+          <p className="mt-1.5 text-[12.5px] text-stone-500">
+            Foto vom Handy passt — wird automatisch verkleinert.
+          </p>
+        </div>
         <div className="grid grid-cols-2 gap-3">
           <TextField label="Vorname" name="firstName" required defaultValue={me.firstName} />
           <TextField label="Nachname" name="lastName" required defaultValue={me.lastName} />

@@ -132,7 +132,7 @@ export function MemberTable({
               className="w-4 h-4 rounded border-stone-300 text-lake-700 focus:ring-lake-500/30"
             />
             <Link href={`/admin/mitglieder/${r.id}`} className="flex items-center gap-3 min-w-0 hover:opacity-80">
-              <Avatar initials={r.initials} size={34} tone={r.avatarTone as AvatarTone} />
+              <Avatar initials={r.initials} src={r.avatarUrl ?? undefined} size={34} tone={r.avatarTone as AvatarTone} />
               <div className="min-w-0">
                 <div className="text-[14px] font-medium text-stone-800 leading-tight truncate">
                   {r.firstName} {r.lastName}
