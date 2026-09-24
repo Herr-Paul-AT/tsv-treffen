@@ -34,8 +34,9 @@ export function DocumentForm({
   submitLabel: string;
 }) {
   return (
-    <form action={action} className="mt-8 max-w-2xl space-y-5">
+    <form action={action} className="mt-8 max-w-2xl space-y-5" encType="multipart/form-data">
       {doc && <input type="hidden" name="id" value={doc.id} />}
+      {doc?.fileUrl && <input type="hidden" name="currentFileUrl" value={doc.fileUrl} />}
 
       <TextField label="Titel" name="title" required defaultValue={doc?.title ?? ''} placeholder="z. B. Vereinsstatuten 2026" />
 
@@ -50,18 +51,40 @@ export function DocumentForm({
         </select>
       </label>
 
-      <div>
-        <TextField
-          label="Link / Datei-URL"
-          name="fileUrl"
-          required
-          defaultValue={doc?.fileUrl ?? ''}
-          placeholder="https://…"
-        />
-        <p className="mt-1.5 text-[12.5px] text-stone-500 leading-snug">
-          Vorerst per Link (z. B. Cloud-Speicher oder bestehende PDF-Adresse). Echtes Datei-Upload
-          folgt mit Supabase Storage — das Dokument bleibt danach erhalten.
-        </p>
+      <div className="rounded-lg border border-stone-200 bg-paper-50/60 p-4 space-y-4">
+        <div>
+          <span className={fieldLabel}>Datei hochladen (PDF oder Bild)</span>
+          {doc?.fileUrl && (
+            <a
+              href={doc.fileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-flex items-center gap-1.5 text-[13.5px] font-medium text-lake-700"
+            >
+              <Icon.Document size={14} /> Aktuelle Datei ansehen
+            </a>
+          )}
+          <input
+            type="file"
+            name="file"
+            accept="application/pdf,image/png,image/jpeg,image/webp"
+            className="mt-2 block w-full text-[14px] text-stone-700 file:mr-4 file:h-11 file:px-4 file:rounded-md file:border-0 file:bg-stone-800 file:text-paper-50 file:text-[14px] file:font-medium hover:file:bg-stone-700 file:cursor-pointer"
+          />
+          <p className="mt-1.5 text-[12.5px] text-stone-500">
+            PDF bis 10 MB, Bilder bis 20 MB.{doc ? ' Leer lassen, um die aktuelle Datei zu behalten.' : ''}
+          </p>
+        </div>
+        <div>
+          <TextField
+            label="… oder Link / Datei-URL"
+            name="fileUrl"
+            defaultValue={doc?.fileUrl ?? ''}
+            placeholder="https://…"
+          />
+          <p className="mt-1.5 text-[12.5px] text-stone-500 leading-snug">
+            Alternativ zum Upload: Adresse eines bestehenden Dokuments (z. B. Cloud-Speicher).
+          </p>
+        </div>
       </div>
 
       <div>

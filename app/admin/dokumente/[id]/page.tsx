@@ -8,8 +8,15 @@ import { deleteDocument, updateDocument } from '@/lib/actions/documents';
 
 export const dynamic = 'force-dynamic';
 
-export default async function EditDocumentPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function EditDocumentPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ error?: string }>;
+}) {
   const { id } = await params;
+  const sp = await searchParams;
   const doc = await getDocumentById(id);
   if (!doc) notFound();
 
@@ -28,6 +35,12 @@ export default async function EditDocumentPage({ params }: { params: Promise<{ i
         <h1 className="font-display text-[32px] leading-[1.05] text-stone-800 mt-1">{doc.title}</h1>
       </div>
 
+      {sp.error && (
+        <div className="mt-5 max-w-2xl flex items-start gap-2.5 rounded-md bg-danger/5 border border-danger/20 px-4 py-3 text-[14px] text-danger">
+          <Icon.Info size={16} className="flex-none mt-0.5" />
+          <span>{sp.error}</span>
+        </div>
+      )}
       <DocumentForm action={updateDocument} doc={doc} submitLabel="Änderungen speichern" />
 
       <div className="mt-12 max-w-2xl border-t border-stone-200 pt-6">

@@ -20,7 +20,8 @@ export const dynamic = 'force-dynamic';
 const QUICK = [
   { href: '/app/platzbuchung', icon: <Icon.Court size={20} />, label: 'Platz buchen' },
   { href: '/app/kalender', icon: <Icon.Calendar size={20} />, label: 'Kalender' },
-  { href: '/app/news/tabelle', icon: <Icon.Trophy size={20} />, label: 'Tabelle' },
+  // Mannschaften + Bilanz stehen auf der Startseite (Abschnitt „Mannschaften").
+  { href: '/#mannschaften', icon: <Icon.Trophy size={20} />, label: 'Tabelle' },
 ];
 
 const NEWS_BADGE_TONES = ['sand', 'lake', 'forest'] as const;
