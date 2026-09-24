@@ -29,15 +29,19 @@ function formatWhen(d: Date): string {
 export default async function AdminMembershipRequestsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; converted?: string }>;
+  searchParams: Promise<{ error?: string; converted?: string; alle?: string }>;
 }) {
   const sp = await searchParams;
-  const [requests, existingEmails] = await Promise.all([
+  const [allRequests, existingEmails] = await Promise.all([
     listMembershipRequests(),
     getExistingEmails(),
   ]);
 
-  const newCount = requests.filter((r) => r.status === 'new').length;
+  const newCount = allRequests.filter((r) => r.status === 'new').length;
+  // Standard: nur offene Anmeldungen zeigen — erledigte/abgelehnte auf Wunsch.
+  const showAll = sp.alle === '1';
+  const requests = showAll ? allRequests : allRequests.filter((r) => r.status === 'new');
+  const hiddenCount = allRequests.length - requests.length;
 
   return (
     <main className="px-8 py-6 max-w-[1080px] mx-auto">
@@ -74,15 +78,38 @@ export default async function AdminMembershipRequestsPage({
         </div>
         <div className="bg-white rounded-lg border border-stone-200 p-5">
           <div className="font-mono text-[11px] uppercase tracking-[0.16em] text-stone-500">Gesamt</div>
-          <div className="font-display text-[36px] text-stone-800 mt-1 leading-none">{requests.length}</div>
+          <div className="font-display text-[36px] text-stone-800 mt-1 leading-none">{allRequests.length}</div>
           <div className="mt-2 text-[13px] font-medium text-lake-700">Anmeldungen</div>
         </div>
       </div>
 
-      <div className="mt-8 space-y-4">
+      <div className="mt-8 flex items-center gap-2">
+        <a
+          href="/admin/anmeldungen"
+          className={`h-10 px-4 inline-flex items-center rounded-md border text-[13.5px] font-medium ${
+            showAll ? 'bg-white border-stone-200 text-stone-700' : 'bg-stone-800 border-stone-800 text-white'
+          }`}
+        >
+          Offen ({newCount})
+        </a>
+        <a
+          href="/admin/anmeldungen?alle=1"
+          className={`h-10 px-4 inline-flex items-center rounded-md border text-[13.5px] font-medium ${
+            showAll ? 'bg-stone-800 border-stone-800 text-white' : 'bg-white border-stone-200 text-stone-700'
+          }`}
+        >
+          Alle inkl. erledigte ({allRequests.length})
+        </a>
+      </div>
+
+      <div className="mt-4 space-y-4">
         {requests.length === 0 && (
           <div className="bg-white rounded-lg border border-stone-200 px-5 py-10 text-center text-[14px] text-stone-500">
-            Noch keine Anmeldungen eingegangen.
+            {showAll
+              ? 'Noch keine Anmeldungen eingegangen.'
+              : hiddenCount > 0
+                ? `Keine offenen Anmeldungen. ${hiddenCount} erledigte/abgelehnte sind ausgeblendet.`
+                : 'Noch keine Anmeldungen eingegangen.'}
           </div>
         )}
 

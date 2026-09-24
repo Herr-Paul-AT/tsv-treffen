@@ -12,8 +12,11 @@ const ERRORS: Record<string, string> = {
   short: 'Das Passwort muss mindestens 8 Zeichen haben.',
   mismatch: 'Die beiden Passwörter stimmen nicht überein.',
   unknown: 'Diese E-Mail ist nicht als Mitglied hinterlegt. Bitte beim Vorstand melden.',
-  exists: 'Für diese E-Mail gibt es schon ein Konto. Nutze „Anmelden" oder „Passwort vergessen".',
-  failed: 'Konto konnte nicht eingerichtet werden. Bitte erneut versuchen.',
+  exists:
+    'Für diese E-Mail gibt es schon ein Konto. Nutze „Anmelden" — oder „Passwort vergessen", falls du noch keinen Bestätigungslink erhalten hast.',
+  failed: 'Konto konnte nicht eingerichtet werden. Bitte erneut versuchen oder beim Vorstand melden.',
+  mailfailed:
+    'Das Konto wurde angelegt, aber die Bestätigungs-E-Mail konnte nicht versendet werden. Bitte über „Passwort vergessen" einen Link anfordern.',
 };
 
 export default async function RegisterPage({

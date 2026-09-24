@@ -11,6 +11,11 @@ export const dynamic = 'force-dynamic';
 const ERRORS: Record<string, string> = {
   credentials: 'E-Mail oder Passwort ist nicht korrekt.',
   missing: 'Bitte E-Mail und Passwort eingeben.',
+  noaccount:
+    'Für diese E-Mail gibt es noch kein Login-Konto. Bitte zuerst unten über „Konto einrichten" ein Passwort festlegen.',
+  unconfirmed:
+    'Dein Konto ist noch nicht bestätigt. Bitte klicke auf den Link in unserer E-Mail — oder fordere über „Passwort vergessen" einen neuen Link an.',
+  callback: 'Der Link ist ungültig oder abgelaufen. Bitte über „Passwort vergessen" einen neuen anfordern.',
 };
 
 export default async function LoginPage({
@@ -56,7 +61,10 @@ export default async function LoginPage({
         {sp.registered === '1' && (
           <div className="mb-4 flex items-start gap-2.5 rounded-md bg-forest-50 border border-forest-200 px-4 py-3 text-[13.5px] text-forest-800">
             <Icon.Mail size={16} className="flex-none mt-0.5" />
-            <span>Fast fertig — bestätige kurz deine E-Mail, danach kannst du dich anmelden.</span>
+            <span>
+              Fast fertig — wir haben dir einen Bestätigungslink per E-Mail geschickt (bitte auch
+              im Spam-Ordner nachsehen). Nach dem Klick kannst du dich hier anmelden.
+            </span>
           </div>
         )}
         {sp.reset === '1' && (

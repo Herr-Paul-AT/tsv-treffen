@@ -1,5 +1,4 @@
 import 'server-only';
-import sharp from 'sharp';
 import { createClient } from '@supabase/supabase-js';
 import { SUPABASE_URL } from './config';
 
@@ -13,6 +12,19 @@ const ALLOWED_FILE = [...ALLOWED, 'application/pdf'];
 const RASTER = ['image/png', 'image/jpeg', 'image/webp'];
 
 /**
+ * sharp erst bei Bedarf laden — und wenn die native Bibliothek auf dem Server
+ * nicht verfügbar ist, ohne Verkleinerung weiterarbeiten statt zu crashen.
+ */
+async function loadSharp(): Promise<typeof import('sharp') | null> {
+  try {
+    const mod = await import('sharp');
+    return (mod.default ?? mod) as typeof import('sharp');
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Rasterbilder (JPG/PNG/WEBP) verkleinern + als JPEG ausgeben; alles andere
  * (SVG, GIF, PDF) unverändert durchreichen. Berücksichtigt EXIF-Drehung (Handy).
  */
@@ -22,6 +34,8 @@ async function prepareUpload(
   const raw = new Uint8Array(await file.arrayBuffer());
   const type = file.type || 'application/octet-stream';
   if (!RASTER.includes(type)) return { bytes: raw, contentType: type, ext: null };
+  const sharp = await loadSharp();
+  if (!sharp) return { bytes: raw, contentType: type, ext: null };
   try {
     const out = await sharp(raw)
       .rotate()

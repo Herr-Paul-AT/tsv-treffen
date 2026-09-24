@@ -14,6 +14,11 @@ export default async function ForgotPasswordPage({
 }) {
   const sp = await searchParams;
   const sent = sp.sent === '1';
+  const errorMsg = sp.error
+    ? sp.error === 'missing'
+      ? 'Bitte deine E-Mail-Adresse eingeben.'
+      : 'Der Link konnte nicht versendet werden. Bitte später erneut versuchen oder beim Vorstand melden.'
+    : null;
 
   return (
     <main className="min-h-dvh bg-paper-100 flex flex-col">
@@ -36,6 +41,12 @@ export default async function ForgotPasswordPage({
       </div>
 
       <form action={requestPasswordReset} className="flex-1 px-7 mt-7 max-w-md w-full mx-auto">
+        {errorMsg && (
+          <div className="mb-4 flex items-start gap-2.5 rounded-md bg-danger/5 border border-danger/20 px-4 py-3 text-[13.5px] text-danger">
+            <Icon.Info size={16} className="flex-none mt-0.5" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
         {sent && (
           <div className="mb-4 flex items-start gap-2.5 rounded-md bg-forest-50 border border-forest-200 px-4 py-3 text-[13.5px] text-forest-800">
             <Icon.Mail size={16} className="flex-none mt-0.5" />

@@ -110,9 +110,12 @@ export async function sendMemberWelcome(opts: {
     `willkommen beim TSV Schloss Treffen! Wir haben dich als Mitglied angelegt.`,
     opts.packageLabel ? `\nDein Paket: ${opts.packageLabel}` : ``,
     ``,
-    `Über den Mitgliederbereich auf https://www.tsv-treffen.at/login kannst du dich jederzeit`,
-    `mit dieser E-Mail-Adresse anmelden — beim ersten Mal einfach „Passwort vergessen" nutzen,`,
-    `um dein Passwort zu setzen.`,
+    `So richtest du deinen Zugang zum Mitgliederbereich ein:`,
+    `1. https://www.tsv-treffen.at/login/registrieren öffnen`,
+    `2. Diese E-Mail-Adresse eingeben und ein Passwort wählen`,
+    `3. Den Bestätigungslink anklicken, den wir dir daraufhin schicken`,
+    `Danach meldest du dich unter https://www.tsv-treffen.at/login mit E-Mail und Passwort an.`,
+    `(Alternativ funktioniert auch „Passwort vergessen" auf der Login-Seite.)`,
     ``,
     `Mitgliedsbeitrag — Bankverbindung:`,
     `Empfänger: Tennissportverein Schloß Treffen c/o Hr. Kalin Martin`,
@@ -215,6 +218,51 @@ export async function sendTrainingReminder(opts: {
     text: body,
     html: bodyToHtml(body),
   });
+  return true;
+}
+
+/**
+ * Bestätigungs- bzw. Passwort-Link an ein Mitglied — über UNSER SMTP, nicht
+ * über den Supabase-Mailer (der schickt standardmäßig nur an Team-Adressen).
+ * Gibt false zurück, wenn SMTP nicht konfiguriert ist.
+ */
+export async function sendAuthLinkMail(opts: {
+  to: string;
+  kind: 'signup' | 'recovery';
+  url: string;
+}): Promise<boolean> {
+  if (!isMailConfigured()) return false;
+  const transport = getTransport();
+  const isSignup = opts.kind === 'signup';
+  const subject = isSignup
+    ? 'Bitte bestätige dein Konto — TSV Schloss Treffen'
+    : 'Dein Link zum Passwort setzen — TSV Schloss Treffen';
+  const intro = isSignup
+    ? 'fast fertig! Klicke auf den Link, um dein Konto für den Mitgliederbereich zu bestätigen. Danach kannst du dich mit E-Mail und Passwort anmelden.'
+    : 'über den folgenden Link kannst du ein neues Passwort für den Mitgliederbereich setzen.';
+  const validity = isSignup ? '24 Stunden' : '1 Stunde';
+  const text = [
+    `Hallo,`,
+    ``,
+    intro,
+    ``,
+    opts.url,
+    ``,
+    `Der Link ist ${validity} gültig. Falls du das nicht angefordert hast, ignoriere diese Nachricht einfach.`,
+    ``,
+    `Sportliche Grüße`,
+    `TSV Schloss Treffen`,
+  ].join('\n');
+  const button = isSignup ? 'Konto bestätigen' : 'Passwort setzen';
+  const html = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#2b2b2b;line-height:1.6">
+<p>Hallo,</p>
+<p>${escapeHtml(intro)}</p>
+<p style="margin:24px 0"><a href="${opts.url}" style="background:#1c3a4a;color:#fff;text-decoration:none;padding:12px 20px;border-radius:6px;display:inline-block;font-weight:bold">${button}</a></p>
+<p style="font-size:13px;color:#666">Falls der Button nicht funktioniert, kopiere diesen Link in deinen Browser:<br/><a href="${opts.url}" style="color:#1c3a4a;word-break:break-all">${opts.url}</a></p>
+<p style="font-size:13px;color:#666">Der Link ist ${validity} gültig. Falls du das nicht angefordert hast, ignoriere diese Nachricht einfach.</p>
+<p>Sportliche Grüße<br/>TSV Schloss Treffen</p>
+</div>`;
+  await transport.sendMail({ from: MAIL_FROM, to: opts.to, subject, text, html });
   return true;
 }
 
