@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { TextField } from '@/components/ui/TextField';
+import { ImageFileInput } from '@/components/ui/ImageFileInput';
 import { Icon } from '@/components/ui/Icon';
 import type { Sponsor } from '@/lib/db/schema';
 
@@ -48,14 +49,11 @@ export function SponsorForm({
             <span className="text-[13px] text-stone-500">Aktuelles Logo</span>
           </div>
         )}
-        <input
-          type="file"
-          name="logo"
-          accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif"
-          className="mt-2 block w-full text-[14px] text-stone-700 file:mr-4 file:h-11 file:px-4 file:rounded-md file:border-0 file:bg-stone-800 file:text-paper-50 file:text-[14px] file:font-medium hover:file:bg-stone-700 file:cursor-pointer"
-        />
+        <div className="mt-2">
+          <ImageFileInput name="logo" accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif" maxDim={1200} />
+        </div>
         <p className="mt-1.5 text-[12.5px] text-stone-500">
-          PNG, JPG, WEBP oder SVG, max. 5 MB.{' '}
+          PNG, JPG, WEBP oder SVG — große Bilder werden automatisch verkleinert.{' '}
           {sponsor ? 'Leer lassen, um das aktuelle Logo zu behalten.' : ''}
         </p>
       </div>

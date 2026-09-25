@@ -84,6 +84,8 @@ export default async function LandingPage() {
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-stone-900/55 via-stone-900/20 to-stone-900/90" />
+        {/* Links abdunkeln: dort sitzt der Text — und am PC wird so der Baustellen-Rand des Fotos kaschiert. */}
+        <div className="absolute inset-0 bg-gradient-to-r from-stone-900/95 via-stone-900/40 to-transparent" />
         <div className="absolute -right-6 top-12 opacity-15 pointer-events-none">
           <TSVMark size={320} variant="negative" />
         </div>
@@ -109,11 +111,11 @@ export default async function LandingPage() {
             <LandingMobileMenu />
           </div>
           <div>
-            <span className="font-mono text-[10.5px] uppercase tracking-[0.22em] text-sand-300">
+            <span className="inline-block font-mono text-[10.5px] uppercase tracking-[0.22em] text-sand-200 bg-stone-900/55 backdrop-blur-sm px-3 py-1.5 rounded-full">
               Saison {seasonYear}
               {seasonOpening ? ` · ${seasonOpening}` : ''}
             </span>
-            <h1 className="font-display text-[40px] sm:text-[64px] leading-[1.02] tracking-[-0.015em] mt-3 max-w-[820px]">
+            <h1 className="font-display text-[36px] sm:text-[64px] leading-[1.02] tracking-[-0.015em] mt-3 max-w-[820px] [text-shadow:0_2px_16px_rgba(0,0,0,0.35)]">
               Tennis beim Schloss
               <br />
               mit Blick auf die Gerlitzen.

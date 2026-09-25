@@ -2,6 +2,7 @@
 import { Button } from '@/components/ui/Button';
 import { TextField } from '@/components/ui/TextField';
 import { Icon } from '@/components/ui/Icon';
+import { ImageFileInput } from '@/components/ui/ImageFileInput';
 import { DeleteButton } from '@/components/admin/DeleteButton';
 import { listAllGalleryImages } from '@/lib/db/queries/gallery';
 import { addGalleryImages, deleteGalleryImage } from '@/lib/actions/gallery';
@@ -55,15 +56,12 @@ export default async function AdminGalleryPage({
       >
         <div>
           <span className={fieldLabel}>Bilder</span>
-          <input
-            type="file"
-            name="images"
-            accept="image/png,image/jpeg,image/webp"
-            multiple
-            required
-            className="mt-2 block w-full text-[14px] text-stone-700 file:mr-4 file:h-11 file:px-4 file:rounded-md file:border-0 file:bg-stone-800 file:text-paper-50 file:text-[14px] file:font-medium hover:file:bg-stone-700 file:cursor-pointer"
-          />
-          <p className="mt-1.5 text-[12.5px] text-stone-500">JPG, PNG oder WEBP, je max. 5 MB.</p>
+          <div className="mt-2">
+            <ImageFileInput name="images" accept="image/*" multiple required />
+          </div>
+          <p className="mt-1.5 text-[12.5px] text-stone-500">
+            JPG, PNG oder WEBP — werden vor dem Hochladen automatisch verkleinert.
+          </p>
         </div>
         <div className="grid sm:grid-cols-[1fr_160px] gap-4">
           <TextField label="Bildunterschrift (optional)" name="caption" placeholder="z. B. Sommercamp 2026" />

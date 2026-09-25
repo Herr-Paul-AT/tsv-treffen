@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { TextField } from '@/components/ui/TextField';
 import { Icon } from '@/components/ui/Icon';
+import { ImageFileInput } from '@/components/ui/ImageFileInput';
 import type { Document } from '@/lib/db/schema';
 
 const fieldLabel = 'font-mono text-[11px] uppercase tracking-[0.16em] text-stone-500';
@@ -64,14 +65,12 @@ export function DocumentForm({
               <Icon.Document size={14} /> Aktuelle Datei ansehen
             </a>
           )}
-          <input
-            type="file"
-            name="file"
-            accept="application/pdf,image/png,image/jpeg,image/webp"
-            className="mt-2 block w-full text-[14px] text-stone-700 file:mr-4 file:h-11 file:px-4 file:rounded-md file:border-0 file:bg-stone-800 file:text-paper-50 file:text-[14px] file:font-medium hover:file:bg-stone-700 file:cursor-pointer"
-          />
+          <div className="mt-2">
+            <ImageFileInput name="file" accept="application/pdf,image/*" />
+          </div>
           <p className="mt-1.5 text-[12.5px] text-stone-500">
-            PDF bis 10 MB, Bilder bis 20 MB.{doc ? ' Leer lassen, um die aktuelle Datei zu behalten.' : ''}
+            PDF bis 4 MB; Bilder werden automatisch verkleinert.
+            {doc ? ' Leer lassen, um die aktuelle Datei zu behalten.' : ''}
           </p>
         </div>
         <div>

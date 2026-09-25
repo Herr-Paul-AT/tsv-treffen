@@ -3,6 +3,7 @@ import { Avatar, type AvatarTone } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { TextField } from '@/components/ui/TextField';
 import { Icon } from '@/components/ui/Icon';
+import { ImageFileInput } from '@/components/ui/ImageFileInput';
 import { getCurrentMember } from '@/lib/db/queries/session';
 import { updateOwnProfile } from '@/lib/actions/profile';
 
@@ -67,14 +68,11 @@ export default async function ProfilBearbeitenPage({
           <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-stone-500">
             Profilbild (optional)
           </span>
-          <input
-            type="file"
-            name="avatar"
-            accept="image/png,image/jpeg,image/webp"
-            className="mt-2 block w-full text-[14px] text-stone-700 file:mr-4 file:h-11 file:px-4 file:rounded-md file:border-0 file:bg-stone-800 file:text-paper-50 file:text-[14px] file:font-medium hover:file:bg-stone-700 file:cursor-pointer"
-          />
+          <div className="mt-2">
+            <ImageFileInput name="avatar" accept="image/*" maxDim={800} />
+          </div>
           <p className="mt-1.5 text-[12.5px] text-stone-500">
-            Foto vom Handy passt — wird automatisch verkleinert.
+            Foto vom Handy passt — wird vor dem Hochladen automatisch verkleinert.
           </p>
         </div>
         <div className="grid grid-cols-2 gap-3">

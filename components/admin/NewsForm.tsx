@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { TextField } from '@/components/ui/TextField';
+import { ImageFileInput } from '@/components/ui/ImageFileInput';
 import { Icon } from '@/components/ui/Icon';
 import type { News } from '@/lib/db/schema';
 
@@ -126,14 +127,12 @@ export function NewsForm({
             <Icon.Document size={14} /> {article.attachmentName ?? 'Aktueller Anhang'}
           </a>
         )}
-        <input
-          type="file"
-          name="attachment"
-          accept="image/png,image/jpeg,image/webp,application/pdf"
-          className="mt-2 block w-full text-[14px] text-stone-700 file:mr-4 file:h-11 file:px-4 file:rounded-md file:border-0 file:bg-stone-800 file:text-paper-50 file:text-[14px] file:font-medium hover:file:bg-stone-700 file:cursor-pointer"
-        />
+        <div className="mt-2">
+          <ImageFileInput name="attachment" accept="image/*,application/pdf" />
+        </div>
         <p className="mt-1.5 text-[12.5px] text-stone-500">
-          Bild oder PDF, max. 5 MB.{article ? ' Leer lassen, um den aktuellen Anhang zu behalten.' : ''}
+          Bild (wird automatisch verkleinert) oder PDF bis 4 MB.
+          {article ? ' Leer lassen, um den aktuellen Anhang zu behalten.' : ''}
         </p>
       </div>
 

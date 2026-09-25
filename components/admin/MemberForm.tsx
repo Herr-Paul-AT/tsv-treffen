@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/Button';
 import { TextField } from '@/components/ui/TextField';
 import { Icon } from '@/components/ui/Icon';
 import { Avatar, type AvatarTone } from '@/components/ui/Avatar';
+import { ImageFileInput } from '@/components/ui/ImageFileInput';
 import type { Member } from '@/lib/db/schema';
 import { MEMBER_CATEGORIES } from '@/lib/member-categories';
 
@@ -96,14 +97,9 @@ export function MemberForm({
             tone={(member?.avatarTone as AvatarTone) ?? 'lake'}
           />
           <div className="flex-1 min-w-0">
-            <input
-              type="file"
-              name="avatar"
-              accept="image/png,image/jpeg,image/webp"
-              className="block w-full text-[14px] text-stone-700 file:mr-4 file:h-11 file:px-4 file:rounded-md file:border-0 file:bg-stone-800 file:text-paper-50 file:text-[14px] file:font-medium hover:file:bg-stone-700 file:cursor-pointer"
-            />
+            <ImageFileInput name="avatar" accept="image/*" maxDim={800} />
             <p className="mt-1.5 text-[12.5px] text-stone-500">
-              JPG, PNG oder WEBP — Handyfotos sind ok, werden automatisch verkleinert.
+              Foto vom Handy passt — wird vor dem Hochladen automatisch verkleinert.
               {member?.avatarUrl ? ' Leer lassen, um das aktuelle Bild zu behalten.' : ''}
             </p>
           </div>
