@@ -1,7 +1,11 @@
 import Link from 'next/link';
 import { TSVLockup } from '@/components/brand/Logo';
 
-export const metadata = { title: 'Datenschutz · TSV Schloss Treffen' };
+export const metadata = {
+  title: 'Datenschutz',
+  description: 'Datenschutzerklärung des TSV Schloss Treffen.',
+  alternates: { canonical: '/datenschutz' },
+};
 
 export default function DatenschutzPage() {
   return (

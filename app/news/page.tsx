@@ -3,8 +3,15 @@ import { TSVMark } from '@/components/brand/Logo';
 import { Icon } from '@/components/ui/Icon';
 import { listNews } from '@/lib/db/queries/news';
 import { formatDayMonth } from '@/lib/format';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'News',
+  description: 'Neuigkeiten, Ergebnisse und Termine vom Tennisverein TSV Schloss Treffen.',
+  alternates: { canonical: '/news' },
+};
 
 const EYEBROW_TONE: Record<string, string> = {
   Saisoneröffnung: 'text-sand-700',

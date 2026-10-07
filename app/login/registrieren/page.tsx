@@ -4,8 +4,14 @@ import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { TextField } from '@/components/ui/TextField';
 import { registerAccount } from '@/lib/actions/auth';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Konto einrichten',
+  robots: { index: false, follow: false },
+};
 
 const ERRORS: Record<string, string> = {
   missing: 'Bitte E-Mail und Passwort ausfüllen.',

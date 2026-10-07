@@ -2,6 +2,12 @@ import Link from 'next/link';
 import { TSVMark } from '@/components/brand/Logo';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Danke',
+  robots: { index: false, follow: false },
+};
 
 export default function MembershipThanksPage() {
   return (

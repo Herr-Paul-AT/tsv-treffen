@@ -16,6 +16,8 @@ import { listActiveContacts } from '@/lib/db/queries/contacts';
 import { getClubStats } from '@/lib/db/queries/stats';
 import { getSiteSettings } from '@/lib/db/queries/settings';
 import { eventKindLabel } from '@/lib/event-kinds';
+import { OG_IMAGE, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/lib/site';
+import type { Metadata } from 'next';
 import { LandingMobileMenu } from '@/components/LandingMobileMenu';
 import { ContactsGrid } from '@/components/ContactsGrid';
 import { OfferCard } from '@/components/OfferCard';
@@ -26,6 +28,12 @@ import { formatDayMonth, formatDayMonthCaps, MONTHS_DE } from '@/lib/format';
 // (Cold-Start-Hänger auf Serverless). Admin-Änderungen lösen zusätzlich sofort
 // via revalidatePath('/') eine Neuerzeugung aus.
 export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: { absolute: 'TSV Schloss Treffen — Tennis in Treffen am Ossiachersee' },
+  description: SITE_DESCRIPTION,
+  alternates: { canonical: '/' },
+};
 
 const RESERVATION_URL = 'https://treffen.tennisplatz.info/reservierung';
 
@@ -80,6 +88,34 @@ export default async function LandingPage() {
   const seasonOpening = settings.seasonOpening;
   return (
     <main className="min-h-dvh bg-paper-100">
+      {/* Strukturierte Vereinsdaten für Google (Name, Adresse, Kontakt, Logo). */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'SportsClub',
+            name: SITE_NAME,
+            alternateName: 'Tennissportverein Schloß Treffen',
+            sport: 'Tennis',
+            url: SITE_URL,
+            logo: `${SITE_URL}/icon-512.png`,
+            image: `${SITE_URL}${OG_IMAGE.url}`,
+            description: SITE_DESCRIPTION,
+            foundingDate: String(foundingYear),
+            email: 'office@tsv-treffen.at',
+            telephone: '+43 650 3473434',
+            address: {
+              '@type': 'PostalAddress',
+              streetAddress: 'Schloßstraße 1',
+              postalCode: '9521',
+              addressLocality: 'Treffen am Ossiachersee',
+              addressRegion: 'Kärnten',
+              addressCountry: 'AT',
+            },
+          }),
+        }}
+      />
       {/* ─── HERO ─────────────────────────────────────────────── */}
       <section className="relative h-[520px] sm:h-[620px] bg-stone-800 overflow-hidden">
         <img

@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { cache } from 'react';
+import type { Metadata } from 'next';
 import { TSVMark } from '@/components/brand/Logo';
 import { Badge, type BadgeTone } from '@/components/ui/Badge';
 import { Icon } from '@/components/ui/Icon';
@@ -7,6 +9,27 @@ import { getNewsBySlug } from '@/lib/db/queries/news';
 import { formatDayMonth } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
+
+// Einmal pro Request laden (Metadaten + Seite teilen sich das Ergebnis).
+const loadArticle = cache(getNewsBySlug);
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const a = await loadArticle(slug);
+  if (!a || a.visibility !== 'public' || !a.publishedAt) {
+    return { title: 'News', robots: { index: false } };
+  }
+  return {
+    title: a.title,
+    description: a.excerpt,
+    alternates: { canonical: `/news/${a.slug}` },
+    openGraph: { type: 'article', title: a.title, description: a.excerpt, publishedTime: a.publishedAt.toISOString() },
+  };
+}
 
 const EYEBROW_TONE: Record<string, BadgeTone> = {
   Saisoneröffnung: 'sand',
@@ -21,7 +44,7 @@ export default async function PublicNewsDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const article = await getNewsBySlug(slug);
+  const article = await loadArticle(slug);
   // Nur veröffentlichte, öffentliche Beiträge sind hier sichtbar.
   if (!article || article.visibility !== 'public' || !article.publishedAt) notFound();
 

@@ -1,7 +1,11 @@
 import Link from 'next/link';
 import { TSVLockup } from '@/components/brand/Logo';
 
-export const metadata = { title: 'Impressum · TSV Schloss Treffen' };
+export const metadata = {
+  title: 'Impressum',
+  description: 'Impressum des Tennissportvereins TSV Schloss Treffen, Treffen am Ossiachersee.',
+  alternates: { canonical: '/impressum' },
+};
 
 export default function ImpressumPage() {
   return (

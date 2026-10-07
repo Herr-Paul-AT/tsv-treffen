@@ -1,4 +1,11 @@
+import type { Metadata } from 'next';
 import { BottomNav } from '@/components/nav/BottomNav';
+
+// Mitgliederbereich nicht in Suchmaschinen.
+export const metadata: Metadata = {
+  title: 'Mitgliederbereich',
+  robots: { index: false, follow: false },
+};
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (

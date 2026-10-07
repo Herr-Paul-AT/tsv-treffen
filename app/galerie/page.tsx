@@ -3,8 +3,15 @@ import Link from 'next/link';
 import { TSVMark } from '@/components/brand/Logo';
 import { Icon } from '@/components/ui/Icon';
 import { listActiveGalleryImages } from '@/lib/db/queries/gallery';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Galerie',
+  description: 'Fotos vom TSV Schloss Treffen: Sandplätze mit Blick auf die Gerlitzen, Training, Turniere und Vereinsleben.',
+  alternates: { canonical: '/galerie' },
+};
 
 export default async function GalleryPage() {
   const images = await listActiveGalleryImages();

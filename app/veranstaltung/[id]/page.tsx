@@ -7,8 +7,34 @@ import { Icon } from '@/components/ui/Icon';
 import { getEvent, countEventParticipants } from '@/lib/db/queries/events';
 import { submitEventRegistration } from '@/lib/actions/events';
 import { formatGermanDate } from '@/lib/format';
+import { cache } from 'react';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+// Einmal pro Request laden; ungültige IDs gar nicht erst abfragen.
+const loadEvent = cache(async (id: string) => (UUID_RE.test(id) ? getEvent(id) : null));
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const e = await loadEvent(id);
+  if (!e) return { title: 'Veranstaltung', robots: { index: false } };
+  const when = formatGermanDate(e.startsAt);
+  const description = e.description
+    ? `${when} · ${e.description.slice(0, 150)}`
+    : `${when}${e.location ? ` · ${e.location}` : ''} — Veranstaltung des TSV Schloss Treffen.`;
+  return {
+    title: e.title,
+    description,
+    alternates: { canonical: `/veranstaltung/${e.id}` },
+    openGraph: { title: e.title, description },
+  };
+}
 
 const fieldLabel = 'font-mono text-[11px] uppercase tracking-[0.16em] text-stone-500';
 
@@ -29,7 +55,7 @@ export default async function PublicEventPage({
 }) {
   const { id } = await params;
   const sp = await searchParams;
-  const event = await getEvent(id);
+  const event = await loadEvent(id);
   if (!event) notFound();
 
   const taken = event.registrationOpen ? await countEventParticipants(id) : 0;

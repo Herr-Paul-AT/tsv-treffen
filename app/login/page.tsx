@@ -5,8 +5,14 @@ import { Icon } from '@/components/ui/Icon';
 import { TextField } from '@/components/ui/TextField';
 import { signInWithPassword } from '@/lib/actions/auth';
 import { isSupabaseConfigured } from '@/lib/supabase/config';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Anmelden',
+  robots: { index: false, follow: false },
+};
 
 const ERRORS: Record<string, string> = {
   credentials: 'E-Mail oder Passwort ist nicht korrekt.',

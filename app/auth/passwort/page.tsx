@@ -4,8 +4,14 @@ import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { TextField } from '@/components/ui/TextField';
 import { updatePassword } from '@/lib/actions/auth';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Passwort setzen',
+  robots: { index: false, follow: false },
+};
 
 const ERRORS: Record<string, string> = {
   short: 'Das Passwort muss mindestens 8 Zeichen haben.',

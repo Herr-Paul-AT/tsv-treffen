@@ -4,8 +4,14 @@ import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { TextField } from '@/components/ui/TextField';
 import { requestPasswordReset } from '@/lib/actions/auth';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Passwort vergessen',
+  robots: { index: false, follow: false },
+};
 
 export default async function ForgotPasswordPage({
   searchParams,

@@ -4,8 +4,15 @@ import { Icon } from '@/components/ui/Icon';
 import { MembershipRequestForm, type PlanOption } from '@/components/MembershipRequestForm';
 import { submitMembershipRequest } from '@/lib/actions/membership-requests';
 import { listActiveMembershipPlans } from '@/lib/db/queries/membership-plans';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Mitglied werden',
+  description: 'Jetzt Mitglied beim TSV Schloss Treffen werden: Tarife für Jugend, Aktive und Familien — online anmelden, Schnuppern kostenlos.',
+  alternates: { canonical: '/mitglied-werden' },
+};
 
 export default async function MembershipRequestPage({
   searchParams,
