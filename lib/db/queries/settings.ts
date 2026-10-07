@@ -5,7 +5,16 @@ export type SiteSettings = {
   seasonYear: number;
   seasonOpening: string;
   foundingYear: number;
+  /** Hinweis bei „Werde Teil des TSV" — leer = automatisch aus der Saisoneröffnung. */
+  ctaText: string;
 };
+
+/** Standardtext, wenn kein eigener Hinweis gepflegt ist. */
+export function defaultCtaText(seasonOpening: string): string {
+  return seasonOpening
+    ? `${seasonOpening.replace(/\.$/, '')}. Ab dann sind Schnuppertermine jederzeit kostenlos möglich.`
+    : 'Während der Saison sind Schnuppertermine jederzeit kostenlos möglich.';
+}
 
 // Gründungsjahr laut Vorstand (Gert, Sept. 2026) — im Admin änderbar.
 const DEFAULT_FOUNDING_YEAR = 1978;
@@ -25,5 +34,6 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     seasonYear,
     seasonOpening: map.get('season_opening') ?? '',
     foundingYear,
+    ctaText: map.get('cta_text') ?? '',
   };
 }

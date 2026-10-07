@@ -1,0 +1,1 @@
+ALTER TYPE "public"."member_category" ADD VALUE 'student';

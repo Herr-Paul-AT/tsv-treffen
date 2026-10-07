@@ -14,7 +14,7 @@ import { listActiveFaqs } from '@/lib/db/queries/faqs';
 import { listActivePartners } from '@/lib/db/queries/partners';
 import { listActiveContacts } from '@/lib/db/queries/contacts';
 import { getClubStats } from '@/lib/db/queries/stats';
-import { getSiteSettings } from '@/lib/db/queries/settings';
+import { getSiteSettings, defaultCtaText } from '@/lib/db/queries/settings';
 import { eventKindLabel } from '@/lib/event-kinds';
 import { OG_IMAGE, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/lib/site';
 import type { Metadata } from 'next';
@@ -132,7 +132,7 @@ export default async function LandingPage() {
         <div className="relative h-full max-w-[1080px] mx-auto flex flex-col justify-end p-6 pb-8 text-paper-50">
           <div className="flex items-center justify-between absolute top-[calc(1.5rem+env(safe-area-inset-top))] left-6 right-6">
             <TSVLockup height={36} color="#FBF8F1" accent="#C39265" />
-            <nav className="hidden sm:flex items-center gap-6 text-[14px] text-paper-100/80">
+            <nav className="hidden lg:flex items-center gap-5 text-[14px] text-paper-100/80">
               <a href="#anlage" className="hover:text-paper-50">Anlage</a>
               <a href="#mannschaften" className="hover:text-paper-50">Mannschaften</a>
               <a href="#training" className="hover:text-paper-50">Training</a>
@@ -142,6 +142,33 @@ export default async function LandingPage() {
               {otherOffers.length > 0 && (
                 <a href="#angebote" className="hover:text-paper-50">Angebote</a>
               )}
+              {/* „Verein": Trainer, Partner, Sponsoren & Anfahrt ohne Scrollen erreichbar. */}
+              <div className="relative group">
+                <button
+                  type="button"
+                  aria-haspopup="true"
+                  className="inline-flex items-center gap-1 hover:text-paper-50 group-focus-within:text-paper-50"
+                >
+                  Verein <Icon.ChevronDown size={14} />
+                </button>
+                <div className="absolute right-0 top-full pt-3 z-30 hidden group-hover:block group-focus-within:block">
+                  <div className="min-w-[220px] bg-paper-50 rounded-lg border border-stone-200 shadow-pop p-1.5 flex flex-col text-stone-800">
+                    {[
+                      { href: '#verein', label: 'Über uns', show: true },
+                      { href: '#trainer', label: 'Trainer & Kontakte', show: contacts.length > 0 },
+                      { href: '#partner', label: 'Sportliche Partner', show: partners.length > 0 },
+                      { href: '#sponsoren', label: 'Sponsoren', show: true },
+                      { href: '#anfahrt', label: 'Anfahrt', show: true },
+                    ]
+                      .filter((l) => l.show)
+                      .map((l) => (
+                        <a key={l.href} href={l.href} className="px-3.5 py-2.5 rounded-md text-[14.5px] hover:bg-paper-100">
+                          {l.label}
+                        </a>
+                      ))}
+                  </div>
+                </div>
+              </div>
               <Link href="/galerie" className="hover:text-paper-50">Galerie</Link>
               <a href="#mitgliedschaft" className="hover:text-paper-50">Mitglied werden</a>
               <Link
@@ -151,7 +178,12 @@ export default async function LandingPage() {
                 Anmelden
               </Link>
             </nav>
-            <LandingMobileMenu showKids={kidsOffers.length > 0} showOffers={otherOffers.length > 0} />
+            <LandingMobileMenu
+              showKids={kidsOffers.length > 0}
+              showOffers={otherOffers.length > 0}
+              showTrainer={contacts.length > 0}
+              showPartner={partners.length > 0}
+            />
           </div>
           <div>
             <span className="inline-block font-mono text-[10.5px] uppercase tracking-[0.22em] text-sand-200 bg-stone-900/55 backdrop-blur-sm px-3 py-1.5 rounded-full">
@@ -465,7 +497,7 @@ export default async function LandingPage() {
         </h2>
         <p className="text-[15px] text-stone-600 mt-3 max-w-xl leading-[1.6]">
           Beitragsperiode ist die Sommer-Saison (April bis Oktober). Schnuppertraining ist
-          jederzeit kostenlos möglich — meld dich vorher kurz.
+          während der Saison jederzeit kostenlos möglich — meld dich vorher kurz.
         </p>
 
         <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -886,7 +918,7 @@ export default async function LandingPage() {
       )}
 
       {/* ─── SPONSOREN ────────────────────────────────────── */}
-      <section className="max-w-[1080px] mx-auto px-5 mt-20 pb-16">
+      <section id="sponsoren" className="max-w-[1080px] mx-auto px-5 mt-20 pb-16">
         <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-stone-500 rule-eyebrow">
           Saison {seasonYear}
         </div>
@@ -942,7 +974,7 @@ export default async function LandingPage() {
               Werde Teil des TSV.
             </h2>
             <p className="text-[15px] sm:text-[17px] text-paper-100/80 mt-3 max-w-[480px] mx-auto sm:mx-0 leading-[1.55]">
-              Eröffnung am 12. April. Bis dahin sind Schnuppertermine jederzeit kostenlos möglich.
+              {settings.ctaText || defaultCtaText(seasonOpening)}
             </p>
           </div>
           <div className="flex gap-2 justify-center flex-wrap">

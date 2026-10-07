@@ -7,25 +7,32 @@ import { Icon } from '@/components/ui/Icon';
 export function LandingMobileMenu({
   showKids = false,
   showOffers = false,
+  showTrainer = false,
+  showPartner = false,
 }: {
   showKids?: boolean;
   showOffers?: boolean;
+  showTrainer?: boolean;
+  showPartner?: boolean;
 }) {
   const [open, setOpen] = useState(false);
-  // Angebots-Links nur zeigen, wenn es den Abschnitt auch gibt.
+  // Abschnitts-Links nur zeigen, wenn es den Abschnitt auch gibt.
   const LINKS = [
     { href: '#anlage', label: 'Anlage' },
     { href: '#mannschaften', label: 'Mannschaften' },
     { href: '#training', label: 'Training' },
     ...(showKids ? [{ href: '#kinder', label: 'Kinder & Jugend' }] : []),
     ...(showOffers ? [{ href: '#angebote', label: 'Angebote' }] : []),
+    ...(showTrainer ? [{ href: '#trainer', label: 'Trainer & Kontakte' }] : []),
+    ...(showPartner ? [{ href: '#partner', label: 'Sportliche Partner' }] : []),
+    { href: '#sponsoren', label: 'Sponsoren' },
     { href: '/galerie', label: 'Galerie' },
     { href: '#mitgliedschaft', label: 'Mitglied werden' },
     { href: '#anfahrt', label: 'Anfahrt' },
   ];
 
   return (
-    <div className="sm:hidden">
+    <div className="lg:hidden">
       <button
         type="button"
         aria-label={open ? 'Menü schließen' : 'Menü öffnen'}
@@ -45,14 +52,14 @@ export function LandingMobileMenu({
             onClick={() => setOpen(false)}
             className="fixed inset-0 z-40 bg-stone-900/40"
           />
-          <div className="fixed top-[68px] left-4 right-4 z-50 bg-paper-50 rounded-xl border border-stone-200 shadow-pop p-2">
+          <div className="fixed top-[calc(68px+env(safe-area-inset-top))] left-4 right-4 sm:left-auto sm:w-[340px] z-50 bg-paper-50 rounded-xl border border-stone-200 shadow-pop p-2 max-h-[calc(100dvh-90px-env(safe-area-inset-top))] overflow-y-auto">
             <nav className="flex flex-col">
               {LINKS.map((l) => (
                 <a
                   key={l.href}
                   href={l.href}
                   onClick={() => setOpen(false)}
-                  className="px-4 py-3.5 rounded-lg text-[16px] text-stone-800 hover:bg-paper-100"
+                  className="px-4 py-3 rounded-lg text-[16px] text-stone-800 hover:bg-paper-100"
                 >
                   {l.label}
                 </a>

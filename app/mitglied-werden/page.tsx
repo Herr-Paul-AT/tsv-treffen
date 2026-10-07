@@ -50,7 +50,7 @@ export default async function MembershipRequestPage({
           </h1>
           <p className="text-[16px] text-stone-600 mt-3 leading-[1.55]">
             Fülle das Formular aus — wir melden uns persönlich bei dir und klären alles Weitere.
-            Schnuppern ist jederzeit kostenlos möglich.
+            Schnuppern ist während der Saison jederzeit kostenlos möglich.
           </p>
         </div>
 

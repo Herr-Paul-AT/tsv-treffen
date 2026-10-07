@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/Button';
 import { TextField } from '@/components/ui/TextField';
 import { Icon } from '@/components/ui/Icon';
-import { getSiteSettings } from '@/lib/db/queries/settings';
+import { getSiteSettings, defaultCtaText } from '@/lib/db/queries/settings';
 import { updateSettings } from '@/lib/actions/settings';
 
 export const dynamic = 'force-dynamic';
@@ -62,6 +62,25 @@ export default async function AdminSettingsPage({
           />
           <p className="text-[13px] text-stone-500 leading-snug self-end pb-3">
             Erscheint auf der Startseite („seit …", „… gegründet") und in der Saisons-Zählung.
+          </p>
+        </div>
+        <div className="pt-2">
+          <label htmlFor="cta-text" className="block">
+            <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-stone-500">
+              Hinweis bei „Werde Teil des TSV" (optional)
+            </span>
+            <textarea
+              id="cta-text"
+              name="ctaText"
+              rows={2}
+              defaultValue={settings.ctaText}
+              placeholder={defaultCtaText(settings.seasonOpening)}
+              className="mt-2 w-full px-4 py-3 bg-white rounded-md border border-stone-200 text-[16px] text-stone-800 placeholder-stone-400 outline-none focus:border-lake-500 focus:ring-2 focus:ring-lake-500/15 resize-y"
+            />
+          </label>
+          <p className="mt-1.5 text-[13px] text-stone-500 leading-snug">
+            Steht im dunklen Kasten unten auf der Startseite. Leer lassen = automatisch aus der
+            Saisoneröffnung (Vorschlag siehe grauer Text im Feld).
           </p>
         </div>
         <Button type="submit" variant="primary" icon={<Icon.Check size={16} />}>

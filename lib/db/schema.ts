@@ -30,6 +30,7 @@ export const memberCategory = pgEnum('member_category', [
   'vollmitglied',
   'std_abo',
   'unterstuetzend',
+  'student',
 ]);
 
 export const teamRole = pgEnum('team_role', ['player', 'captain', 'reserve']);

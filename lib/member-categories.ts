@@ -3,6 +3,7 @@ export const MEMBER_CATEGORIES = [
   { value: 'kinder', label: 'Kinder' },
   { value: 'jugend', label: 'Jugend' },
   { value: 'vollmitglied', label: 'Vollmitglied' },
+  { value: 'student', label: 'Student' },
   { value: 'std_abo', label: 'Stundenabo' },
   { value: 'unterstuetzend', label: 'Unterstützendes Mitglied' },
 ] as const;

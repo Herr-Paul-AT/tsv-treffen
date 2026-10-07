@@ -32,6 +32,7 @@ export async function updateSettings(formData: FormData) {
   await setSetting('season_year', seasonYear);
   await setSetting('season_opening', seasonOpening);
   await setSetting('founding_year', foundingYear);
+  await setSetting('cta_text', String(formData.get('ctaText') ?? '').trim());
 
   // Startseite und überall, wo das Saison-Jahr erscheint, neu aufbauen.
   revalidatePath('/');
