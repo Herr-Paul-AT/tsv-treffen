@@ -15,8 +15,10 @@ import { listActivePartners } from '@/lib/db/queries/partners';
 import { listActiveContacts } from '@/lib/db/queries/contacts';
 import { getClubStats } from '@/lib/db/queries/stats';
 import { getSiteSettings } from '@/lib/db/queries/settings';
+import { eventKindLabel } from '@/lib/event-kinds';
 import { LandingMobileMenu } from '@/components/LandingMobileMenu';
 import { ContactsGrid } from '@/components/ContactsGrid';
+import { OfferCard } from '@/components/OfferCard';
 import { formatDayMonth, formatDayMonthCaps, MONTHS_DE } from '@/lib/format';
 
 // Öffentliche Startseite als ISR: alle 60 s im Hintergrund neu erzeugt und aus
@@ -68,6 +70,8 @@ export default async function LandingPage() {
   const contacts = await listActiveContacts();
   const settings = await getSiteSettings();
   const offers = await listTrainingOffers();
+  const kidsOffers = offers.filter((o) => o.forKids);
+  const otherOffers = offers.filter((o) => !o.forKids);
   const adultTeams = teams.filter((t) => !/^Jugend/.test(t.name));
   const youthTeams = teams.filter((t) => /^Jugend/.test(t.name));
   const foundingYear = settings.foundingYear;
@@ -96,7 +100,10 @@ export default async function LandingPage() {
               <a href="#anlage" className="hover:text-paper-50">Anlage</a>
               <a href="#mannschaften" className="hover:text-paper-50">Mannschaften</a>
               <a href="#training" className="hover:text-paper-50">Training</a>
-              {offers.length > 0 && (
+              {kidsOffers.length > 0 && (
+                <a href="#kinder" className="hover:text-paper-50">Kinder &amp; Jugend</a>
+              )}
+              {otherOffers.length > 0 && (
                 <a href="#angebote" className="hover:text-paper-50">Angebote</a>
               )}
               <Link href="/galerie" className="hover:text-paper-50">Galerie</Link>
@@ -108,7 +115,7 @@ export default async function LandingPage() {
                 Anmelden
               </Link>
             </nav>
-            <LandingMobileMenu />
+            <LandingMobileMenu showKids={kidsOffers.length > 0} showOffers={otherOffers.length > 0} />
           </div>
           <div>
             <span className="inline-block font-mono text-[10.5px] uppercase tracking-[0.22em] text-sand-200 bg-stone-900/55 backdrop-blur-sm px-3 py-1.5 rounded-full">
@@ -370,80 +377,44 @@ export default async function LandingPage() {
       </section>
       )}
 
-      {/* ─── ANGEBOTE (buchbare Trainings/Camps) ───────────── */}
-      {offers.length > 0 && (
+      {/* ─── KINDER & JUGEND (eigener Block für Eltern) ───────── */}
+      {kidsOffers.length > 0 && (
+        <section id="kinder" className="max-w-[1080px] mx-auto px-5 mt-20">
+          <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-stone-500 rule-eyebrow">
+            Kinder &amp; Jugend
+          </div>
+          <h2 className="font-display text-[28px] sm:text-[36px] leading-[1.1] tracking-[-0.01em] text-stone-800 mt-4 max-w-2xl">
+            Tennis für Kinder und Jugendliche.
+          </h2>
+          <p className="text-[15px] text-stone-600 mt-3 max-w-xl leading-[1.6]">
+            Kindertraining, Camps und Trainingslager für den Nachwuchs — einfach online anmelden.
+            Eine Mitgliedschaft ist dafür nicht nötig.
+          </p>
+          <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {kidsOffers.map((o) => (
+              <OfferCard key={o.id} offer={o} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ─── ANGEBOTE (buchbare Trainings/Camps für alle) ─────── */}
+      {otherOffers.length > 0 && (
         <section id="angebote" className="max-w-[1080px] mx-auto px-5 mt-20">
           <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-stone-500 rule-eyebrow">
-            Angebote & Anmeldung
+            Angebote &amp; Anmeldung
           </div>
           <h2 className="font-display text-[28px] sm:text-[36px] leading-[1.1] tracking-[-0.01em] text-stone-800 mt-4 max-w-2xl">
             Trainingspakete zum Mitmachen — ohne Mitgliedschaft buchbar.
           </h2>
           <p className="text-[15px] text-stone-600 mt-3 max-w-xl leading-[1.6]">
-            Kinder- und Jugendtrainings, Camps und Trainingslager: einfach online anmelden. Eine
-            Mitgliedschaft ist dafür nicht nötig.
+            Trainings, Sommercamps und Trainingslager: einfach online anmelden. Eine Mitgliedschaft
+            ist dafür nicht nötig.
           </p>
-
           <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {offers.map((o) => {
-              const spotsLeft = o.maxAttendees != null ? Math.max(0, o.maxAttendees - o.taken) : null;
-              const full = o.maxAttendees != null && spotsLeft === 0;
-              return (
-                <article
-                  key={o.id}
-                  className="bg-white rounded-xl border border-stone-200 p-6 flex flex-col transition-all hover:border-stone-300 hover:shadow-card"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <Badge tone={o.kind === 'camp' ? 'sand' : 'lake'}>
-                      {o.kind === 'camp' ? 'Camp' : 'Training'}
-                    </Badge>
-                    <span className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-stone-500">
-                      {formatEventDate(o.startsAt, o.endsAt)}
-                    </span>
-                  </div>
-                  <h3 className="font-display text-[22px] leading-[1.15] text-stone-800 mt-4">{o.title}</h3>
-                  {o.description && (
-                    <p className="text-[14px] text-stone-600 mt-2 leading-[1.55] line-clamp-3">{o.description}</p>
-                  )}
-                  <div className="mt-5 flex items-baseline gap-1.5">
-                    {o.priceCents != null ? (
-                      <>
-                        <span className="font-display text-[30px] leading-none text-stone-800">
-                          € {formatPlanPrice(o.priceCents)}
-                        </span>
-                        <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-stone-500">
-                          pro Teilnehmer
-                        </span>
-                      </>
-                    ) : (
-                      <span className="text-[14px] text-stone-600">Preis auf Anfrage</span>
-                    )}
-                  </div>
-                  <div className="mt-1.5 font-mono text-[10.5px] uppercase tracking-[0.14em]">
-                    {full ? (
-                      <span className="text-sand-700">Ausgebucht</span>
-                    ) : spotsLeft != null ? (
-                      <span className="text-forest-700">
-                        Noch {spotsLeft} {spotsLeft === 1 ? 'Platz' : 'Plätze'} frei
-                      </span>
-                    ) : (
-                      <span className="text-forest-700">Anmeldung offen</span>
-                    )}
-                  </div>
-                  <div className="mt-auto pt-6">
-                    <Link href={`/veranstaltung/${o.id}`} className="block">
-                      <Button
-                        variant={full ? 'secondary' : 'primary'}
-                        className="w-full"
-                        iconAfter={<Icon.ArrowRight size={14} />}
-                      >
-                        {full ? 'Details & Warteliste' : 'Jetzt anmelden'}
-                      </Button>
-                    </Link>
-                  </div>
-                </article>
-              );
-            })}
+            {otherOffers.map((o) => (
+              <OfferCard key={o.id} offer={o} />
+            ))}
           </div>
         </section>
       )}
@@ -589,16 +560,7 @@ export default async function LandingPage() {
             {events.map((e) => {
               const dateLabel = formatEventDate(e.startsAt, e.endsAt);
               const tone = e.kind === 'match' ? 'lake' : 'sand';
-              const badgeLabel =
-                e.kind === 'match'
-                  ? 'Match'
-                  : e.kind === 'tournament'
-                    ? 'Turnier'
-                    : e.kind === 'camp'
-                      ? 'Camp'
-                      : e.kind === 'training'
-                        ? 'Training'
-                        : 'Event';
+              const badgeLabel = eventKindLabel(e.kind);
               return (
                 <div
                   key={e.id}

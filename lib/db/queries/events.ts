@@ -4,9 +4,40 @@ import {
   events,
   eventRegistrations,
   eventRsvps,
+  members,
   type Event,
   type EventRegistration,
 } from '@/lib/db/schema';
+import { OFFER_KINDS } from '@/lib/event-kinds';
+
+export type ParticipantRecipient = { email: string; name: string | null };
+
+/**
+ * Alle Teilnehmer einer Veranstaltung mit E-Mail: Online-Anmeldungen +
+ * Mitglieder mit Zu- oder Vielleicht-Zusage. Dubletten (gleiche Mail) entfernt.
+ */
+export async function listEventParticipantRecipients(eventId: string): Promise<ParticipantRecipient[]> {
+  const regs = await db
+    .select({ email: eventRegistrations.email, name: eventRegistrations.name })
+    .from(eventRegistrations)
+    .where(eq(eventRegistrations.eventId, eventId));
+  const rsvps = await db
+    .select({ email: members.email, firstName: members.firstName, lastName: members.lastName })
+    .from(eventRsvps)
+    .innerJoin(members, eq(members.id, eventRsvps.memberId))
+    .where(and(eq(eventRsvps.eventId, eventId), inArray(eventRsvps.status, ['yes', 'maybe'])));
+
+  const byMail = new Map<string, ParticipantRecipient>();
+  for (const r of regs) {
+    const e = r.email?.trim().toLowerCase();
+    if (e) byMail.set(e, { email: e, name: r.name });
+  }
+  for (const m of rsvps) {
+    const e = m.email?.trim().toLowerCase();
+    if (e && !byMail.has(e)) byMail.set(e, { email: e, name: `${m.firstName} ${m.lastName}` });
+  }
+  return Array.from(byMail.values());
+}
 
 export type RsvpStatus = 'yes' | 'maybe' | 'no';
 
@@ -81,7 +112,7 @@ export async function listTrainingOffers(): Promise<TrainingOffer[]> {
   const rows = await db
     .select()
     .from(events)
-    .where(and(eq(events.registrationOpen, true), inArray(events.kind, ['training', 'camp'])))
+    .where(and(eq(events.registrationOpen, true), inArray(events.kind, OFFER_KINDS)))
     .orderBy(asc(events.startsAt));
   const upcoming = rows.filter((e) => (e.endsAt ?? e.startsAt) >= now);
   const out: TrainingOffer[] = [];

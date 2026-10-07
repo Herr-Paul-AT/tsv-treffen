@@ -2,9 +2,14 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Icon } from '@/components/ui/Icon';
 import { EventForm } from '@/components/admin/EventForm';
-import { DeleteButton } from '@/components/admin/DeleteButton';
+import { EventDeleteForm } from '@/components/admin/EventDeleteForm';
 import { Button } from '@/components/ui/Button';
-import { getEvent, listEventRegistrations, countEventParticipants } from '@/lib/db/queries/events';
+import {
+  getEvent,
+  listEventRegistrations,
+  countEventParticipants,
+  listEventParticipantRecipients,
+} from '@/lib/db/queries/events';
 import { deleteEvent, updateEvent } from '@/lib/actions/events';
 
 export const dynamic = 'force-dynamic';
@@ -23,6 +28,7 @@ export default async function EditEventPage({
 
   const registrations = event.registrationOpen ? await listEventRegistrations(id) : [];
   const taken = event.registrationOpen ? await countEventParticipants(id) : 0;
+  const participantRecipients = await listEventParticipantRecipients(id);
 
   return (
     <main className="px-8 py-6 max-w-[1280px] mx-auto">
@@ -117,12 +123,14 @@ export default async function EditEventPage({
         <h2 className="font-display text-[18px] text-stone-800">Gefahrenzone</h2>
         <p className="text-[14px] text-stone-600 mt-1.5 mb-4">
           Dieser Termin wird dauerhaft entfernt — auch aus Kalender, Dashboard und Startseite.
+          Für eine Verschiebung stattdessen oben das Datum ändern und „Teilnehmer informieren"
+          anhaken.
         </p>
-        <DeleteButton
+        <EventDeleteForm
           action={deleteEvent}
           id={event.id}
-          label="Veranstaltung löschen"
-          confirmText={`„${event.title}" wirklich löschen? Das kann nicht rückgängig gemacht werden.`}
+          title={event.title}
+          participantCount={participantRecipients.length}
         />
       </div>
     </main>

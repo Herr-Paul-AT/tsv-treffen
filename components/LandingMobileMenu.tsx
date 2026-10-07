@@ -4,18 +4,25 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Icon } from '@/components/ui/Icon';
 
-const LINKS = [
-  { href: '#anlage', label: 'Anlage' },
-  { href: '#mannschaften', label: 'Mannschaften' },
-  { href: '#training', label: 'Training' },
-  { href: '#angebote', label: 'Angebote' },
-  { href: '/galerie', label: 'Galerie' },
-  { href: '#mitgliedschaft', label: 'Mitglied werden' },
-  { href: '#anfahrt', label: 'Anfahrt' },
-];
-
-export function LandingMobileMenu() {
+export function LandingMobileMenu({
+  showKids = false,
+  showOffers = false,
+}: {
+  showKids?: boolean;
+  showOffers?: boolean;
+}) {
   const [open, setOpen] = useState(false);
+  // Angebots-Links nur zeigen, wenn es den Abschnitt auch gibt.
+  const LINKS = [
+    { href: '#anlage', label: 'Anlage' },
+    { href: '#mannschaften', label: 'Mannschaften' },
+    { href: '#training', label: 'Training' },
+    ...(showKids ? [{ href: '#kinder', label: 'Kinder & Jugend' }] : []),
+    ...(showOffers ? [{ href: '#angebote', label: 'Angebote' }] : []),
+    { href: '/galerie', label: 'Galerie' },
+    { href: '#mitgliedschaft', label: 'Mitglied werden' },
+    { href: '#anfahrt', label: 'Anfahrt' },
+  ];
 
   return (
     <div className="sm:hidden">

@@ -1,28 +1,16 @@
 import Link from 'next/link';
-import { Badge, type BadgeTone } from '@/components/ui/Badge';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { listAllEvents } from '@/lib/db/queries/events';
 import type { Event } from '@/lib/db/schema';
 import { MONTHS_DE } from '@/lib/format';
+import { eventKindLabel, eventKindTone } from '@/lib/event-kinds';
 
 export const dynamic = 'force-dynamic';
 
-const KIND_LABEL: Record<Event['kind'], string> = {
-  tournament: 'Turnier',
-  event: 'Veranstaltung',
-  match: 'Match',
-  training: 'Training',
-  camp: 'Camp',
-};
-
-const KIND_TONE: Record<Event['kind'], BadgeTone> = {
-  tournament: 'sand',
-  event: 'forest',
-  match: 'lake',
-  training: 'neutral',
-  camp: 'lake',
-};
+const KIND_LABEL = eventKindLabel;
+const KIND_TONE = eventKindTone;
 
 function formatWhen(e: Event): string {
   const d = e.startsAt;
@@ -37,7 +25,7 @@ function formatWhen(e: Event): string {
 export default async function AdminEventsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ notified?: string }>;
+  searchParams: Promise<{ notified?: string; informed?: string; cancelled?: string }>;
 }) {
   const sp = await searchParams;
   const all = await listAllEvents();
@@ -86,6 +74,27 @@ export default async function AdminEventsPage({
             {Number(sp.notified) > 0
               ? `Termin gespeichert und an ${sp.notified} Mitglied(er) per E-Mail versendet.`
               : 'Termin gespeichert. Es wurde keine E-Mail versendet (kein Empfänger oder Mailversand inaktiv).'}
+          </span>
+        </div>
+      )}
+
+      {sp.informed != null && (
+        <div className="mt-3 flex items-start gap-2.5 rounded-md bg-forest-50 border border-forest-200 px-4 py-3 text-[14px] text-forest-800">
+          <Icon.Check size={16} className="flex-none mt-0.5" />
+          <span>
+            {Number(sp.informed) > 0
+              ? `Änderung gespeichert — ${sp.informed} Teilnehmer werden per Mail informiert.`
+              : 'Änderung gespeichert. Es gab keine Teilnehmer mit E-Mail-Adresse zu informieren.'}
+          </span>
+        </div>
+      )}
+      {sp.cancelled != null && (
+        <div className="mt-3 flex items-start gap-2.5 rounded-md bg-forest-50 border border-forest-200 px-4 py-3 text-[14px] text-forest-800">
+          <Icon.Check size={16} className="flex-none mt-0.5" />
+          <span>
+            {Number(sp.cancelled) > 0
+              ? `Veranstaltung abgesagt — ${sp.cancelled} Teilnehmer bekommen eine Absage-Mail.`
+              : 'Veranstaltung gelöscht. Es gab keine Teilnehmer mit E-Mail-Adresse.'}
           </span>
         </div>
       )}
@@ -152,7 +161,10 @@ function EventTable({
               )}
             </span>
             <span>
-              <Badge tone={KIND_TONE[e.kind]}>{KIND_LABEL[e.kind]}</Badge>
+              <span className="inline-flex items-center gap-1.5 flex-wrap">
+                <Badge tone={KIND_TONE(e.kind)}>{KIND_LABEL(e.kind)}</Badge>
+                {e.forKids && <Badge tone="forest">Kinder</Badge>}
+              </span>
             </span>
             <span className="text-[13.5px] text-stone-600 truncate">{e.location ?? '—'}</span>
             <span className="text-stone-400 inline-flex justify-end">

@@ -7,6 +7,8 @@ import { Icon } from '@/components/ui/Icon';
 import { getCurrentMember } from '@/lib/db/queries/session';
 import { getNextTrainingForMember } from '@/lib/db/queries/trainings';
 import { listNews } from '@/lib/db/queries/news';
+import { listTrainingOffers } from '@/lib/db/queries/events';
+import { eventKindLabel, eventKindTone } from '@/lib/event-kinds';
 import {
   formatDayMonth,
   formatGermanDate,
@@ -22,6 +24,7 @@ const QUICK = [
   { href: '/app/kalender', icon: <Icon.Calendar size={20} />, label: 'Kalender' },
   // Mannschaften + Bilanz stehen auf der Startseite (Abschnitt „Mannschaften").
   { href: '/#mannschaften', icon: <Icon.Trophy size={20} />, label: 'Tabelle' },
+  { href: '/', icon: <Icon.Home size={20} />, label: 'Website' },
 ];
 
 const NEWS_BADGE_TONES = ['sand', 'lake', 'forest'] as const;
@@ -32,10 +35,10 @@ export default async function DashboardPage() {
   const me = await getCurrentMember();
   const greeting = me ? `Servus, ${me.firstName}` : 'Servus';
 
-  const [nextTraining, latestNews] = await Promise.all([
-    me ? getNextTrainingForMember(me.id) : Promise.resolve(null),
-    listNews(2),
-  ]);
+  // Sequenziell (Serverless + Supabase-Pooler, siehe app/page.tsx).
+  const nextTraining = me ? await getNextTrainingForMember(me.id) : null;
+  const latestNews = await listNews(2);
+  const offers = await listTrainingOffers();
 
   const now = new Date();
   return (
@@ -110,12 +113,12 @@ export default async function DashboardPage() {
         )}
 
         {/* Quick actions */}
-        <div className="grid grid-cols-3 gap-2 mt-5">
+        <div className="grid grid-cols-4 gap-2 mt-5">
           {QUICK.map((a) => (
             <Link
               key={a.href}
               href={a.href}
-              className="bg-white rounded-lg border border-stone-200 p-3.5 flex flex-col items-start gap-2"
+              className="bg-white rounded-lg border border-stone-200 p-3 flex flex-col items-start gap-2"
             >
               <span className="w-9 h-9 rounded-md bg-lake-50 text-lake-700 inline-flex items-center justify-center">
                 {a.icon}
@@ -137,6 +140,33 @@ export default async function DashboardPage() {
             </Link>
           </div>
           <div className="mt-3 space-y-2.5">
+            {offers.map((o) => {
+              const spotsLeft = o.maxAttendees != null ? Math.max(0, o.maxAttendees - o.taken) : null;
+              return (
+                <Link
+                  key={o.id}
+                  href={`/veranstaltung/${o.id}`}
+                  className="block bg-white rounded-lg border border-sand-200 p-4"
+                >
+                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                    <Badge tone={o.forKids ? 'forest' : eventKindTone(o.kind)}>
+                      {o.forKids ? 'Kinder & Jugend' : 'Angebot'}
+                    </Badge>
+                    <span className="font-mono text-[10.5px] text-stone-500 uppercase tracking-[0.14em]">
+                      {eventKindLabel(o.kind)} · {formatDayMonth(o.startsAt)}
+                    </span>
+                  </div>
+                  <div className="font-display text-[16.5px] text-stone-800 leading-[1.2]">{o.title}</div>
+                  <div className="mt-1.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-forest-700">
+                    {spotsLeft === 0
+                      ? 'Ausgebucht'
+                      : spotsLeft != null
+                        ? `Noch ${spotsLeft} ${spotsLeft === 1 ? 'Platz' : 'Plätze'} · Jetzt anmelden →`
+                        : 'Jetzt anmelden →'}
+                  </div>
+                </Link>
+              );
+            })}
             {latestNews.map((n, i) => (
               <Link
                 key={n.id}

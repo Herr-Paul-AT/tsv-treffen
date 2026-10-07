@@ -38,7 +38,17 @@ export const attendanceStatus = pgEnum('attendance_status', ['yes', 'maybe', 'no
 
 export const imageKind = pgEnum('image_kind', ['sand', 'lake', 'forest', 'none']);
 
-export const eventKind = pgEnum('event_kind', ['event', 'match', 'tournament', 'training', 'camp']);
+// 'camp' bleibt für Bestandsdaten; neu getrennt: Kindertraining, Sommercamp, Trainingslager.
+export const eventKind = pgEnum('event_kind', [
+  'event',
+  'match',
+  'tournament',
+  'training',
+  'camp',
+  'kindertraining',
+  'sommercamp',
+  'trainingslager',
+]);
 
 export const sponsorTier = pgEnum('sponsor_tier', ['gold', 'silver', 'bronze', 'standard']);
 
@@ -218,6 +228,8 @@ export const events = pgTable('events', {
   maxAttendees: integer('max_attendees'),
   // Preis in Cent für buchbare Angebote (Trainingspakete/Camps); null = ohne Preisangabe.
   priceCents: integer('price_cents'),
+  // Zielgruppe Kinder & Jugend → eigener Block „Kinder & Jugend" auf der Startseite.
+  forKids: boolean('for_kids').notNull().default(false),
   // Wann/an wie viele Mitglieder dieser Termin per E-Mail versendet wurde.
   notifiedAt: timestamp('notified_at', { withTimezone: true }),
   notifiedCount: integer('notified_count').notNull().default(0),

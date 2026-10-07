@@ -3,15 +3,13 @@ import { Button } from '@/components/ui/Button';
 import { TextField } from '@/components/ui/TextField';
 import { Icon } from '@/components/ui/Icon';
 import { ImageFileInput } from '@/components/ui/ImageFileInput';
+import { EVENT_KINDS } from '@/lib/event-kinds';
 import type { Event } from '@/lib/db/schema';
 
-const KIND_OPTIONS = [
-  { value: 'tournament', label: 'Turnier' },
-  { value: 'event', label: 'Veranstaltung / Treffen' },
-  { value: 'match', label: 'Match / Wettkampf' },
-  { value: 'training', label: 'Training' },
-  { value: 'camp', label: 'Camp / Trainingslager / Sommertraining' },
-];
+// 'camp' nur anbieten, wenn ein Bestandstermin diese Art noch hat.
+function kindOptions(current?: string) {
+  return EVENT_KINDS.filter((k) => k.value !== 'camp' || current === 'camp');
+}
 
 function toLocalInput(d: Date | null | undefined): string {
   if (!d) return '';
@@ -59,7 +57,7 @@ export function EventForm({
             defaultValue={event?.kind ?? 'event'}
             className="mt-2 w-full h-12 px-4 bg-white rounded-md border border-stone-200 text-[16px] text-stone-800 outline-none focus:border-lake-500 focus:ring-2 focus:ring-lake-500/15"
           >
-            {KIND_OPTIONS.map((o) => (
+            {kindOptions(event?.kind).map((o) => (
               <option key={o.value} value={o.value}>
                 {o.label}
               </option>
@@ -125,6 +123,20 @@ export function EventForm({
           />
           <span className="text-[15px] text-stone-700 font-medium">
             Online-Anmeldung aktivieren (z. B. Sommercamp)
+          </span>
+        </label>
+        <label className="flex items-center gap-3 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            name="forKids"
+            defaultChecked={event?.forKids ?? false}
+            className="w-5 h-5 rounded border-stone-300 text-lake-700 focus:ring-lake-500/30"
+          />
+          <span className="text-[15px] text-stone-700 font-medium">
+            Angebot für Kinder &amp; Jugend
+            <span className="block text-[12.5px] font-normal text-stone-500">
+              Erscheint auf der Startseite im eigenen Block „Kinder &amp; Jugend".
+            </span>
           </span>
         </label>
         <div className="grid sm:grid-cols-2 gap-4">
@@ -197,6 +209,35 @@ export function EventForm({
           </p>
         )}
       </div>
+
+      {event && (
+        <div className="rounded-lg border border-sand-200 bg-sand-50/60 p-4 space-y-3">
+          <label className="flex items-start gap-3 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              name="notifyParticipants"
+              className="mt-0.5 w-5 h-5 flex-none rounded border-stone-300 text-lake-700 focus:ring-lake-500/30"
+            />
+            <span className="text-[15px] text-stone-700 leading-snug">
+              Teilnehmer über die Änderung informieren
+              <span className="block text-[12.5px] text-stone-500">
+                Mail an alle Online-Anmeldungen und Mitglieder mit Zu- oder Vielleicht-Zusage —
+                z. B. bei Verschiebung. Bei geändertem Datum stehen altes und neues Datum in der Mail.
+              </span>
+            </span>
+          </label>
+          <label htmlFor="event-change-note" className="block pl-8">
+            <span className={fieldLabel}>Hinweis an die Teilnehmer (optional)</span>
+            <textarea
+              id="event-change-note"
+              name="changeNote"
+              rows={2}
+              placeholder="z. B. Wegen Regen auf Samstag verschoben."
+              className="mt-2 w-full px-4 py-3 bg-white rounded-md border border-stone-200 text-[16px] text-stone-800 placeholder-stone-400 outline-none focus:border-lake-500 focus:ring-2 focus:ring-lake-500/15 resize-y"
+            />
+          </label>
+        </div>
+      )}
 
       <div className="flex items-center gap-3 pt-2">
         <Button type="submit" variant="primary" icon={<Icon.Check size={16} />}>

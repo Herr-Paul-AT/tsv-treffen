@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { MobileHeader } from '@/components/nav/MobileHeader';
-import { Badge, type BadgeTone } from '@/components/ui/Badge';
+import { Badge } from '@/components/ui/Badge';
+import { eventKindLabel, eventKindTone } from '@/lib/event-kinds';
 import { Icon } from '@/components/ui/Icon';
 import { EventRsvpButtons } from '@/components/EventRsvpButtons';
 import { listUpcomingEvents, getMemberEventRsvps } from '@/lib/db/queries/events';
@@ -10,20 +11,6 @@ import type { Event } from '@/lib/db/schema';
 
 export const dynamic = 'force-dynamic';
 
-const KIND_LABEL: Record<Event['kind'], string> = {
-  tournament: 'Turnier',
-  event: 'Veranstaltung',
-  match: 'Match',
-  training: 'Training',
-  camp: 'Camp',
-};
-const KIND_TONE: Record<Event['kind'], BadgeTone> = {
-  tournament: 'sand',
-  event: 'forest',
-  match: 'lake',
-  training: 'neutral',
-  camp: 'lake',
-};
 
 function timeLabel(e: Event): string {
   if (e.allDay) return 'ganztägig';
@@ -62,7 +49,7 @@ export default async function AppEventsPage() {
                       {formatGermanDate(e.startsAt)} · {timeLabel(e)}
                     </div>
                   </div>
-                  <Badge tone={KIND_TONE[e.kind]}>{KIND_LABEL[e.kind]}</Badge>
+                  <Badge tone={eventKindTone(e.kind)}>{eventKindLabel(e.kind)}</Badge>
                 </div>
                 <div className="mt-3">
                   <EventRsvpButtons eventId={e.id} initial={rsvps.get(e.id) ?? 'none'} />

@@ -3,6 +3,7 @@
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { after } from 'next/server';
 import { db } from '@/lib/db';
 import { members, membershipRequests } from '@/lib/db/schema';
 import { getMembershipRequest } from '@/lib/db/queries/membership-requests';
@@ -66,7 +67,9 @@ export async function submitMembershipRequest(formData: FormData) {
   revalidatePath('/admin/anmeldungen');
   revalidatePath('/admin');
 
-  // Benachrichtigung an den Verein (best effort — Anmeldung ist bereits gespeichert).
+  // Benachrichtigung an den Verein — nach der Antwort im Hintergrund (best effort),
+  // damit die Danke-Seite sofort erscheint.
+  after(async () => {
   try {
     const lines = [
       `Neue Beitritts-Anmeldung über die Website:`,
@@ -91,6 +94,7 @@ export async function submitMembershipRequest(formData: FormData) {
   } catch {
     // Mailversand fehlgeschlagen — Anmeldung bleibt gespeichert und im Admin sichtbar.
   }
+  });
 
   redirect('/mitglied-werden/danke');
 }
